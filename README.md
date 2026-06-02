@@ -1,2 +1,2 @@
-# CALMS
+# CashFY
 Projeto escolar de uma Startup de site com foco em educação financeira para pessoas de em média 17 a 24 anos de idade. O objetivo primário envolve criar uma planilha de gestão de finanças, calculadora de gastos, entre diversas ferramentas que serão em breve pensadas e adicionadas com o decorrer do projeto.
