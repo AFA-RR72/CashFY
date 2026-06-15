@@ -1,26 +1,47 @@
-<?php session_start(); ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>CASHFY</title>
 </head>
+
 <body>
-    <form action="../controller/logincontroller.php" method="POST">
-        <label for="email">Email: <input type="email" name="email" id="email"></label>
-        <br>
-        <label for="password">Senha: <input type="password" name="password" id="password"></label>
-        <label for="togglepass"><input  type="checkbox" onchange="togglepass()" title="mostrar senha"></input></label>
-        <br>
-        <label for="remember">Lembrar de mim <input type="checkbox" name="remember"></label>
-        <br>
-        <input type="submit">
-    </form>
+    <div class="container">
+        <a href="../../index.html">previous</a>
+
+        <div class="card">
+
+            <h2>CASHFY</h2>
+            <h4>Entrar na sua conta</h4>
+
+            <form action="../controller/login.php" method="post">
+                <label for="email">e-mail:</label>
+                <br>
+                <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
+
+                <br><br>
+
+                <label for="password">senha:</label> <br>
+                <input type="password" id="password" name="password" placeholder="Digite sua senha" minlength="8" required>
+                
+                <input type="checkbox" title="Mostrar senha" onchange="togglepass()">
+
+                <br><br>
+
+                <label for="remind">Lembrar de mim</label>
+                <input type="checkbox" name="remind"><button type="submit">enviar</button>
+                <br>
+            </form>
+
+            <a href="sign-up.php">Não tem uma conta? criar</a>
+        </div>
+    </div>
     <script>
         function togglepass(){
             const password = document.getElementById("password");
-            if (password.type == "password"){
+            if(password.type == "password"){
                 password.type = "text";
             } else{
                 password.type = "password";
@@ -28,15 +49,5 @@
         }
     </script>
 </body>
-</html>
 
-<?php
-if (isset($_SESSION['erro'])){
-    echo $_SESSION['erro'];
-    unset($_SESSION['erro']);
-}
-if (isset($_SESSION['success'])){
-    echo $_SESSION['success'];
-    unset($_SESSION['success']);
-}
-?>
+</html>

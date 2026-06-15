@@ -1,58 +1,85 @@
 <?php
-require_once("../config/auth.php");
-require_once("../model/educational_institutemodel.php");
+session_start();
+require_once("../model/institute.php");
 $institutes = getinstitutes();
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign-Up</title>
+    <title>CASHFY</title>
 </head>
 <body>
-    <form action="../controller/sign-upcontroller.php" method="POST">
-        <label for="name">Nome: <input type="text" name="name"></label>
+    <div class="container">
+    <a href="login.php">previous</a>
+
+    <div class="card">
+
+    <h2>CASHFY</h2>
+    <h4>Criar conta como vendedor</h4>
+    
+    <form action="../controller/sign-up.php" method="post">
+
+        <label for="nome">Nome:</label>
         <br>
-        <label for="institute_id">Instituição de ensino: <select name="institute_id">
-            <option value="">Selecione um instituto</option>
-            <?php foreach ($institutes as $inst): ?>
-            <option value="<?= $inst['ID']; ?>">
-                <?= $inst['name']; ?>
+        <input type="text" id="nome" name="name" placeholder="Digite seu nome" required>
+
+        <br><br>
+
+        <label for="institute_id">Sua instituição de ensino:</label>
+        <br>
+        <select name="institute_id" required>
+            <option value="">Selecione uma Instituição:</option>
+        <?php foreach ($institutes as $inst): ?>
+                <option value="<?= $inst['ID']; ?>">
+                    <?= $inst['name']; ?>
             </option>
-            <?php endforeach; ?>
-        </select></label>
+        <?php endforeach ?>
+        </select>
+
+        <br><br>
+
+        <label for="email">e-mail:</label> <br>
+        <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
+
+        <br><br>
+
+        <label for="password">senha:</label> <br>
+        <input type="password" id="password" name="password" placeholder="Digite sua senha" minlength="8" required>
+
+        <br><br>
+
+        <label for="pass_confirm">Confirme a senha:</label>
         <br>
-        <label for="email">Email: <input type="text" name="email"></label>
+        <input type="password" id="pass_confirm" name="pass_confirm" placeholder="Confirme a senha" minlength="8" required>
+
+        <input type="checkbox" title="Mostrar senha" onchange="togglepass()">
+
+        <br><br>
+
+        <button type="submit">criar conta</button>
+
         <br>
-        <label for="password">Senha: <input type="password" name="password" id="password"></label>
-        <br>
-        <label for="pass_verify">Confirme a senha: <input type="password" name="pass_verify" id="pass_verify"></label><input type="checkbox" onclick="togglepass()" title="mostrar senha">
-        <br>
-        <input type="submit">
     </form>
-    <?php
-    if (isset($_SESSION['erro'])){
-        echo $_SESSION['erro'];
-        unset($_SESSION['erro']);
-    }
-    if (isset($_SESSION['success'])){
-        echo $_SESSION['success'];
-        unset($_SESSION['success']);
-    }
-    ?>
+    <?php if (isset($_SESSION['msg'])) {
+        echo $_SESSION['msg'];
+        unset($_SESSION['msg']);
+    } ?>
+    </div>
+    </div>
     <script>
         function togglepass(){
             const password = document.getElementById("password");
-            const pass_verify = document.getElementById("pass_verify");
+            const pass_confirm = document.getElementById("pass_confirm")
             if (password.type == "password"){
                 password.type = "text";
-                pass_verify.type = "text";
-            }else{
+                pass_confirm.type = "text";
+            } else{
                 password.type = "password";
-                pass_verify.type = "password";
+                pass_confirm.type = "password";
             }
         }
-        </script>
+    </script>
 </body>
 </html>
