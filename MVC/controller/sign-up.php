@@ -19,6 +19,7 @@ if (
     $_SESSION['msg'] = "Você precisa preencher todos os campos";
     header("Location: ../view/sign-up.php");
     exit;
+    exit;
 } elseif(
     strlen($_POST['name']) > 255 ||
     strlen($_POST['institute_id']) > 255 ||
@@ -28,24 +29,30 @@ if (
 ){
     $_SESSION['msg'] = "O limite de caracteres permitidos é 255.";
     header("Location: ../view/sign-up.php");
+    exit;
 } elseif(institute_verify($institute_id)){
     $_SESSION['msg'] = "Selecione uma instituição!";
     header("Location: ../view/sign-up.php");
+    exit;
 } elseif(email_verify($email)){
     $_SESSION['msg'] = "Este email já está em uso.";
     header("Location: ../view/sign-up.php");
+    exit;
 } elseif(strlen($password) < 8){
     $_SESSION['msg'] = "A senha precisa conter no mínimo 8 caracteres.";
     header("Location: ../view/sign-up.php");
+    exit;
 } elseif ($password != $pass_confirm) {
     $_SESSION['msg'] = "As senhas precisam ser a mesma.";
     header("Location: ../view/sign-up.php");
+    exit;
 } else {
     $pass_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     criar($name, $institute_id, $email, $pass_hash);
-    $_SESSION['msg'] = "Usuário criado com sucesso";
+    $_SESSION['msg'] = "Usuário criado com sucesso. <br> <a href='log-in.php'>Fazer log-in.</a>";
     header("Location: ../view/sign-up.php");
+    exit;
 }
 
 ?>

@@ -12,7 +12,7 @@ $institutes = getinstitutes();
 </head>
 <body>
     <div class="container">
-    <a href="login.php">previous</a>
+    <a href="log-in.php">previous</a>
 
     <div class="card">
 

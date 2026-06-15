@@ -1,6 +1,6 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +16,7 @@
             <h2>CASHFY</h2>
             <h4>Entrar na sua conta</h4>
 
-            <form action="../controller/login.php" method="post">
+            <form action="../controller/log-in.php" method="post">
                 <label for="email">e-mail:</label>
                 <br>
                 <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
@@ -34,8 +34,12 @@
                 <input type="checkbox" name="remind"><button type="submit">enviar</button>
                 <br>
             </form>
-
             <a href="sign-up.php">Não tem uma conta? criar</a>
+            <br>
+            <?php if (isset($_SESSION['msg'])){
+                echo $_SESSION['msg'];
+                unset($_SESSION['msg']);
+            } ?>
         </div>
     </div>
     <script>
