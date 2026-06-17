@@ -13,6 +13,11 @@ if (
 $user = get_user($_POST['email']);
 if ($user) {
     if (password_verify($_POST['password'], $user['password'])) {
+        $_SESSION['institute'] = $user['institute_id'];
+        $_SESSION['name'] = $user['name'];
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['password'] = $user['password'];
+        $_SESSION['remember_token'] = $user['remember_token'];
         $_SESSION['msg'] = "Log-in efetuado com sucesso. <br> Bem vindo, " . $user['name'] . "!";
         header("Location: ../view/log-in.php");
         exit;
