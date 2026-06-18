@@ -1,6 +1,6 @@
 <?php
-session_start();
-require_once("../model/institute.php");
+require_once __DIR__ . "/../config/init.php";
+require_once BASE_PATH . "model/institute.php";
 $institutes = getinstitutes();
 ?>
 <!DOCTYPE html>
@@ -8,7 +8,7 @@ $institutes = getinstitutes();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CASHFY</title>
+    <title>Registrar Usuário</title>
 </head>
 <body>
     <div class="container">
@@ -63,7 +63,7 @@ $institutes = getinstitutes();
         <br>
     </form>
     <?php if (isset($_SESSION['msg'])) {
-        echo $_SESSION['msg'];
+        echo htmlspecialchars($_SESSION['msg']);
         unset($_SESSION['msg']);
     } ?>
     </div>

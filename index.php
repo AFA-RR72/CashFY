@@ -1,5 +1,7 @@
+<?php require_once __DIR__ . "/MVC/config/init.php";
+require_once BASE_PATH . "config/auth.php"; ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -19,6 +21,21 @@
             <a href="contato.html">contato</a>
 
             <a href="sobre.html">sobre</a>
+
+            <a href="MVC/controller/log-out.php"> <?php if (isset($_SESSION['user_id'])){echo "encerrar sessão"; } ?></a>
+
+            <?php
+            if (isset($_SESSION['log-out_msg'])) {
+                echo '
+                <div class="box">
+                    <p>' . htmlspecialchars($_SESSION['log-out_msg']) . '</p>
+                    <a href="MVC/controller/log-out.php?log-out=1">Sim</a>
+                    <a href="index.php">Não</a>
+                </div>
+                ';
+                unset($_SESSION['log-out_msg']);
+            }
+            ?>
 
             <a href="MVC/view/log-in.php">vender aqui</a>
 
@@ -76,29 +93,35 @@
 
     <div class="vendedores">
 
-    <h2>VENDEDORES</h2>
+        <h2>VENDEDORES</h2>
 
-    <div class="card-vendedor">
-        <img src="icones/pink-panther-ess-pink-pantheress.png" alt="Vendedor">
+        <div class="card-vendedor">
+            <img src="icones/pink-panther-ess-pink-pantheress.png" alt="Vendedor">
 
-        <div class="info">
-            <h3>Nome</h3>
-            <p>Descrição etc etc</p>
-            <button class="botaocomprar">COMPRAR</button>
+            <div class="info">
+                <h3><?php
+                if (isset($_SESSION['name'])) {
+                    echo htmlspecialchars($_SESSION['name']);
+                } else {
+                    echo "Nome";
+                }
+                ?></h3>
+                <p>Descrição etc etc</p>
+                <button class="botaocomprar">COMPRAR</button>
+            </div>
         </div>
-    </div>
 
-    <div class="card-vendedor">
-        <img src="icones/pink-panther-ess-pink-pantheress.png" alt="Vendedor">
+        <div class="card-vendedor">
+            <img src="icones/pink-panther-ess-pink-pantheress.png" alt="Vendedor">
 
-        <div class="info">
-            <h3>Nome</h3>
-            <p>Descrição etc etc</p>
-            <button class="botaocomprar">COMPRAR</button>
+            <div class="info">
+                <h3>Nome</h3>
+                <p>Descrição etc etc</p>
+                <button class="botaocomprar">COMPRAR</button>
+            </div>
         </div>
-    </div>
 
-</div>
+    </div>
 </body>
 
 </html>

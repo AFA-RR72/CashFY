@@ -1,7 +1,7 @@
 <?php
-session_start();
-require_once('../model/user.php');
-require_once('../model/institute.php');
+require_once __DIR__ . "/../config/init.php";
+require_once BASE_PATH . "model/institute.php";
+require_once BASE_PATH . "model/user.php";
 
 $name = $_POST['name'];
 $institute_id = $_POST['institute_id'];
@@ -18,7 +18,6 @@ if (
 ) {
     $_SESSION['msg'] = "Você precisa preencher todos os campos";
     header("Location: ../view/sign-up.php");
-    exit;
     exit;
 } elseif(
     strlen($_POST['name']) > 255 ||
