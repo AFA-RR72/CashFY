@@ -70,7 +70,17 @@ function get_users(){
     $result = $stmt -> get_result();
     $users = $result -> fetch_all(MYSQLI_ASSOC);
 
+    $stmt ->close();
     return $users;
+}
+
+function update_photo($id, $profile_photo){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("UPDATE users SET profile_photo = ? WHERE id = ?");
+    $stmt -> bind_param("si", $profile_photo, $id);
+
+    $stmt -> execute();
 }
 
 ?>

@@ -1,7 +1,26 @@
 <?php session_start();
 require_once('MVC/model/user.php');
+require_once('MVC/config/init.php');
 
 $users = get_users();
+
+function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
+{
+  $palavras = preg_split('/\s+/', trim($frase));
+  $iniciais = '';
+
+  foreach ($palavras as $palavra) {
+    $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
+
+    if (in_array($palavraMinuscula, $ignorar) || empty($palavraMinuscula)) {
+      continue;
+    }
+
+    $iniciais .= mb_substr($palavra, 0, 1, 'UTF-8');
+  }
+
+  return mb_strtoupper($iniciais, 'UTF-8');
+}
 
 ?>
 
@@ -12,15 +31,15 @@ $users = get_users();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cashfy — Compre e venda entre estudantes</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="MVC/view/style.css">
 </head>
 
 <body>
   <div class="page">
-
     <header class="site-header">
       <div class="container">
-        <a href="index.php" class="brand"><span class="brand-mark"></span> Cashfy</a>
+        <a href="index.php" class="brand"><span class="brand-mark"></span> CashFY</a>
         <ul class="nav-links">
           <li><a href="index.php" class="active">Home</a></li>
           <li><a href="index.php#contato">Contato</a></li>
@@ -29,7 +48,7 @@ $users = get_users();
         <?php if (isset($_SESSION['id'])): ?>
           <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
             <div class="header-actions">
-              <a href="MVC/view/login.php" class="btn btn-gradient btn-sm">Vender aqui</a>
+              <a href="MVC/view/perfil.php?vendedor=true" class="btn btn-gradient btn-sm">Vender aqui</a>
             </div>
           <?php else: ?>
             <div class="header-actions">
@@ -38,10 +57,25 @@ $users = get_users();
           <?php endif; ?>
         <?php else: ?>
           <div class="header-actions">
-            <a href="MVC/view/login.php" class="btn btn-gradient btn-sm">Cadastre-se</a>
+            <a href="MVC/view/login.php" class="btn btn-gradient btn-sm">Fazer log-in</a>
           </div>
         <?php endif; ?>
-
+        <?php if (isset($_SESSION['id'])): ?>
+          <?php if (!empty($_SESSION['profile_photo'])): ?>
+            <a href="MVC/view/perfil.php" class="account">
+              <div class="profile-photo-icon-mother">
+                <span class="account-mark"><img src="<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+                </span>
+              </div>
+            </a>
+          <?php else: ?>
+            <a href="MVC/view/perfil.php" class="account">
+              <div class="profile-photo-icon-mother">
+                <span class="index-account-mark-child"> <?= pegarIniciais($_SESSION['name']) ?></span>
+              </div>
+            </a>
+          <?php endif; ?>
+        <?php endif; ?>
       </div>
     </header>
 

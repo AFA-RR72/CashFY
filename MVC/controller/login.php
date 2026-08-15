@@ -8,6 +8,11 @@ if (empty($_POST['email']) || empty($_POST['password'])) {
     $user = get_user_by_email($_POST['email']);
     if (password_verify($_POST['password'], $user['password'])) {
         $_SESSION['id'] = $user['id'];
+        
+        if (!empty($user['profile_photo'])) {
+            $_SESSION['profile_photo'] = $user['profile_photo'];
+        }
+        
         $_SESSION['name'] = $user['name'];
         $_SESSION['institute'] = $user['institute'];
         $_SESSION['email'] = $user['email'];
@@ -16,7 +21,7 @@ if (empty($_POST['email']) || empty($_POST['password'])) {
         header("Location: ../view/login.php");
     } else {
         $_SESSION['msg'] = "Senha incorreta.";
-        header("Location: ../view/login.php?id=". $user['id']);
+        header("Location: ../view/login.php?id=" . $user['id']);
     }
 } else {
     $_SESSION['msg'] = "Email não encontrado.";

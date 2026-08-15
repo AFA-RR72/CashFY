@@ -97,6 +97,7 @@ img {
    Reduce motion
 ============================================ */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -159,16 +160,80 @@ img {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: conic-gradient(
-        from 200deg,
-        var(--sky-600),
-        var(--gold-400),
-        var(--orange-500),
-        var(--leaf-500),
-        var(--sky-600)
-    );
+    background: conic-gradient(from 200deg,
+            var(--sky-600),
+            var(--gold-400),
+            var(--orange-500),
+            var(--leaf-500),
+            var(--sky-600));
     flex-shrink: 0;
     box-shadow: inset 0 0 0 3px var(--cream);
+}
+
+.account {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+    color: var(--leaf-500);
+    white-space: nowrap;
+}
+
+.account-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.account-mark img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.fa-circle-user {
+    font-size: 29px;
+}
+
+.perfil-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.profile-photo-form-button-mother{
+    display: flex;
+    flex-direction: row;
+}
+
+.profile-photo-icon-mother{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    background: linear-gradient(160deg, var(--gold-400), var(--orange-300));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    color: rgba(255, 255, 255, .85);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.profile-photo-icon-mother span{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.index-account-mark-child{
+    
 }
 
 .nav-links {
@@ -422,9 +487,9 @@ img {
     position: absolute;
     inset: 0;
     background-image:
-        radial-gradient(circle at 85% 15%, rgba(255,255,255,0.16) 0 3px, transparent 4px),
-        radial-gradient(circle at 70% 30%, rgba(255,255,255,0.14) 0 2px, transparent 3px),
-        radial-gradient(circle at 92% 40%, rgba(255,255,255,0.14) 0 2px, transparent 3px);
+        radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.16) 0 3px, transparent 4px),
+        radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.14) 0 2px, transparent 3px),
+        radial-gradient(circle at 92% 40%, rgba(255, 255, 255, 0.14) 0 2px, transparent 3px);
     background-size: 60px 60px;
     opacity: .8;
 }
@@ -436,14 +501,14 @@ img {
     right: -10%;
     bottom: -30%;
     height: 65%;
-    background: rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 50% 50% 0 0 / 60% 60% 0 0;
 }
 
 .cat-card span {
     position: relative;
     z-index: 2;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
 .cat-icon {
@@ -568,15 +633,15 @@ img {
     width: 220px;
     height: 220px;
     background:
-        radial-gradient(circle, rgba(255,255,255,0.14) 0 4px, transparent 5px) 0 0/34px 34px,
-        radial-gradient(circle, rgba(255,255,255,0.1) 0 3px, transparent 4px) 12px 20px/34px 34px;
+        radial-gradient(circle, rgba(255, 255, 255, 0.14) 0 4px, transparent 5px) 0 0/34px 34px,
+        radial-gradient(circle, rgba(255, 255, 255, 0.1) 0 3px, transparent 4px) 12px 20px/34px 34px;
 }
 
 .cat-banner-icon {
     width: 68px;
     height: 68px;
     border-radius: var(--radius-md);
-    background: rgba(255,255,255,0.18);
+    background: rgba(255, 255, 255, 0.18);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -638,9 +703,19 @@ img {
     align-items: center;
     justify-content: center;
     font-size: 2.6rem;
-    color: rgba(255,255,255,.85);
+    color: rgba(255, 255, 255, .85);
     flex-shrink: 0;
     box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.avatar img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-position: center;
+    transform: scale(1.2);
+
 }
 
 .profile-meta {
@@ -700,7 +775,7 @@ img {
 .tab-btn.active {
     background: linear-gradient(100deg, var(--teal-700), var(--teal-300));
     color: #fff;
-    box-shadow: 0 6px 14px rgba(31,122,112,0.25);
+    box-shadow: 0 6px 14px rgba(31, 122, 112, 0.25);
 }
 
 .tab-panel {
@@ -1203,18 +1278,16 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0);
+    background: rgba(255, 255, 255, 0);
     color: var(--teal-700);
     font-weight: 800;
     font-size: 0.95rem;
 }
 
 .img-drop.has-img .drop-label {
-    background: linear-gradient(
-        0deg,
-        rgba(20,60,55,0.45),
-        rgba(20,60,55,0)
-    );
+    background: linear-gradient(0deg,
+            rgba(20, 60, 55, 0.45),
+            rgba(20, 60, 55, 0));
     color: #fff;
     align-items: flex-end;
     padding-bottom: 10px;
@@ -1541,4 +1614,125 @@ img {
     .team-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ============================================
+   Upload de foto de perfil
+============================================ */
+
+.photo-title {
+    font-family: var(--font-display);
+    color: var(--teal-900);
+    font-size: 1.4rem;
+    text-align: center;
+    margin: 0 0 6px;
+}
+
+.photo-subtitle {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0 0 26px;
+}
+
+.photo-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 24px;
+}
+
+.photo-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: var(--cream-deep);
+    border: 3px dashed var(--teal-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: .2s ease;
+}
+
+.photo-preview:hover {
+    border-color: var(--teal-500);
+    transform: scale(1.03);
+    background: #fff;
+}
+
+.photo-icon {
+    font-size: 2.2rem;
+    opacity: .7;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-preview.has-photo {
+    border-style: solid;
+    border-color: var(--teal-500);
+}
+
+.photo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 14px;
+    gap: 3px;
+}
+
+.photo-text strong {
+    color: var(--teal-700);
+    font-family: var(--font-display);
+    font-weight: 800;
+}
+
+.photo-text span {
+    color: var(--muted);
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.img {
+    .profile {}
+}
+
+.delete_profile_photo {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: #FBEAE6;
+    color: #C0503D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 
+        background .15s ease,
+        color .15s ease,
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.delete_profile_photo:hover {
+    background: #C0503D;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(192, 80, 61, 0.25);
+}
+
+.delete_profile_photo:active {
+    transform: translateY(0);
+}
+
+.delete_profile_photo .lixeira-icone {
+    pointer-events: none;
 }

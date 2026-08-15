@@ -68,7 +68,14 @@ $institutes = get_institutes();
               <?= htmlspecialchars($_SESSION['msg']) ?>
             </div>
 
-            <?php unset($_SESSION['msg']); ?>
+            <?php
+            if ($_SESSION['msg'] === 'Usuário criado com sucesso.') {
+              unset($_SESSION['msg']);
+              header("Refresh: 2; url=login.php");
+            } else {
+              unset($_SESSION['msg']);
+            }
+            ?>
 
           <?php endif; ?>
           <button class="btn btn-gradient btn-block" type="submit">Criar</button>

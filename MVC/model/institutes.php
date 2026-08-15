@@ -1,32 +1,35 @@
 <?php require_once("cashfy.php");
 
-function check_institute($institute_id){
+function check_institute($institute_id)
+{
     $conn = conn();
 
-    $stmt = $conn -> prepare("SELECT * FROM educational_institute WHERE id = ?");
-    $stmt -> bind_param('i', $institute_id);
-    $stmt -> execute();
+    $stmt = $conn->prepare("SELECT * FROM educational_institute WHERE id = ?");
+    $stmt->bind_param('i', $institute_id);
+    $stmt->execute();
 
-    $result = $stmt -> get_result();
-    if($result -> num_rows > 0){
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $stmt->close();
         return false;
     }
+    $stmt ->close();
     return true;
 }
 
-function get_institutes(){
+function get_institutes()
+{
     $conn = conn();
 
-    $stmt = $conn -> prepare("SELECT * FROM educational_institute");
+    $stmt = $conn->prepare("SELECT * FROM educational_institute");
 
-    $stmt -> execute();
+    $stmt->execute();
 
-    $result = $stmt -> get_result();
-    $institutes = $result -> fetch_all(MYSQLI_ASSOC);
+    $result = $stmt->get_result();
+    $institutes = $result->fetch_all(MYSQLI_ASSOC);
 
-    $stmt -> close();
-
-    return $institutes;    
+    $stmt->close();
+    return $institutes;
 }
 
 ?>
