@@ -75,6 +75,7 @@
       </div>
     </div>
   </div>
+  <script src="theme.js"></script>
 </body>
 
 </html>

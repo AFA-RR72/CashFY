@@ -1,3 +1,25 @@
+<?php session_start();
+
+function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
+{
+  $palavras = preg_split('/\s+/', trim($frase));
+  $iniciais = '';
+
+  foreach ($palavras as $palavra) {
+    $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
+
+    if (in_array($palavraMinuscula, $ignorar) || empty($palavraMinuscula)) {
+      continue;
+    }
+
+    $iniciais .= mb_substr($palavra, 0, 1, 'UTF-8');
+  }
+
+  return mb_strtoupper($iniciais, 'UTF-8');
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -19,9 +41,37 @@
           <li><a href="../../index.php#contato">Contato</a></li>
           <li><a href="sobre.php" class="active">Sobre nós</a></li>
         </ul>
-        <div class="header-actions">
-          <a href="login.php" class="btn btn-gradient btn-sm">Vender aqui</a>
-        </div>
+        <?php if (isset($_SESSION['id'])): ?>
+          <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
+            <div class="header-actions">
+              <a href="perfil.php?vendedor=true" class="btn btn-gradient btn-sm">Vender aqui</a>
+            </div>
+          <?php else: ?>
+            <div class="header-actions">
+              <a href="../controller/log-out.php" class="btn btn-gradient btn-sm">Fazer log-out</a>
+            </div>
+          <?php endif; ?>
+        <?php else: ?>
+          <div class="header-actions">
+            <a href="login.php" class="btn btn-gradient btn-sm">Fazer log-in</a>
+          </div>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['id'])): ?>
+          <?php if (!empty($_SESSION['profile_photo'])): ?>
+            <a href="perfil.php" class="account">
+              <div class="profile-photo-icon-mother">
+                <span class="account-mark"><img src="../../<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+                </span>
+              </div>
+            </a>
+          <?php else: ?>
+            <a href="perfil.php" class="account">
+              <div class="profile-photo-icon-mother">
+                <span class="index-account-mark-child"> <?= pegarIniciais($_SESSION['name']) ?></span>
+              </div>
+            </a>
+          <?php endif; ?>
+        <?php endif; ?>
       </div>
     </header>
 
@@ -80,6 +130,7 @@
       Cashfy — feito por estudantes, para estudantes. &nbsp;·&nbsp; <span id="contato">contato@cashfy.com</span>
     </footer>
   </div>
+  <script src="theme.js"></script>
 </body>
 
 </html>

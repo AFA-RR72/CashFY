@@ -108,7 +108,7 @@ $user = get_user_by_id($_SESSION['id']);
             reader.readAsDataURL(file);
         });
     </script>
-
+    <script src="theme.js"></script>
 </body>
 
 </html>

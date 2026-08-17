@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 11/08/2026 às 05:58
+-- Tempo de geração: 16/08/2026 às 06:25
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -147,6 +147,7 @@ CREATE TABLE `users` (
   `description` varchar(255) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `profile_photo` varchar(255) DEFAULT NULL,
   `role_id` int(11) NOT NULL,
   `remember_token` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -155,10 +156,20 @@ CREATE TABLE `users` (
 -- Despejando dados para a tabela `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `institute_id`, `phone_number`, `description`, `email`, `password`, `role_id`, `remember_token`) VALUES
-(53, 'Andrei Freire de Almeida', 1, NULL, NULL, 'andreifalmeida08@gmail.com', '$2y$10$dMBMXfJcvuo27iJP1aiF6.fiyi86F/XJvnsdetU6aes.2KUouX0aW', 2, NULL),
-(54, 'Lenalinda', 4, NULL, NULL, 'lena@email.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', 3, NULL),
-(55, 'Carlos Henrique', 3, NULL, NULL, 'carlos@email.com', '$2y$10$joXcvHldaNoTljNbFfyVT.Zimx2Ac.Ntl66wLxiUk1Clbz6IMi2Ua', 3, NULL);
+INSERT INTO `users` (`id`, `name`, `institute_id`, `phone_number`, `description`, `email`, `password`, `profile_photo`, `role_id`, `remember_token`) VALUES
+(53, 'Andrei Freire de Almeida', 1, NULL, NULL, 'andreifalmeida08@gmail.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', 'uploads/perfil/6a8138ff6a1fa.jpg', 2, NULL),
+(54, 'Lenalinda', 4, NULL, NULL, 'lena@email.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', NULL, 3, NULL),
+(55, 'Carlos Henrique', 3, NULL, NULL, 'carlos@email.com', '$2y$10$joXcvHldaNoTljNbFfyVT.Zimx2Ac.Ntl66wLxiUk1Clbz6IMi2Ua', NULL, 3, NULL),
+(56, 'Mateus Costa de Sousa', 1, NULL, NULL, 'mininolocoiala@gmail.com', '$2y$10$J2IzklEz17HNSPG1Obn2fOdUt2VxTz0eK5R7VxOFO9jU.Wb75YGsO', NULL, 3, NULL),
+(57, 'Maria', 3, NULL, NULL, 'maria@email.com', '$2y$10$Gp43f4laZ7uGJKnDO11oNOA/7V9cObjslAtk2pGZAfW503hsh/WzS', NULL, 3, NULL),
+(58, 'José Henrique', 3, NULL, NULL, 'jose@email.com', '$2y$10$faTw4nXgA/98b7hM3t30ju3lowWt..VsDFs/2o3rAhtp0TTOPsG4S', 'uploads/perfil/6a7f7b06e7244.jpg', 3, NULL),
+(61, 'Andrei Almeida', 4, NULL, NULL, 'andreifalmeida08@hotmail.com', '$2y$10$mxzr.Zvq7ItiWAyTLEouUeI7hLNqgBAFPSjqvRRz0TKR27rH5CcMa', NULL, 3, NULL),
+(62, 'Elvis Gabriel Philips', 2, NULL, NULL, 'elvis@email.com', '$2y$10$aiIyoDL/x2BJBu8lwq4Rpeb6nY7blLNRt14IrGQU.JOqkO51GjbeG', NULL, 3, NULL),
+(63, 'gabi', 4, NULL, NULL, 'gabi@|email.com', '$2y$10$.zfri4CXqW3ZCzK5zY4cXuXVq8i5AaHduWRKs61.roKDPWUFIfj3u', NULL, 3, NULL),
+(64, 'Samuel', 4, NULL, NULL, 'samuel@email.com', '$2y$10$NqhuiHzkukgCI1WyWKAI4ORtVPeYRkwGL7saaMgv5R8.WyaSWaYue', NULL, 3, NULL),
+(65, 'Maiana', 4, NULL, NULL, 'maiana@email.com', '$2y$10$SqfwmSlY6UYtbv/RENneYOT6Y/bsXXaYU3iF.jGchLJzHUr0CLeoO', 'uploads/perfil/6a807b27101ce.jpg', 3, NULL),
+(66, 'Raul Oliveira', 1, NULL, NULL, 'raul@email.com', '$2y$10$jwWHM00zoAbjl9hTjSvDjeYhEQTQ47YL5EzV/hhsDWGIQguZP5.o.', NULL, 3, NULL),
+(67, 'Mateus Costa de Sousa', 1, NULL, NULL, 'mateus@email.com', '$2y$10$xLwRTKBxSwIYdUvQRAZVf.tiOTzw0VDBo.Wj2yj53am7O2gIBFeF2', NULL, 3, NULL);
 
 --
 -- Índices para tabelas despejadas
@@ -252,7 +263,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- Restrições para tabelas despejadas

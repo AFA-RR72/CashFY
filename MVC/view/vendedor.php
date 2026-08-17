@@ -73,6 +73,6 @@ $user = get_user_by_id($_GET['id']);
 
     <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
   </div>
+  <script src="theme.js"></script>
 </body>
-
 </html>

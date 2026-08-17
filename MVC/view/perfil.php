@@ -236,6 +236,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
         <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
     </div>
+    <script src="theme.js"></script>
 </body>
 
 </html>

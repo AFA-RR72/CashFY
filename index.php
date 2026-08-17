@@ -30,7 +30,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cashfy — Compre e venda entre estudantes</title>
+  <title>Cashfy — Compra e venda entre estudantes</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="MVC/view/style.css">
 </head>
@@ -40,6 +40,10 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     <header class="site-header">
       <div class="container">
         <a href="index.php" class="brand"><span class="brand-mark"></span> CashFY</a>
+        <label class="theme-switch">
+          <input type="checkbox" id="theme-toggle" onchange="toggleDarkMode()">
+          <span class="slider"></span>
+        </label>
         <ul class="nav-links">
           <li><a href="index.php" class="active">Home</a></li>
           <li><a href="index.php#contato">Contato</a></li>
@@ -153,6 +157,22 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       Cashfy — feito por estudantes, para estudantes. &nbsp;·&nbsp; <span id="contato">contato@cashfy.com</span>
     </footer>
   </div>
-</body>
+  <script>
+    const themeToggle = document.getElementById("theme-toggle");
 
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+
+      localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark-mode") ? "dark" : "light"
+      );
+    }
+
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-mode");
+      themeToggle.checked = true;
+    }
+  </script>
+</body>
 </html>
