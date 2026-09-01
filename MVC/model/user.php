@@ -60,6 +60,38 @@ function get_user_by_id($id){
     $stmt -> close();
     return $user;
 }
+function search_user_by_name($name)
+{
+    $conn = conn();
+
+    $name = trim($name);
+    $search = "%$name%";
+    $start = "$name%";
+
+    $stmt = $conn -> prepare("
+        SELECT *
+        FROM users
+        WHERE name LIKE ?
+        AND role_id = 2
+        ORDER BY
+            CASE
+                WHEN name = ? THEN 1
+                WHEN name LIKE ? THEN 2
+                ELSE 3
+            END,
+            name ASC
+    ");
+
+    $stmt -> bind_param("sss", $search, $name, $start);
+
+    $stmt -> execute();
+
+    $result = $stmt -> get_result() -> fetch_all(MYSQLI_ASSOC);
+
+    $stmt -> close();
+
+    return $result;
+}
 
 function get_users(){
     $conn = conn();

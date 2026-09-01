@@ -89,13 +89,13 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     <main class="container" style="flex:1;">
 
       <div class="search-wrap">
-        <form class="search-box" action="index.php" method="get" role="search">
+        <form method="post" class="search-box" action="MVC/controller/search.php" role="search">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
             stroke-linecap="round">
             <circle cx="11" cy="11" r="7" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" name="busca" placeholder="Pesquisar por vendedores ou categorias...">
+          <input type="text" name="search" placeholder="Pesquisar por vendedores ou categorias...">
         </form>
       </div>
 
@@ -141,7 +141,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       <div class="seller-list">
         <?php foreach ($users as $seller): ?>
           <?php if ($seller['role_id'] == 2): ?>
-            <div class="seller-card">
+            <div class="seller-card" id="seller-<?= $seller['id'] ?>">
               <div class="thumb">🛍️</div>
               <div class="seller-info">
                 <p class="seller-name"><?= htmlspecialchars($seller['name']); ?></p>
@@ -179,5 +179,36 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       themeToggle.checked = true;
     }
   </script>
+  <script>
+window.addEventListener('load', function () {
+
+    const hash = window.location.hash;
+
+    if (!hash) {
+        return;
+    }
+
+    const vendedor = document.getElementById(hash.substring(1));
+
+    if (!vendedor) {
+        return;
+    }
+
+    const rect = vendedor.getBoundingClientRect();
+
+    const posicao =
+        window.scrollY +
+        rect.top -
+        (window.innerHeight / 2) +
+        (rect.height / 2);
+
+    window.scrollTo({
+        top: posicao,
+        behavior: 'smooth'
+    });
+
+});
+</script>
 </body>
+
 </html>

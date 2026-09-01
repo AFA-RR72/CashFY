@@ -4,62 +4,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Fale Conosco - CashFy</title>
 </head>
 
 <body>
-    <div>
-        <h1>Fale Conosco</h1>
-        <br><br>
-        <h3>Atendimento de segunda a sexta, 9h às 18h</h3>
-    </div>
 
-    <hr>
+    <main class="page">
+        <div class="container">
 
-    <div>
-        <h1>Suporte geral e dúvidas comerciais</h1>
+            <div class="page-header">
+                <h1>Fale Conosco</h1>
+                <h3>Atendimento de segunda a sexta, 9h às 18h</h3>
+            </div>
 
-        <ul>
-            <li>Dúvida sobre um pedido;</li>
-            <li>Parceria institucional;</li>
-            <li>Solicitação sobre dados pessoais (LGPD);</li>
-            <li>Denúncia de conteúdo ou conduta;</li>
-            <li>Outros assuntos.</li>
-        </ul>
+            <hr>
 
-        <p>Ao se comunicar via email ou mensagem, você concorda com o tratamento dos seus dados conforme
-            nossa Política de Privacidade, apenas para fins de resposta ao seu contato.</p>
-    </div>
+            <div class="card">
+                <h1>Suporte geral e dúvidas comerciais</h1>
 
-    <hr>
+                <ul>
+                    <li>Dúvida sobre um pedido;</li>
+                    <li>Parceria institucional;</li>
+                    <li>Solicitação sobre dados pessoais (LGPD);</li>
+                    <li>Denúncia de conteúdo ou conduta;</li>
+                    <li>Outros assuntos.</li>
+                </ul>
 
-    <div>
-        <h1>Contato</h1>
+                <p>
+                    Ao se comunicar via email ou mensagem, você concorda com o tratamento dos seus dados conforme
+                    nossa Política de Privacidade, apenas para fins de resposta ao seu contato.
+                </p>
+            </div>
 
-        <h3>E-mail</h3>
-        <p>administração@cashfy.com.br</p>
+            <div class="card">
+                <h2>@</h2>
+                <h1>E-mail</h1>
+                <p>administração@cashfy.com.br</p>
+            </div>
 
-        <h3>Telefone / WhatsApp</h3>
-        <p>(95)99999-9999</p>
-    </div>
+            <div class="card">
+                <h2>✆</h2>
+                <h1>Telefone / WhatsApp</h1>
+                <p>(95)99999-9999</p>
+            </div>
 
-    <hr>
+            <div class="card">
+                <h1>Perguntas frequentes</h1>
 
-    <div>
-        <h1>Perguntas frequentes</h1>
+                <div>
+                    <h2>Minha escola/faculdade pode participar da plataforma?</h2>
 
-        <h3>Minha escola/faculdade pode participar da plataforma?</h3>
-        <p>Sim. Entre em contato para conhecer o processo de adesão institucional, que inclui um acordo de tratamento
-            de dados e diretrizes de acompanhamento pedagógico.</p>
+                    <p>
+                        Sim. Entre em contato para conhecer o processo de adesão institucional, que inclui um acordo
+                        de tratamento de dados e diretrizes de acompanhamento pedagógico.
+                    </p>
+                </div>
 
-        <h3>Sou menor de idade, posso vender na plataforma?</h3>
-        <p>Sim, desde que haja autorização da instituição de ensino e, consequentemente, autorização dos responsáveis,
-            conforme descrito em nossos Termos de Uso.</p>
+                <div>
+                    <h2>Sou menor de idade, posso vender na plataforma?</h2>
 
-        <h3>Como faço para excluir meus dados da plataforma?</h3>
-        <p>Ao excluir sua conta, seus dados são automaticamente deletados do sistema.</p>
-    </div>
+                    <p>
+                        Sim, desde que haja autorização da instituição de ensino e, consequentemente, autorização dos
+                        responsáveis, conforme descrito em nossos Termos de Uso.
+                    </p>
+                </div>
+
+                <div>
+                    <h2>Como faço para excluir meus dados da plataforma?</h2>
+
+                    <p>
+                        Ao excluir sua conta, seus dados são automaticamente deletados do sistema.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <script src="theme.js"></script>
 </body>
 
 </html>
-```
