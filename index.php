@@ -49,7 +49,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         </label>
         <ul class="nav-links">
           <li><a href="index.php" class="active">Home</a></li>
-          <li><a href="index.php#contato">Contato</a></li>
+          <li><a href="MVC/view/contact.php">Contato</a></li>
           <li><a href="MVC/view/sobre.php">Sobre nós</a></li>
         </ul>
         <?php if (isset($_SESSION['id'])): ?>
@@ -139,27 +139,45 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
          puxando do banco quando o back-end estiver pronto. -->
       <h2 class="section-title">Vendedores</h2>
       <div class="seller-list">
-        <?php foreach ($users as $seller): ?>
-          <?php if ($seller['role_id'] == 2): ?>
-            <div class="seller-card" id="seller-<?= $seller['id'] ?>">
-              <div class="thumb">🛍️</div>
-              <div class="seller-info">
-                <p class="seller-name"><?= htmlspecialchars($seller['name']); ?></p>
-                <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
-                <span class="stars">★★★★<span class="off">★</span></span>
+        <?php if (!isset($_SESSION['search-users'])): ?>
+          <?php foreach ($users as $seller): ?>
+            <?php if ($seller['role_id'] == 2): ?>
+              <div class="seller-card">
+                <div class="thumb">🛍️</div>
+                <div class="seller-info">
+                  <p class="seller-name"><?= htmlspecialchars($seller['name']); ?></p>
+                  <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
+                  <span class="stars">★★★★<span class="off">★</span></span>
+                </div>
+                <a class="btn btn-orange" href="MVC/view/vendedor.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
               </div>
-              <a class="btn btn-orange" href="MVC/view/vendedor.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
-            </div>
-          <?php endif; ?>
-        <?php endforeach; ?>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['search-users'])): ?>
+          <?php foreach ($_SESSION['search-users'] as $seller): ?>
+            <?php if ($seller['role_id'] == 2): ?>
+              <div class="seller-card" id="seller-<?= $seller['id'] ?>">
+                <div class="thumb">🛍️</div>
+                <div class="seller-info">
+                  <p class="seller-name"><?= htmlspecialchars($seller['name']); ?></p>
+                  <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
+                  <span class="stars">★★★★<span class="off">★</span></span>
+                </div>
+                <a class="btn btn-orange" href="MVC/view/vendedor.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
+              </div>
+            <?php endif; ?>
+          <?php endforeach; ?>
+          <?php unset($_SESSION['search-users']); ?>
+        <?php endif; ?>
       </div>
     </main>
 
     <footer class="site-footer">
       Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;
       <span id="contato">cashfy@gmail.com</span> &nbsp;·&nbsp;
-      <a href="tos.php">Termos de uso</a> &nbsp;·&nbsp;
-      <a href="pp.php">Políticas de privacidade</a>
+      <a href="MVC/view/tos.php">Termos de uso</a> &nbsp;·&nbsp;
+      <a href="MVC/view/pp.php">Políticas de privacidade</a>
     </footer>
   </div>
   <script>
@@ -180,35 +198,35 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     }
   </script>
   <script>
-window.addEventListener('load', function () {
+    window.addEventListener('load', function () {
 
-    const hash = window.location.hash;
+      const hash = window.location.hash;
 
-    if (!hash) {
+      if (!hash) {
         return;
-    }
+      }
 
-    const vendedor = document.getElementById(hash.substring(1));
+      const vendedor = document.getElementById(hash.substring(1));
 
-    if (!vendedor) {
+      if (!vendedor) {
         return;
-    }
+      }
 
-    const rect = vendedor.getBoundingClientRect();
+      const rect = vendedor.getBoundingClientRect();
 
-    const posicao =
+      const posicao =
         window.scrollY +
         rect.top -
         (window.innerHeight / 2) +
         (rect.height / 2);
 
-    window.scrollTo({
+      window.scrollTo({
         top: posicao,
         behavior: 'smooth'
-    });
+      });
 
-});
-</script>
+    });
+  </script>
 </body>
 
 </html>

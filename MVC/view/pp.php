@@ -16,6 +16,7 @@
             <div class="page-header">
                 <h1>Política de Privacidade</h1>
                 <h3>Última atualização: 31 de agosto de 2026</h3>
+                <a href="contact.php#return">Ir até o fim</a>
             </div>
 
             <hr>
@@ -272,7 +273,12 @@
                     <li>Telefone/WhatsApp: (95)99999-9999</li>
                 </ul>
             </div>
-
+            <hr>    
+            <div id="return">
+                <a href="../../index.php">Voltar para a página inicial</a>
+                &nbsp;·&nbsp;
+                <a href="cadastro.php">Voltar para o cadastro.</a>
+            </div>
         </div>
     </main>
     <script src="theme.js"></script>

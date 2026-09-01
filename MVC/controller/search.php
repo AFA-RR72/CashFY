@@ -11,6 +11,7 @@ if (isset($_POST['search']) && trim($_POST['search']) !== '') {
 $user = $result[0];
 
 if (!empty($user) > 0) {
+    $_SESSION['search-users'] = $result;
     header("Location: ../../index.php#seller-" . $user['id']);
     exit;
 } else{

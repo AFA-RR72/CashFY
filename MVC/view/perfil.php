@@ -142,6 +142,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                                     <?php unset($_SESSION['msg-form']); ?>
                                 </div>
                             <?php endif; ?>
+                            <?php if (isset($_SESSION['msg-form']) && $_SESSION['msg-form'] == "Perfil atualizado com sucesso."){ unset($_GET['vendedor']); } ?>
                             <div class="field">
                                 <button class="btn btn-gradient btn-block" type="submit">Atualizar perfil</button>
                             </div>

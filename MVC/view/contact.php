@@ -16,6 +16,7 @@
             <div class="page-header">
                 <h1>Fale Conosco</h1>
                 <h3>Atendimento de segunda a sexta, 9h às 18h</h3>
+                <a href="contact.php#return">Ir até o fim</a>
             </div>
 
             <hr>
@@ -78,7 +79,12 @@
                     </p>
                 </div>
             </div>
-
+            <hr>
+            <div id="return">
+                <a href="../../index.php">Voltar para a página inicial</a>
+                &nbsp;·&nbsp;
+                <a href="cadastro.php">Voltar para o cadastro.</a>
+            </div>
         </div>
     </main>
     <script src="theme.js"></script>
