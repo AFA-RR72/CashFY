@@ -115,5 +115,4 @@ $categories = get_categories();
         </script>
         <script src="theme.js"></script>
 </body>
-
 </html>
