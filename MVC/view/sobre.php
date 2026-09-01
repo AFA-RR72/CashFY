@@ -87,14 +87,14 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       <div class="team-grid">
 
         <div class="team-card">
-          <div class="team-photo"><img src="icones/andrei.jpg" alt=""></div>
+          <div class="team-photo"><img src="../../uploads/icones/andrei.jpg" alt=""></div>
           <p class="team-name">Andrei Freire</p>
           <p class="team-role">back-end e desenvolvedor</p>
           <p class="team-bio placeholder">Andrei é responsável pela inteligência e lógica do site.</p>
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="icones/eu.jpeg" alt=""></div>
+          <div class="team-photo"><img src="../../uploads/icones/eu.jpeg" alt=""></div>
           <p class="team-name">Carlos Henrique</p>
           <p class="team-role">front-end e desenvolvedor</p>
           <p class="team-bio placeholder">Carlos é focado na interface e interação do usuario, proporcionando
@@ -102,21 +102,21 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="icones/maria.jpg" alt=""></div>
+          <div class="team-photo"><img src="../../uploads/icones/maria.jpg" alt=""></div>
           <p class="team-name">Maria Lara</p>
           <p class="team-role">web designer</p>
           <p class="team-bio placeholder">Maria cuida da identidade visual e do layout inicial</p>
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="icones/larissa.jpg" alt=""></div>
+          <div class="team-photo"><img src="../../uploads/icones/larissa.jpg" alt=""></div>
           <p class="team-name">Larissa dos Santos</p>
           <p class="team-role">testadora e banco de dados</p>
           <p class="team-bio placeholder">Larissa é responsável pelos testes e pela segurança das informações</p>
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="icones/sofia.jpeg" alt=""></div>
+          <div class="team-photo"><img src="../../uploads/icones/sofia.jpeg" alt=""></div>
           <p class="team-name">Sofia Hage</p>
           <p class="team-role">líder</p>
           <p class="team-bio placeholder">Sofia é resposável pela gestao e organização</p>

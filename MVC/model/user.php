@@ -81,6 +81,17 @@ function update_photo($id, $profile_photo){
     $stmt -> bind_param("si", $profile_photo, $id);
 
     $stmt -> execute();
+    $stmt -> close();
+}
+
+function update_to_seller($id, $contact, $description){
+    $conn = conn();
+
+    $stmt  = $conn -> prepare("UPDATE users SET description = ?, phone_number = ?, role_id = 2 WHERE id = ?");
+    $stmt -> bind_param("sii", $description, $contact, $id);
+
+    $stmt -> execute();
+    $stmt -> close();
 }
 
 ?>

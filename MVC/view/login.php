@@ -39,7 +39,7 @@
             <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"
               required minlength="8">
             <button type="button" id="toggle_pass" class="password-toggle" onclick="toggle()" title="Mostrar senha">
-              <img id="eye-icon" src="icones/olhof.png" alt="Mostrar senha">
+              <img id="eye-icon" src="../../uploads/icones/olhof.png" alt="Mostrar senha">
             </button>
           </div>
           <?php if (isset($_SESSION['msg'])): ?>
@@ -66,23 +66,8 @@
       <p class="auth-foot">Não tem uma conta? <a href="cadastro.php">Criar</a></p>
     </div>
   </div>
-  <script>
-    function toggle() {
-      const password = document.getElementById("password");
-      const olho = document.getElementById("eye-icon");
-
-      if (password.type === "password") {
-        password.type = "text";
-        olho.src = "icones/olhoa.png";
-        olho.alt = "Ocultar senha";
-      } else {
-        password.type = "password";
-        olho.src = "icones/olhof.png";
-        olho.alt = "Mostrar senha";
-      }
-    }
-  </script>
-  <script src="theme.js""></script>
+  <script src="toggle.js"></script>
+  <script src="theme.js"></script>
 </body>
 
 </html>

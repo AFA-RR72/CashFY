@@ -66,9 +66,7 @@ $user = get_user_by_id($_SESSION['id']);
                             <?php endif; ?>
                         </strong>
                     </div>
-
                     <input type="file" name="profile_photo" id="profile_photo" accept="image/*" hidden>
-
                 </label>
 
                 <div class="profile-photo-form-button-mother">

@@ -1,4 +1,7 @@
-<?php session_start();
+<?php ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+session_start();
 require_once('MVC/model/user.php');
 require_once('MVC/config/init.php');
 
@@ -39,7 +42,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <div class="page">
     <header class="site-header">
       <div class="container">
-        <a href="index.php" class="brand"><span class="brand-mark"></span> CashFY</a>
+        <a href="index.php" class="brand"><span class="brand-mark"></span>CashFY</a>
         <label class="theme-switch">
           <input type="checkbox" id="theme-toggle" onchange="toggleDarkMode()">
           <span class="slider"></span>
@@ -142,7 +145,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
               <div class="thumb">🛍️</div>
               <div class="seller-info">
                 <p class="seller-name"><?= htmlspecialchars($seller['name']); ?></p>
-                <p class="seller-desc"><?= htmlspecialchars($seller['description']); ?></p>
+                <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
                 <span class="stars">★★★★<span class="off">★</span></span>
               </div>
               <a class="btn btn-orange" href="MVC/view/vendedor.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
@@ -150,7 +153,6 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <?php endif; ?>
         <?php endforeach; ?>
       </div>
-
     </main>
 
     <footer class="site-footer">

@@ -12,7 +12,7 @@ if (empty($_POST['email']) || empty($_POST['password'])) {
         if (!empty($user['profile_photo'])) {
             $_SESSION['profile_photo'] = $user['profile_photo'];
         }
-        
+        $_SESSION['id'] = $user['id'];
         $_SESSION['name'] = $user['name'];
         $_SESSION['institute'] = $user['institute'];
         $_SESSION['email'] = $user['email'];

@@ -2161,3 +2161,76 @@ body.dark-mode ::selection {
     background: #3E9C8E;
     color: #fff;
 }
+
+.be-seller-form{
+    justify-self: center;
+}
+
+.titulo-form-vendedor{
+    color: gray;
+    margin-bottom: 10px;
+}
+
+.cashfy{
+    color: var(--leaf-500);
+    font-weight: bold;
+}
+
+.description{
+    height: 90px;
+    resize: none !important;
+}
+
+.seller-products{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 30px 24px;
+}
+
+.pill-tag-perfil{
+    display: inline-block;
+    background: linear-gradient(
+        100deg,
+        var(--teal-700),
+        var(--teal-300)
+    );
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 9px 22px;
+    border-radius: var(--radius-pill);
+    margin: 20px 30px 18px;
+}
+.menu_details{
+    display: flex;
+    flex-direction: row;
+    width: 350px;
+    height: 35px;
+    background-color: var(--line);
+    border-width: 1px;
+    border-radius: var(--radius-sm);
+    padding: 9px 22px;
+    margin: 20px 30px 18px;
+    align-items: center;
+}
+.menu_details_options{
+    padding: 5px;
+}
+
+.product-photo{
+    display: flex;
+    align-self: center;
+    justify-self: center;
+    
+}
+
+.photo-preview{
+    align-self: center;
+    justify-self: center;
+    
+}
+
+.photo-preview i{
+    color: var(--leaf-700);
+}

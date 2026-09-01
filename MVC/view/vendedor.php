@@ -75,4 +75,5 @@ $user = get_user_by_id($_GET['id']);
   </div>
   <script src="theme.js"></script>
 </body>
+
 </html>

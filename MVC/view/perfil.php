@@ -1,5 +1,7 @@
 <?php session_start();
+require_once('../config/init.php');
 require_once('../model/user.php');
+require_once('../model/products.php');
 
 $user = get_user_by_id($_SESSION['id']);
 
@@ -36,7 +38,6 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
 <body>
     <div class="page">
-
         <header class="site-header">
             <div class="container">
                 <a href="../../index.php" class="brand"><span class="brand-mark"></span> Cashfy</a>
@@ -103,8 +104,87 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                         <h1 id="pf-name"><?= htmlspecialchars($user['name']) ?></h1>
                         <p id="pf-desc"><?php if ($user['role_id'] === 2) ?></p>
                     </div>
-                    <a href="#" class="profile-contact" id="add-contact-btn">Contato</a>
+                    <?php if (isset($user['phone_number'])): ?>
+                        <a href="#" class="profile-contact"
+                            id="add-contact-btn"><?= htmlspecialchars($user['phone_number']); ?></a>
+                    <?php endif; ?>
                 </div>
+                <?php if (isset($_GET['vendedor']) && $_GET['vendedor'] == true): ?>
+                    <div class="be-seller-form">
+                        <div class="titulo-form-vendedor">Atualize seu perfil para tornar-se um vendedor <span
+                                class="cashfy">CashFY</span></div>
+                        <form action="../controller/seja_vendedor.php" method="post" novalidate>
+                            <div class="field">
+                                <label for="phone_number">Contato</label>
+                                <input type="tel" name="phone_number" id="phone_number" placeholder="(00) 0 0000-0000"
+                                    pattern="[0-9]{10,11}" required>
+                            </div>
+                            <div class="field">
+                                <label for="description">Descrição</label>
+                                <textarea name="description" id="description" class="description"
+                                    placeholder="min. 20 letras." required></textarea>
+                            </div>
+                            <div class="field">
+                                <label for="pass">Senha</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="password" name="password" placeholder="••••••••"
+                                        autocomplete="current-password" required minlength="8">
+                                    <button type="button" id="toggle_pass" class="password-toggle" onclick="toggle()"
+                                        title="Mostrar senha">
+                                        <img id="eye-icon" src="../../uploads/icones/olhof.png" alt="Mostrar senha">
+                                    </button>
+                                </div>
+                            </div>
+                            <?php if (isset($_SESSION['msg-form'])): ?>
+                                <div
+                                    class="session-msg <?= $_SESSION['msg-form'] === 'Perfil atualizado com sucesso.' ? 'success' : ''; ?>">
+                                    <?= htmlspecialchars($_SESSION['msg-form']); ?>
+                                    <?php unset($_SESSION['msg-form']); ?>
+                                </div>
+                            <?php endif; ?>
+                            <div class="field">
+                                <button class="btn btn-gradient btn-block" type="submit">Atualizar perfil</button>
+                            </div>
+                        </form>
+                    </div>
+                <?php endif; ?>
+                <?php if (isset($user['role_id']) && $user['role_id'] == 2): ?>
+                    <?php $products = get_products(); ?>
+                    <div class="main-seller">
+                        <div class="menu_details" >
+                            <div class="menu_details_options">
+                                <a href="">Produtos</a>
+                            </div>
+                            <div class="menu_details_options">
+                                <a href="">Diário</a>
+                            </div>
+                            <div class="menu_details_options">
+                                <a href="">Rendimento</a>
+                            </div>
+                            <div class="menu_details_options">
+                                <a href="">Perfil</a>
+                            </div>
+                        </div>
+                        <a href="new_product.php"><div class="pill-tag-perfil">Novo Produto</div></a>
+                        <div class="seller-products">
+                            <div class="product-grid" id="pf-products">
+                                <?php foreach ($products as $product): ?>
+                                    <?php if ($product['user_id'] == $user['id']): ?>
+                                        <div class="product-card">
+                                            <span class="badge-new">Novo!</span>
+                                            <div class="product-img"><img src="<?= "../../" . $product['product_photo'] ?>" alt="Image"></div>
+                                            <p class="product-name"><?= htmlspecialchars($product['name']) ?? ''; ?></p>
+                                            <p class="product-desc"><?= htmlspecialchars($product['description']) ?? ''; ?></p>
+                                            <p class="product-price">
+                                                <?= 'R$ ' . htmlspecialchars(number_format(($product['price'] ?? 0), 2, ',', '.')); ?>
+                                            </p>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- ===== PRODUTOS ===== -->
@@ -237,6 +317,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
     </div>
     <script src="theme.js"></script>
+    <script src="toggle.js"></script>
 </body>
 
 </html>
