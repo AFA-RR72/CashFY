@@ -156,7 +156,10 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     </main>
 
     <footer class="site-footer">
-      Cashfy — feito por estudantes, para estudantes. &nbsp;·&nbsp; <span id="contato">contato@cashfy.com</span>
+      Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;
+      <span id="contato">cashfy@gmail.com</span> &nbsp;·&nbsp;
+      <a href="tos.php">Termos de uso</a> &nbsp;·&nbsp;
+      <a href="pp.php">Políticas de privacidade</a>
     </footer>
   </div>
   <script>
