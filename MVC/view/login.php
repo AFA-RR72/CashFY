@@ -52,7 +52,7 @@
             <?php if ($_SESSION['msg'] === 'Log-in realizado com sucesso.')
             {
               unset($_SESSION['msg']);
-              header("Refresh: 2; url=../../index.php");
+              header("Refresh: 1; url=../../index.php");
             } else{
               unset($_SESSION['msg']);
             }

@@ -1,7 +1,10 @@
-<?php session_start();
+<?php
+require_once('../config/auth.php');
 require_once('../config/init.php');
 require_once('../model/user.php');
 require_once('../model/products.php');
+
+check_login();
 
 $user = get_user_by_id($_SESSION['id']);
 
@@ -40,6 +43,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     <div class="page">
         <header class="site-header">
             <div class="container">
+
+                <!-- Links -->
+
                 <a href="../../index.php" class="brand"><span class="brand-mark"></span> Cashfy</a>
                 <ul class="nav-links">
                     <li><a href="../../index.php">Home</a></li>
@@ -47,24 +53,21 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                     <li><a href="sobre.php">Sobre nós</a></li>
                 </ul>
                 <div class="header-actions">
-                    <!-- "Sair" ainda é só um link. Quando o Andrei fizer a sessão em PHP,
-             troca por uma action que dá destroy na sessão. 
-             
-             -Andrei: Eu sei como funciona, Carlos. ;-;
-
-             -->
                     <a href="../controller/log-out.php" class="btn btn-gradient btn-sm">Sair</a>
                 </div>
             </div>
         </header>
 
-        <!-- radios escondidos que controlam as abas, sem JS -->
+        <!-- radios escondidos que controlam as abas -->
 
         <main class="container" style="flex:1;">
 
             <div class="profile-card">
                 <div class="profile-banner"></div>
                 <div class="profile-body">
+
+                <!-- Foto de perfil -->
+
                     <?php if (!empty($user['profile_photo'])): ?>
                         <a href="perfil_photo.php" title="Atualizar foto">
                             <div class="avatar" id="pf-avatar">
@@ -100,15 +103,21 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                             </script>
                         <?php endif; ?>
                     <?php endif; ?>
+
+                    <!-- Resto do perfil -->
+
                     <div class="profile-meta">
                         <h1 id="pf-name"><?= htmlspecialchars($user['name']) ?></h1>
-                        <p id="pf-desc"><?php if ($user['role_id'] === 2) ?></p>
+                        <p id="pf-desc"></p>
                     </div>
                     <?php if (isset($user['phone_number'])): ?>
                         <a href="#" class="profile-contact"
                             id="add-contact-btn"><?= htmlspecialchars($user['phone_number']); ?></a>
                     <?php endif; ?>
                 </div>
+
+                <!-- Form para virar vendedor -->
+
                 <?php if (isset($_GET['vendedor']) && $_GET['vendedor'] == true): ?>
                     <div class="be-seller-form">
                         <div class="titulo-form-vendedor">Atualize seu perfil para tornar-se um vendedor <span
@@ -149,6 +158,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                         </form>
                     </div>
                 <?php endif; ?>
+
+                <!-- Parte do vendedor -->
+
                 <?php if (isset($user['role_id']) && $user['role_id'] == 2): ?>
                     <?php $products = get_products(); ?>
                     <div class="main-seller">
@@ -167,11 +179,14 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                             </div>
                         </div>
                         <a href="new_product.php"><div class="pill-tag-perfil">Novo Produto</div></a>
+
+                        <!-- Produtos do vendedor -->
+
                         <div class="seller-products">
                             <div class="product-grid" id="pf-products">
                                 <?php foreach ($products as $product): ?>
                                     <?php if ($product['user_id'] == $user['id']): ?>
-                                        <div class="product-card">
+                                        <div class="product-card perfil-card">
                                             <span class="badge-new">Novo!</span>
                                             <div class="product-img"><img src="<?= "../../" . $product['product_photo'] ?>" alt="Image"></div>
                                             <p class="product-name"><?= htmlspecialchars($product['name']) ?? ''; ?></p>
@@ -188,32 +203,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                 <?php endif; ?>
             </div>
 
-            <!-- ===== PRODUTOS ===== -->
-            <section class="tab-panel" id="tab-produtos">
-                <a class="btn btn-orange" href="produto-form.php">+ Adicionar produtos</a>
-                <div class="product-grid" id="my-products" style="margin-top:20px;">
-
-                    <div class="product-card">
-                        <div class="product-img">Imagem</div>
-                        <p class="product-name">Coxinha de frango</p>
-                        <p class="product-desc">Feita na hora, crocante por fora</p>
-                        <div class="product-row-actions">
-                            <p class="product-price" style="margin:0;">R$ 6,00</p>
-                            <div class="product-actions">
-                                <a class="icon-btn" title="Editar" href="produto-form.php?id=1">✎</a>
-                                <!-- ligue esse form num controller de exclusão em MVC/controller -->
-                                <form method="post" action="excluir-produto.php" style="display:inline;">
-                                    <input type="hidden" name="id" value="1">
-                                    <button class="icon-btn danger" title="Excluir" type="submit">🗑</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
             <!-- ===== DIÁRIO ===== -->
+
             <section class="tab-panel" id="tab-diario">
                 <div class="daily-card">
                     <h3>+ Registrar vendas</h3>

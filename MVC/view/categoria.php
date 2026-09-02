@@ -1,3 +1,12 @@
+<?php session_start();
+require_once("../model/category.php");
+require_once("../model/products.php");
+
+$category = get_category_by_slug($_GET['cat']);
+$products = get_products_by_category($category['id']);
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -5,11 +14,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Categoria — Cashfy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   <div class="page">
+
+    <!-- Cabeçalho -->
 
     <header class="site-header">
       <div class="container">
@@ -25,6 +37,8 @@
       </div>
     </header>
 
+    <!-- Links -->
+
     <main class="container" style="flex:1;">
       <div class="crumb-row">
         <a class="back-link" href="../../index.php">
@@ -35,43 +49,46 @@
           </svg>
           Voltar
         </a>
-        <nav class="breadcrumb"><a href="../../index.php">Início</a> &gt; <a href="../../index.php">Categorias</a> &gt;
-          <span id="crumb-cat">Comida</span>
+        <nav class="breadcrumb"><a href="../../index.php">Início</a> &gt; <a
+            href="../../index.php#categories">Categorias</a> &gt;
+          <span id="crumb-cat"><?= $category['name']; ?></span>
         </nav>
       </div>
 
-      <!-- Exemplo estático da categoria "Comida". No PHP, troque o
-         título/ícone/quantidade conforme "$_GET['cat']" e a consulta
-         no banco de dados. -->
-      <div class="cat-banner">
-        <div class="cat-banner-icon" id="banner-icon">🍽️</div>
+      <!-- Categoria -->
+
+      <?php $classes = ['cat-blue', 'cat-gold', 'cat-orange', 'cat-green']; ?>
+
+      <div class="cat-banner <?= $classes[($category['id'] - 1) % 4]; ?>">
+        <div class="cat-banner-icon" id="banner-icon"><?= $category['icon']; ?></div>
         <div>
-          <h1 id="banner-title">Comida</h1>
-          <p id="banner-count">2 vendedores nessa categoria</p>
+          <h1 id="banner-title"><?= $category['name']; ?></h1>
+          <p id="banner-count"><?= count($products) ?> produto<?php if (count($products) != 1) {echo 's';} ?> nessa categoria</p>
         </div>
       </div>
 
-      <div id="seller-list" class="seller-list" style="margin-top:30px;">
-        <div class="seller-card">
-          <div class="thumb">🛍️</div>
-          <div class="seller-info">
-            <p class="seller-name">Ana Beatriz</p>
-            <p class="seller-desc">Salgados e marmitas caseiras</p>
-            <span class="stars">★★★★<span class="off">★</span></span>
-          </div>
-          <a class="btn btn-orange" href="vendedor.php?id=ana">Comprar</a>
-        </div>
-        <div class="seller-card">
-          <div class="thumb">🛍️</div>
-          <div class="seller-info">
-            <p class="seller-name">João Pedro</p>
-            <p class="seller-desc">Bolos e doces por encomenda</p>
-            <span class="stars">★★★★<span class="off">★</span></span>
-          </div>
-          <a class="btn btn-orange" href="vendedor.php?id=joao">Comprar</a>
+      <!-- Produtos -->
+
+      <div class="seller-products">
+        <div class="product-grid" id="pf-products">
+          <?php foreach ($products as $product): ?>
+            <?php if ($product['category_id'] == $category['id']): ?>
+              <div class="product-card">
+                <span class="badge-new">Novo!</span>
+                <div class="product-img"><img src="<?= "../../" . $product['product_photo'] ?>" alt="Image"></div>
+                <p class="product-name"><?= htmlspecialchars($product['name']) ?? ''; ?></p>
+                <p class="product-desc"><?= htmlspecialchars($product['description']) ?? ''; ?></p>
+                <p class="product-price">
+                  <?= 'R$ ' . htmlspecialchars(number_format(($product['price'] ?? 0), 2, ',', '.')); ?>
+                </p>
+              </div>
+            <?php endif; ?>
+          <?php endforeach; ?>
         </div>
       </div>
     </main>
+
+    <!-- Rodapé -->
 
     <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
   </div>

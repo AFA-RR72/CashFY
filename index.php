@@ -2,10 +2,12 @@
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 session_start();
-require_once('MVC/model/user.php');
 require_once('MVC/config/init.php');
+require_once('MVC/model/user.php');
+require_once('MVC/model/category.php');
 
 $users = get_users();
+$categories = get_categories();
 
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
@@ -99,44 +101,39 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         </form>
       </div>
 
+      <!-- As coisa de categoria aqui -->
+
       <h2 class="section-title">Categorias</h2>
-      <div class="cat-grid">
-        <a class="cat-card cat-blue" href="MVC/view/categoria.php?cat=comida">
-          <div class="cat-icon">🍽️</div>
-          <span>Comida</span>
-        </a>
-        <a class="cat-card cat-gold" href="MVC/view/categoria.php?cat=artesanato">
-          <div class="cat-icon">🧶</div>
-          <span>Artesanato</span>
-        </a>
-        <a class="cat-card cat-orange" href="MVC/view/categoria.php?cat=doces">
-          <div class="cat-icon">🧁</div>
-          <span>Doces &amp; Sobremesas</span>
-        </a>
-        <a class="cat-card cat-green" href="MVC/view/categoria.php?cat=plantas">
-          <div class="cat-icon">🌿</div>
-          <span>Plantas &amp; Mudas</span>
-        </a>
-        <a class="cat-card cat-blue" href="MVC/view/categoria.php?cat=bebidas">
-          <div class="cat-icon">🥤</div>
-          <span>Bebidas</span>
-        </a>
-        <a class="cat-card cat-gold" href="MVC/view/categoria.php?cat=papelaria">
-          <div class="cat-icon">✏️</div>
-          <span>Papelaria</span>
-        </a>
-        <a class="cat-card cat-orange" href="MVC/view/categoria.php?cat=acessorios">
-          <div class="cat-icon">💍</div>
-          <span>Acessórios</span>
-        </a>
-        <a class="cat-card cat-green" href="MVC/view/categoria.php?cat=roupas">
-          <div class="cat-icon">👕</div>
-          <span>Roupas</span>
-        </a>
+      <div class="cat-grid" id="categories">
+        <?php
+        $classes = ['cat-blue', 'cat-gold', 'cat-orange', 'cat-green'];
+        ?>
+        <?php if (!isset($_SESSION['search-categories'])): ?>
+          <?php foreach ($categories as $i => $category): ?>
+            <?php $class = $classes[$i % count($classes)]; ?>
+            <a class="cat-card <?= $class; ?>" href="MVC/view/categoria.php?cat=<?= $category['slug']; ?>">
+              <div class="cat-icon "><?= $category['icon']; ?></div>
+              <span class="cat-name"><?= $category['name']; ?></span>
+            </a>
+          <?php endforeach; ?>
+        <?php endif; ?>
+
+          <!-- Categoria pesquisada aqui -->
+
+        <?php if (isset($_SESSION['search-categories'])): ?>
+          <?php foreach ($_SESSION['search-categories'] as $category): ?>
+            <a class="cat-card <?= $classes[($category['id'] - 1) % 4]; ?>" id="<?= $category['id']; ?>"
+              href="MVC/view/categoria.php?cat=<?= $category['slug']; ?>">
+              <div class="cat-icon "><?= $category['icon']; ?></div>
+              <span class="cat-name"><?= $category['name']; ?></span>
+            </a>
+          <?php endforeach; ?>
+          <?php unset($_SESSION['search-categories']); ?>
+        <?php endif; ?>
       </div>
 
-      <!-- Vendedores: lista estática de exemplo — troque por um "while" do PHP
-         puxando do banco quando o back-end estiver pronto. -->
+      <!-- Aqui é o bagulho de vendedores -->
+
       <h2 class="section-title">Vendedores</h2>
       <div class="seller-list">
         <?php if (!isset($_SESSION['search-users'])): ?>
@@ -172,6 +169,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         <?php endif; ?>
       </div>
     </main>
+
+    <!-- Aqui já é o rodapé -->
 
     <footer class="site-footer">
       Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;

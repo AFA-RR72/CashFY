@@ -1,5 +1,9 @@
-<?php session_start();
+<?php
+require_once('../config/auth.php');
 require_once("../model/category.php");
+
+check_login();
+check_role();
 
 $categories = get_categories();
 
@@ -17,6 +21,9 @@ $categories = get_categories();
 </head>
 
 <body>
+
+    <!-- Links -->
+
     <div class="auth-page">
         <a href="perfil.php" class="auth-back">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
@@ -26,6 +33,9 @@ $categories = get_categories();
             </svg>
             Voltar
         </a>
+
+        <!-- Início do form -->
+
         <div class="auth-card">
             <p class="brand"><span class="brand-mark"></span> Cashfy</p>
             <form method="post" action="../controller/new_product.php" enctype="multipart/form-data" novalidate>
@@ -55,27 +65,36 @@ $categories = get_categories();
                     <label for="price">Preço</label>
                     <input type="number" name="product_price" placeholder="R$ 00.00" required>
                 </div>
+
+                <!-- Select de categorias -->
+
                 <div class="field">
                     <label for="category">Categoria</label>
                     <select name="product_category">
                         <option value="" disabled selected>Selecione uma categoria</option>
                         <?php foreach ($categories as $category): ?>
                             <option value="<?= $category['id']; ?>"><?= $category['name']; ?></option>
-                        </select>
                     <?php endforeach; ?>
+                    </select>
                 </div>
+
+                <!-- Descrição -->
+
                 <div class="field">
                     <label for="product_description">Descrição</label>
                     <textarea name="product_description" id="description" class="description"
                         placeholder="min. 10 letras." required></textarea>
                 </div>
+
+                <!-- Mensagem do session -->
+
                 <?php if (isset($_SESSION['msg'])): ?>
                     <div class="session-msg <?= $_SESSION['msg'] === 'Produto criado com sucesso' ? 'success' : '' ?>">
                         <?= htmlspecialchars($_SESSION['msg']) ?>
                     </div>
                     <?php if ($_SESSION['msg'] === 'Produto criado com sucesso') {
                         unset($_SESSION['msg']);
-                        header("Refresh: 2; url=perfil.php");
+                        header("Refresh: 1; url=perfil.php");
                     }
                     ?>
                     <?php unset($_SESSION['msg']); endif; ?>

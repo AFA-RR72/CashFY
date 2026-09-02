@@ -68,9 +68,8 @@ function search_user_by_name($name)
     $search = "%$name%";
     $start = "$name%";
 
-    $stmt = $conn -> prepare("
-        SELECT *
-        FROM users
+    $stmt = $conn -> prepare(
+        "SELECT * FROM users
         WHERE name LIKE ?
         AND role_id = 2
         ORDER BY
@@ -79,8 +78,8 @@ function search_user_by_name($name)
                 WHEN name LIKE ? THEN 2
                 ELSE 3
             END,
-            name ASC
-    ");
+            name ASC"
+    );
 
     $stmt -> bind_param("sss", $search, $name, $start);
 

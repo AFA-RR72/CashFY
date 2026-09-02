@@ -1,5 +1,13 @@
-<?php session_start();
+<?php
+require_once('../config/auth.php');
 require_once("../model/user.php");
+
+check_login();
+
+if (!isset($_SESSION['id']) || empty($_SESSION['id'])){
+    header('Location: ../../index.php');
+    exit;
+}
 
 $user = get_user_by_id($_SESSION['id']);
 

@@ -71,7 +71,7 @@ $institutes = get_institutes();
             <?php
             if ($_SESSION['msg'] === 'Usuário criado com sucesso.') {
               unset($_SESSION['msg']);
-              header("Refresh: 2; url=login.php");
+              header("Refresh: 1; url=login.php");
             } else {
               unset($_SESSION['msg']);
             }
