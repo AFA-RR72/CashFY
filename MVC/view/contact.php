@@ -81,13 +81,11 @@
             </div>
             <hr>
             <div id="return">
-                <a href="../../index.php">Voltar para a página inicial</a>
-                &nbsp;·&nbsp;
-                <a href="cadastro.php">Voltar para o cadastro.</a>
+                <a href="#" onclick="voltarPagina(event)">Voltar</a>
             </div>
         </div>
     </main>
+    <script src="return.js"></script>
     <script src="theme.js"></script>
 </body>
-
 </html>

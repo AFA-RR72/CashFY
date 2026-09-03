@@ -16,122 +16,211 @@ $categories = get_categories();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novo Produto - Cashfy</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Links -->
+    <div class="page">
 
-    <div class="auth-page">
-        <a href="perfil.php" class="auth-back">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                stroke-linecap="round">
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Voltar
-        </a>
+        <div class="form-page-wrap">
 
-        <!-- Início do form -->
+            <div class="form-page-head">
 
-        <div class="auth-card">
-            <p class="brand"><span class="brand-mark"></span> Cashfy</p>
-            <form method="post" action="../controller/new_product.php" enctype="multipart/form-data" novalidate>
-                <div class="product-photo">
-                    <label class="photo_upload" id="photoPreview" for="product_photo">
+                <a href="#" onclick="voltarPagina(event)" class="back-link" style="padding:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                        stroke-linecap="round">
+                        <line x1="19" y1="12" x2="5" y2="12" />
+                        <polyline points="12 19 5 12 12 5" />
+                    </svg>
+                    Voltar
+                </a>
 
-                        <div class="photo-preview">
-                            <span class="photo-icon">
-                                <i class="fa-solid fa-plus"></i>
-                            </span>
-                        </div>
+            </div>
 
-                        <div class="photo-text">
-                            <strong>Escolher foto</strong>
-                            <span>Clique para selecionar uma imagem</span>
-                        </div>
+            <div class="form-card">
 
-                        <input type="file" name="product_photo" accept="image/*" id="product_photo" hidden>
+                <h1 id="form-title">+ Adicionar produto</h1>
+
+                <form method="post" action="../controller/new_product.php" enctype="multipart/form-data" novalidate>
+
+                    <!-- Imagem -->
+
+                    <label class="field-label"
+                        style="font-weight:800; color:var(--teal-900); font-size:0.92rem; display:block; margin-bottom:7px;">
+                        Imagem do produto<span class="required">*</span>
+                    </label>
+
+                    <label class="img-drop" for="product_photo" id="photoPreview" style="cursor:pointer;">
+
+                        <span class="drop-label">
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+
+                        <input type="file" name="product_photo" accept="image/*" id="product_photo"
+                            style="display:none;">
 
                     </label>
-                </div>
-                <div class="field">
-                    <label for="product_name">Nome do Produto</label>
-                    <input type="text" name="product_name" placeholder="Ex.: Salgado de carne" required>
-                </div>
-                <div class="field">
-                    <label for="price">Preço</label>
-                    <input type="number" name="product_price" placeholder="R$ 00.00" required>
-                </div>
 
-                <!-- Select de categorias -->
 
-                <div class="field">
-                    <label for="category">Categoria</label>
-                    <select name="product_category">
-                        <option value="" disabled selected>Selecione uma categoria</option>
-                        <?php foreach ($categories as $category): ?>
-                            <option value="<?= $category['id']; ?>"><?= $category['name']; ?></option>
-                    <?php endforeach; ?>
-                    </select>
-                </div>
+                    <!-- Nome -->
 
-                <!-- Descrição -->
+                    <div class="field">
 
-                <div class="field">
-                    <label for="product_description">Descrição</label>
-                    <textarea name="product_description" id="description" class="description"
-                        placeholder="min. 10 letras." required></textarea>
-                </div>
+                        <label for="product_name">
+                            Nome do produto<span class="required">*</span>
+                        </label>
 
-                <!-- Mensagem do session -->
+                        <input type="text" id="product_name" name="product_name" placeholder="Ex.: Salgado de carne"
+                            required>
 
-                <?php if (isset($_SESSION['msg'])): ?>
-                    <div class="session-msg <?= $_SESSION['msg'] === 'Produto criado com sucesso' ? 'success' : '' ?>">
-                        <?= htmlspecialchars($_SESSION['msg']) ?>
                     </div>
-                    <?php if ($_SESSION['msg'] === 'Produto criado com sucesso') {
-                        unset($_SESSION['msg']);
-                        header("Refresh: 1; url=perfil.php");
-                    }
-                    ?>
-                    <?php unset($_SESSION['msg']); endif; ?>
-                <button class="btn btn-gradient btn-block" type="submit">Criar produto</button>
-            </form>
+
+
+                    <!-- Preço + Categoria -->
+
+                    <div class="field-row">
+
+                        <div class="field">
+
+                            <label for="price">
+                                Preço<span class="required">*</span>
+                            </label>
+
+                            <input type="number" id="price" name="product_price" min="0" step="0.01" placeholder="0,00"
+                                required>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="category">
+                                Categoria<span class="required">*</span>
+                            </label>
+
+                            <select id="category" name="product_category" required>
+
+                                <option value="" disabled selected>
+                                    Selecione uma categoria
+                                </option>
+
+                                <?php foreach ($categories as $category): ?>
+
+                                    <option value="<?= $category['id']; ?>">
+                                        <?= $category['name']; ?>
+                                    </option>
+
+                                <?php endforeach; ?>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Descrição -->
+
+                    <div class="field">
+
+                        <label for="description">
+                            Descrição<span class="required">*</span>
+                        </label>
+
+                        <textarea id="description" name="product_desc" class="product-description"
+                            placeholder="Fale um pouco sobre o produto..." required></textarea>
+
+                    </div>
+
+
+                    <!-- Mensagem -->
+
+                    <?php if (isset($_SESSION['msg'])): ?>
+
+                        <div class="session-msg <?= $_SESSION['msg'] === 'Produto criado com sucesso' ? 'success' : '' ?>">
+                            <?= htmlspecialchars($_SESSION['msg']) ?>
+                        </div>
+
+                        <?php if ($_SESSION['msg'] === 'Produto criado com sucesso') {
+
+                            unset($_SESSION['msg']);
+
+                            header("Refresh: 1; url=perfil.php");
+                        }
+
+                        ?>
+
+                        <?php unset($_SESSION['msg']); ?>
+
+                    <?php endif; ?>
+
+
+                    <!-- Botões -->
+
+                    <div class="form-actions">
+
+                        <a href="perfil.php" class="btn btn-ghost" id="cancel-btn">
+                            Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-orange" id="save-btn">
+                            Salvar
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
         </div>
-        <script>
-            const input = document.getElementById('product_photo');
-            const photoPreview = document.querySelector('.photo-preview');
-            const photoIcon = document.querySelector('.photo-icon');
 
-            input.addEventListener('change', function () {
+    </div>
 
-                const file = this.files[0];
 
-                if (!file) return;
+    <!-- Preview da imagem -->
 
-                const reader = new FileReader();
+    <script>
+        const input = document.getElementById('product_photo');
+        const photoPreview = document.getElementById('photoPreview');
+        const dropLabel = photoPreview.querySelector('.drop-label');
 
-                reader.onload = function (e) {
+        input.addEventListener('change', function () {
 
-                    let img = photoPreview.querySelector('img');
+            const file = this.files[0];
 
-                    if (!img) {
-                        img = document.createElement('img');
-                        photoPreview.appendChild(img);
-                    }
+            if (!file) return;
 
-                    img.src = e.target.result;
+            const reader = new FileReader();
 
-                    photoIcon.style.display = 'none';
-                    photoPreview.classList.add('has-photo');
-                };
+            reader.onload = function (e) {
 
-                reader.readAsDataURL(file);
-            });
-        </script>
-        <script src="theme.js"></script>
+                let img = photoPreview.querySelector('img');
+
+                if (!img) {
+
+                    img = document.createElement('img');
+
+                    photoPreview.appendChild(img);
+
+                }
+
+                img.src = e.target.result;
+
+                dropLabel.style.display = 'none';
+
+                photoPreview.classList.add('has-photo');
+            };
+
+            reader.readAsDataURL(file);
+        });
+    </script>
+    <script src="return.js"></script>
+    <script src="theme.js"></script>
 </body>
+
 </html>
+```

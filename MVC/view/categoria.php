@@ -1,6 +1,15 @@
 <?php session_start();
+require_once("../config/init.php");
 require_once("../model/category.php");
 require_once("../model/products.php");
+require_once("../model/user.php");
+
+if (!isset($_GET['cat']) || empty($_GET['cat']) || check_category($_GET['cat'])) {
+  echo '<script>
+        history.back();
+    </script>';
+  exit;
+}
 
 $category = get_category_by_slug($_GET['cat']);
 $products = get_products_by_category($category['id']);
@@ -41,7 +50,7 @@ $products = get_products_by_category($category['id']);
 
     <main class="container" style="flex:1;">
       <div class="crumb-row">
-        <a class="back-link" href="../../index.php">
+        <a class="back-link" href="#" onclick="voltarPagina(event)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
             stroke-linecap="round">
             <line x1="19" y1="12" x2="5" y2="12" />
@@ -63,7 +72,13 @@ $products = get_products_by_category($category['id']);
         <div class="cat-banner-icon" id="banner-icon"><?= $category['icon']; ?></div>
         <div>
           <h1 id="banner-title"><?= $category['name']; ?></h1>
-          <p id="banner-count"><?= count($products) ?> produto<?php if (count($products) != 1) {echo 's';} ?> nessa categoria</p>
+          <p id="banner-count">
+            <?= count($products) ?> produto<?php if (count($products) != 1) {
+                 echo 's';
+               }
+               ?>
+            nessa categoria
+          </p>
         </div>
       </div>
 
@@ -73,11 +88,21 @@ $products = get_products_by_category($category['id']);
         <div class="product-grid" id="pf-products">
           <?php foreach ($products as $product): ?>
             <?php if ($product['category_id'] == $category['id']): ?>
+              <?php $seller = get_user_by_id($product['user_id']) ?>
               <div class="product-card">
                 <span class="badge-new">Novo!</span>
-                <div class="product-img"><img src="<?= "../../" . $product['product_photo'] ?>" alt="Image"></div>
-                <p class="product-name"><?= htmlspecialchars($product['name']) ?? ''; ?></p>
-                <p class="product-desc"><?= htmlspecialchars($product['description']) ?? ''; ?></p>
+                <div class="product-img"><img src="<?= "../../" . $product['product_photo'] ?>" alt="Image">
+                </div>
+                <p class="product-name">
+                  <?= htmlspecialchars($product['name']) ?? ''; ?>
+                </p>
+                <a href="seller.php?id=<?= $product['user_id']; ?>" class="product-card-seller">
+                  <?= htmlspecialchars($seller['name']) ?? ''; ?>
+                </a>
+
+                <p class="product-desc">
+                  <?= htmlspecialchars($product['description']) ?? ''; ?>
+                </p>
                 <p class="product-price">
                   <?= 'R$ ' . htmlspecialchars(number_format(($product['price'] ?? 0), 2, ',', '.')); ?>
                 </p>
@@ -92,6 +117,7 @@ $products = get_products_by_category($category['id']);
 
     <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
   </div>
+  <script src="return.js"></script>
   <script src="theme.js"></script>
 </body>
 

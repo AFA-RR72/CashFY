@@ -80,7 +80,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <?php else: ?>
             <a href="MVC/view/perfil.php" class="account">
               <div class="profile-photo-icon-mother">
-                <span class="index-account-mark-child"> <?= pegarIniciais($_SESSION['name']) ?></span>
+                <span class="index-account-mark-child">
+                  <?= pegarIniciais($_SESSION['name']); ?>
+                </span>
               </div>
             </a>
           <?php endif; ?>
@@ -146,7 +148,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
                   <span class="stars">★★★★<span class="off">★</span></span>
                 </div>
-                <a class="btn btn-orange" href="MVC/view/vendedor.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
+                <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
               </div>
             <?php endif; ?>
           <?php endforeach; ?>
@@ -161,7 +163,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
                   <span class="stars">★★★★<span class="off">★</span></span>
                 </div>
-                <a class="btn btn-orange" href="MVC/view/vendedor.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
+                <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
               </div>
             <?php endif; ?>
           <?php endforeach; ?>

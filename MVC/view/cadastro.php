@@ -15,7 +15,7 @@ $institutes = get_institutes();
 
 <body>
   <div class="auth-page">
-    <a href="login.php" class="auth-back">
+    <a href="#" onclick="voltarPagina(event)" class="auth-back">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
         stroke-linecap="round">
         <line x1="19" y1="12" x2="5" y2="12" />
@@ -85,8 +85,8 @@ $institutes = get_institutes();
       <p class="auth-foot">Já tem uma conta? <a href="login.php">Entrar</a></p>
     </div>
   </div>
+  <script src="return.js"></script>
   <script src="toggle.js"></script>
   <script src="theme.js"></script>
 </body>
-
 </html>

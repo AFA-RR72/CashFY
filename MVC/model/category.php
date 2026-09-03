@@ -11,12 +11,12 @@ function get_categories()
     return $result;
 }
 
-function check_category($category)
+function check_category($category_id)
 {
     $conn = conn();
 
     $stmt = $conn->prepare("SELECT * FROM category WHERE id = ?");
-    $stmt->bind_param("i", $category);
+    $stmt->bind_param("i", $category_id);
 
     $stmt->execute();
     if (($stmt->num_rows()) > 1) {

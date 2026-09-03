@@ -12,7 +12,7 @@
   <div class="page">
     <div class="form-page-wrap">
       <div class="form-page-head">
-        <a class="back-link" href="dashboard.php" style="padding:0;">
+        <a class="back-link" href="#" onclick="voltarPagina(event)" style="padding:0;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
             stroke-linecap="round">
             <line x1="19" y1="12" x2="5" y2="12" />
@@ -75,7 +75,7 @@
       </div>
     </div>
   </div>
+  <script src="return.js"></script>
   <script src="theme.js"></script>
 </body>
-
 </html>

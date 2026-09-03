@@ -16,7 +16,7 @@
             <div class="page-header">
                 <h1>Termos de Uso</h1>
                 <h3>Última atualização: 31 de agosto de 2026</h3>
-                <a href="contact.php#return">Ir até o fim</a>
+                <a href="#return">Ir até o fim</a>
             </div>
 
             <hr>
@@ -66,7 +66,8 @@
             <div class="card" id="registration">
                 <h1>2. Elegibilidade e cadastro</h1>
                 <ul>
-                    <li>Podem se cadastrar como vendedores estudantes regularmente matriculados em instituições de ensino parceiras;</li>
+                    <li>Podem se cadastrar como vendedores estudantes regularmente matriculados em instituições de
+                        ensino parceiras;</li>
                     <li>As informações fornecidas no cadastro devem ser verdadeiras, completas e atualizadas;</li>
                     <li>Cada usuário é responsável pela guarda e sigilo de sua senha de acesso.</li>
                 </ul>
@@ -81,8 +82,11 @@
                 </p>
 
                 <ul>
-                    <li>O cadastro de estudante menor de idade só é válido mediante consentimento do responsável legal e autorização formal da instituição de ensino;</li>
-                    <li>A instituição de ensino pode estabelecer regras adicionais de uso da plataforma dentro de seu ambiente, desde que não entre em conflito com estes Termos e não contrariem a legislação aplicável.</li>
+                    <li>O cadastro de estudante menor de idade só é válido mediante consentimento do responsável legal e
+                        autorização formal da instituição de ensino;</li>
+                    <li>A instituição de ensino pode estabelecer regras adicionais de uso da plataforma dentro de seu
+                        ambiente, desde que não entre em conflito com estes Termos e não contrariem a legislação
+                        aplicável.</li>
                 </ul>
             </div>
 
@@ -91,8 +95,12 @@
 
                 <ul>
                     <li>Estudantes cadastram seus projetos, produtos ou serviços, com descrição, preço e imagens;</li>
-                    <li>A plataforma atua como intermediária tecnológica, facilitando a conexão entre vendedores e compradores, mas não é parte da relação de compra e venda em si, salvo disposição em contrário;</li>
-                    <li>Prazos de entrega, retirada ou prestação do serviço são definidos por cada projeto/vendedor, respeitando eventuais regras da instituição de ensino (ex.: feiras, eventos, datas letivas).</li>
+                    <li>A plataforma atua como intermediária tecnológica, facilitando a conexão entre vendedores e
+                        compradores, mas não é parte da relação de compra e venda em si, salvo disposição em contrário;
+                    </li>
+                    <li>Prazos de entrega, retirada ou prestação do serviço são definidos por cada projeto/vendedor,
+                        respeitando eventuais regras da instituição de ensino (ex.: feiras, eventos, datas letivas).
+                    </li>
                 </ul>
             </div>
 
@@ -102,7 +110,8 @@
                 <ul>
                     <li>Descrever seus produtos/serviços de forma clara, honesta e sem induzir o comprador a erro;</li>
                     <li>Cumprir os prazos e condições anunciados;</li>
-                    <li>Não comercializar itens proibidos por lei, pelo regulamento da instituição de ensino ou por estes Termos;</li>
+                    <li>Não comercializar itens proibidos por lei, pelo regulamento da instituição de ensino ou por
+                        estes Termos;</li>
                     <li>Manter seus dados de contato e de recebimento de pagamento atualizados;</li>
                     <li>Respeitar as diretrizes pedagógicas estabelecidas pela instituição.</li>
                 </ul>
@@ -121,9 +130,13 @@
                 <h1>7. Conteúdo publicado pelos usuários</h1>
 
                 <ul>
-                    <li>Ao publicar textos, fotos ou vídeos de seus projetos, o estudante concede à plataforma uma licença não exclusiva para exibir esse conteúdo dentro do site e em materiais de divulgação institucional;</li>
-                    <li>É proibido publicar conteúdo ofensivo, discriminatório, falso ou que viole direitos de terceiros;</li>
-                    <li>A plataforma pode remover conteúdos que violem estes Termos, sem aviso prévio, mediante comunicação posterior ao usuário.</li>
+                    <li>Ao publicar textos, fotos ou vídeos de seus projetos, o estudante concede à plataforma uma
+                        licença não exclusiva para exibir esse conteúdo dentro do site e em materiais de divulgação
+                        institucional;</li>
+                    <li>É proibido publicar conteúdo ofensivo, discriminatório, falso ou que viole direitos de
+                        terceiros;</li>
+                    <li>A plataforma pode remover conteúdos que violem estes Termos, sem aviso prévio, mediante
+                        comunicação posterior ao usuário.</li>
                 </ul>
             </div>
 
@@ -143,9 +156,11 @@
 
                 <ul>
                     <li>Comercializar produtos ilegais, perigosos, falsificados ou proibidos para menores de idade;</li>
-                    <li>Utilizar a plataforma para fins fraudulentos, de assédio ou de exposição indevida de outros usuários;</li>
+                    <li>Utilizar a plataforma para fins fraudulentos, de assédio ou de exposição indevida de outros
+                        usuários;</li>
                     <li>Tentar contornar as regras de proteção a estudantes menores de idade;</li>
-                    <li>Utilizar robôs, scripts ou meios automatizados para manipular vendas, avaliações ou métricas da plataforma;</li>
+                    <li>Utilizar robôs, scripts ou meios automatizados para manipular vendas, avaliações ou métricas da
+                        plataforma;</li>
                     <li>Divulgar dados pessoais de terceiros sem consentimento.</li>
                 </ul>
             </div>
@@ -164,9 +179,13 @@
                 <h1>11. Limitação de responsabilidade</h1>
 
                 <ul>
-                    <li>A plataforma atua como intermediária tecnológica e pedagógica, não sendo responsável pela qualidade final dos produtos/serviços oferecidos pelos estudantes, ainda que adote medidas razoáveis de moderação;</li>
-                    <li>Não nos responsabilizamos por instabilidades decorrentes de falhas de conexão, terceiros ou casos fortuitos/força maior;</li>
-                    <li>Eventuais disputas entre comprador e vendedor devem, preferencialmente, ser mediadas pela plataforma e/ou pela instituição de ensino, antes de qualquer medida judicial.</li>
+                    <li>A plataforma atua como intermediária tecnológica e pedagógica, não sendo responsável pela
+                        qualidade final dos produtos/serviços oferecidos pelos estudantes, ainda que adote medidas
+                        razoáveis de moderação;</li>
+                    <li>Não nos responsabilizamos por instabilidades decorrentes de falhas de conexão, terceiros ou
+                        casos fortuitos/força maior;</li>
+                    <li>Eventuais disputas entre comprador e vendedor devem, preferencialmente, ser mediadas pela
+                        plataforma e/ou pela instituição de ensino, antes de qualquer medida judicial.</li>
                 </ul>
             </div>
 
@@ -204,13 +223,11 @@
             </div>
             <hr>
             <div id="return">
-                <a href="../../index.php">Voltar para a página inicial</a>
-                &nbsp;·&nbsp;
-                <a href="cadastro.php">Voltar para o cadastro.</a>
+                <a href="#" onclick="voltarPagina(event)">Voltar</a>
             </div>
         </div>
     </main>
+    <script src="return.js"></script>
     <script src="theme.js"></script>
 </body>
-
 </html>

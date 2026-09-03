@@ -1087,6 +1087,11 @@ body.dark-mode .avatar {
         transform .15s ease,
         box-shadow .15s ease;
 }
+
+.product-card-seller{
+    font-size: small;
+}
+
 .perfil-card{
     margin: 20px 0px 20px 28px;
 }
@@ -1370,8 +1375,48 @@ body.dark-mode .field select option {
 ============================================ */
 
 .field textarea {
-    resize: vertical;
-    min-height: 74px;
+    height: 140px;
+    min-height: 140px;
+    resize: none;
+    overflow-y: auto;
+}
+
+/* Scrollbar da textarea */
+.field textarea::-webkit-scrollbar {
+    width: 8px;
+}
+
+.field textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.field textarea::-webkit-scrollbar-thumb {
+    background: var(--sky-400);
+    border-radius: var(--radius-pill);
+}
+
+.field textarea::-webkit-scrollbar-thumb:hover {
+    background: var(--sky-600);
+}
+
+/* Firefox */
+.field textarea {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sky-400) transparent;
+}
+
+/* Inputs numéricos */
+.field input[type="number"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+.field input[type="number"]::-webkit-inner-spin-button,
+.field input[type="number"]::-webkit-outer-spin-button {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .field-hint {
@@ -1588,17 +1633,18 @@ body.dark-mode .form-card {
 }
 
 .img-drop {
+    width: 150px;
+    height: 150px;
     border: 2px dashed var(--sky-400);
     background: #EAF7FB;
-    border-radius: var(--radius-sm);
-    aspect-ratio: 3.2 / 1;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.6rem;
     color: var(--sky-600);
     cursor: pointer;
-    margin-bottom: 20px;
+    margin: 10px auto 20px;
     overflow: hidden;
     position: relative;
     transition: background .15s ease;
@@ -2189,10 +2235,6 @@ body.dark-mode ::selection {
     font-weight: bold;
 }
 
-.description{
-    height: 90px;
-    resize: none !important;
-}
 
 .seller-products{
     display: flex;

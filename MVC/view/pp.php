@@ -109,10 +109,13 @@
                 </p>
 
                 <ul>
-                    <li>O cadastro de estudantes menores de idade só é realizado mediante autorização da instituição de ensino;</li>
-                    <li>Coletamos apenas os dados estritamente necessários ao funcionamento do projeto empreendedor educacional, evitando dados sensíveis sempre que possível;</li>
+                    <li>O cadastro de estudantes menores de idade só é realizado mediante autorização da instituição de
+                        ensino;</li>
+                    <li>Coletamos apenas os dados estritamente necessários ao funcionamento do projeto empreendedor
+                        educacional, evitando dados sensíveis sempre que possível;</li>
                     <li>Não utilizamos dados de menores para publicidade direcionada ou perfis de consumo;</li>
-                    <li>Pais, responsáveis e a própria instituição podem solicitar, a qualquer momento, acesso, correção ou exclusão dos dados do estudante menor.</li>
+                    <li>Pais, responsáveis e a própria instituição podem solicitar, a qualquer momento, acesso, correção
+                        ou exclusão dos dados do estudante menor.</li>
                 </ul>
             </div>
 
@@ -150,7 +153,8 @@
                 <ul>
                     <li>Autoriorização da instituições de ensino;</li>
                     <li>Cumprimento de obrigação legal ou regulatória, especialmente em questões fiscais;</li>
-                    <li>Legítimo interesse, para melhoria da plataforma e prevenção a fraudes, sempre respeitando os direitos e liberdades fundamentais dos titulares;</li>
+                    <li>Legítimo interesse, para melhoria da plataforma e prevenção a fraudes, sempre respeitando os
+                        direitos e liberdades fundamentais dos titulares;</li>
                     <li>Tutela do exercício regular de direitos, em processos administrativos ou judiciais.</li>
                 </ul>
             </div>
@@ -163,9 +167,11 @@
                 </p>
 
                 <ul>
-                    <li>Instituições de ensino parceiras, limitado aos dados necessários ao acompanhamento pedagógico dos projetos;</li>
+                    <li>Instituições de ensino parceiras, limitado aos dados necessários ao acompanhamento pedagógico
+                        dos projetos;</li>
                     <li>Processadores de pagamento, para viabilizar transações financeiras de forma segura;</li>
-                    <li>Prestadores de serviço de tecnologia (hospedagem, envio de e-mails, análise de dados), sob contrato de confidencialidade;</li>
+                    <li>Prestadores de serviço de tecnologia (hospedagem, envio de e-mails, análise de dados), sob
+                        contrato de confidencialidade;</li>
                     <li>Autoridades públicas, quando exigido por lei, ordem judicial ou solicitação regulatória.</li>
                 </ul>
 
@@ -191,8 +197,10 @@
 
                 <ul>
                     <li>Os dados são armazenados em servidores com criptografia em trânsito e em repouso;</li>
-                    <li>Adotamos controles de acesso restrito, autenticação e monitoramento contra acessos não autorizados;</li>
-                    <li>Em caso de incidente de segurança que possa gerar risco aos titulares, comunicaremos os afetados e a Autoridade Nacional de Proteção de Dados (ANPD), conforme exigido em lei.</li>
+                    <li>Adotamos controles de acesso restrito, autenticação e monitoramento contra acessos não
+                        autorizados;</li>
+                    <li>Em caso de incidente de segurança que possa gerar risco aos titulares, comunicaremos os afetados
+                        e a Autoridade Nacional de Proteção de Dados (ANPD), conforme exigido em lei.</li>
                 </ul>
             </div>
 
@@ -273,15 +281,13 @@
                     <li>Telefone/WhatsApp: (95)99999-9999</li>
                 </ul>
             </div>
-            <hr>    
+            <hr>
             <div id="return">
-                <a href="../../index.php">Voltar para a página inicial</a>
-                &nbsp;·&nbsp;
-                <a href="cadastro.php">Voltar para o cadastro.</a>
+                <a href="#" onclick="voltarPagina(event)">Voltar</a>
             </div>
         </div>
     </main>
+    <script src="return.js"></script>
     <script src="theme.js"></script>
 </body>
-
 </html>

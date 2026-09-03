@@ -4,7 +4,7 @@ require_once("../model/user.php");
 
 check_login();
 
-if (!isset($_SESSION['id']) || empty($_SESSION['id'])){
+if (!isset($_SESSION['id']) || empty($_SESSION['id'])) {
     header('Location: ../../index.php');
     exit;
 }
@@ -28,7 +28,7 @@ $user = get_user_by_id($_SESSION['id']);
 
     <div class="auth-page">
 
-        <a href="perfil.php" class="auth-back">
+        <a href="#" onclick="voltarPagina(event)" class="auth-back">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                 stroke-linecap="round">
                 <line x1="19" y1="12" x2="5" y2="12" />
@@ -114,6 +114,7 @@ $user = get_user_by_id($_SESSION['id']);
             reader.readAsDataURL(file);
         });
     </script>
+    <script src="return.js"></script>
     <script src="theme.js"></script>
 </body>
 
