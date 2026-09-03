@@ -14,6 +14,9 @@ $institutes = get_institutes();
 </head>
 
 <body>
+
+  <!-- Links -->
+
   <div class="auth-page">
     <a href="#" onclick="voltarPagina(event)" class="auth-back">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
@@ -24,9 +27,13 @@ $institutes = get_institutes();
       Voltar
     </a>
 
+    <!-- Bagulho estético -->
+
     <div class="auth-card">
       <p class="brand"><span class="brand-mark"></span> Cashfy</p>
       <p class="auth-sub">Seja bem-vindo! Crie sua conta.</p>
+
+      <!-- Form -->
 
       <form id="signup-form" method="post" action="../controller/cadastro.php" novalidate>
         <div class="field" id="f-name">
@@ -55,17 +62,36 @@ $institutes = get_institutes();
         <div class="field" id="f-pass">
           <label for="pass">Senha</label>
           <div class="password-wrapper">
-            <input type="password" id="password" name="password" placeholder="Crie uma senha"
-              autocomplete="current-password" required minlength="8">
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"
+              required minlength="8">
 
             <button type="button" id="toggle_pass" class="password-toggle" onclick="toggle()" title="Mostrar senha">
               <img id="eye-icon" src="../../uploads/icones/olhof.png" alt="Mostrar senha">
             </button>
           </div>
+        </div>
+        <div class="field" id="f-pass">
+          <label for="pass">Confirme a senha</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="pass_confirm" placeholder="••••••••"
+              autocomplete="current-password" required minlength="8">
+          </div>
+        </div>
+        <div class="field">
+          <div class="checkbox-agreements">
+            <input type="checkbox" name="tos">
+            Li e concordo com os&nbsp; <a href="tos.php">Termos de Uso</a>
+          </div>
+          <div class="checkbox-agreements">
+            <input type="checkbox" name="pp">
+            Li e concordo com a&nbsp; <a href="pp.php">Política de Privacidade</a>
+          </div>
+        </div>
+        <div class="field">
           <?php if (isset($_SESSION['msg'])): ?>
 
             <div class="session-msg <?= $_SESSION['msg'] === 'Usuário criado com sucesso.' ? 'success' : '' ?>">
-              <?= htmlspecialchars($_SESSION['msg']) ?>
+              <?= $_SESSION['msg'] ?>
             </div>
 
             <?php
@@ -78,6 +104,8 @@ $institutes = get_institutes();
             ?>
 
           <?php endif; ?>
+        </div>
+        <div class="field">
           <button class="btn btn-gradient btn-block" type="submit">Criar perfil</button>
         </div>
       </form>
@@ -89,4 +117,5 @@ $institutes = get_institutes();
   <script src="toggle.js"></script>
   <script src="theme.js"></script>
 </body>
+
 </html>

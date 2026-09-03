@@ -1306,6 +1306,28 @@ body.dark-mode .field textarea:focus {
 }
 
 /* ============================================
+   CHECKBOX
+============================================ */
+
+.checkbox-agreements{
+    display: flex;
+    flex-direction: row;
+    font-size: small;
+}
+
+.checkbox-agreements input{
+    width: min-content;
+}
+
+.checkbox-agreements a{
+    color: var(--teal-700);
+}
+
+.agreements-msg{
+    color: var(--teal-700);
+}
+
+/* ============================================
    SELECT
 ============================================ */
 

@@ -42,6 +42,8 @@
               <img id="eye-icon" src="../../uploads/icones/olhof.png" alt="Mostrar senha">
             </button>
           </div>
+        </div>
+        <div class="field">
           <?php if (isset($_SESSION['msg'])): ?>
 
             <div class="session-msg <?= $_SESSION['msg'] === 'Log-in realizado com sucesso.' ? 'success' : '' ?>">
@@ -49,16 +51,17 @@
             </div>
 
 
-            <?php if ($_SESSION['msg'] === 'Log-in realizado com sucesso.')
-            {
+            <?php if ($_SESSION['msg'] === 'Log-in realizado com sucesso.') {
               unset($_SESSION['msg']);
               header("Refresh: 1; url=../../index.php");
-            } else{
+            } else {
               unset($_SESSION['msg']);
             }
             ?>
 
           <?php endif; ?>
+        </div>
+        <div class="field">
           <button class="btn btn-gradient btn-block" type="submit">Entrar</button>
         </div>
       </form>
@@ -70,4 +73,5 @@
   <script src="toggle.js"></script>
   <script src="theme.js"></script>
 </body>
+
 </html>
