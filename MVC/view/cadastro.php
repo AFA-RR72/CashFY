@@ -10,7 +10,7 @@ $institutes = get_institutes();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Criar conta — Cashfy</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body>
@@ -60,9 +60,10 @@ $institutes = get_institutes();
           <input type="email" id="email" name="email" placeholder="voce@exemplo.com" autocomplete="email" required>
         </div>
         <div class="field" id="f-pass">
-          <label for="pass">Senha</label>
+          <label for="password">Senha</label>
+
           <div class="password-wrapper">
-            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password"
               required minlength="8">
 
             <button type="button" id="toggle_pass" class="password-toggle" onclick="toggle()" title="Mostrar senha">
@@ -70,12 +71,10 @@ $institutes = get_institutes();
             </button>
           </div>
         </div>
-        <div class="field" id="f-pass">
-          <label for="pass">Confirme a senha</label>
-          <div class="password-wrapper">
-            <input type="password" id="password" name="pass_confirm" placeholder="••••••••"
-              autocomplete="current-password" required minlength="8">
-          </div>
+
+        <div class="field" id="f-pass-confirm"> <label for="pass_confirm">Confirme a senha</label>
+          <div class="password-wrapper"> <input type="password" id="pass_confirm" name="pass_confirm"
+              placeholder="••••••••" autocomplete="new-password" required minlength="8"> </div>
         </div>
         <div class="field">
           <div class="checkbox-agreements">
@@ -90,7 +89,7 @@ $institutes = get_institutes();
         <div class="field">
           <?php if (isset($_SESSION['msg'])): ?>
 
-            <div class="session-msg <?= $_SESSION['msg'] === 'Usuário criado com sucesso.' ? 'success' : '' ?>">
+            <div class="session-msg <?= $_SESSION['msg'] === 'Usuário criado com sucesso.' ? 'success' : '' ?>" id="msg">
               <?= $_SESSION['msg'] ?>
             </div>
 
@@ -113,9 +112,26 @@ $institutes = get_institutes();
       <p class="auth-foot">Já tem uma conta? <a href="login.php">Entrar</a></p>
     </div>
   </div>
-  <script src="return.js"></script>
-  <script src="toggle.js"></script>
-  <script src="theme.js"></script>
+  <script src="../../assets/js/return.js"></script>
+  <script>
+    function toggle() {
+      const password = document.getElementById("password");
+      const confirmPassword = document.getElementById("pass_confirm");
+      const olho = document.getElementById("eye-icon");
+      if (password.type === "password") {
+        password.type = "text";
+        confirmPassword.type = "text";
+        olho.src = "../../uploads/icones/olhoa.png";
+        olho.alt = "Ocultar senha";
+      } else {
+        password.type = "password";
+        confirmPassword.type = "password";
+        olho.src = "../../uploads/icones/olhof.png";
+        olho.alt = "Mostrar senha";
+      }
+    }
+  </script>
+  <script src="../../assets/js/theme.js"></script>
 </body>
 
 </html>

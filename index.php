@@ -12,19 +12,43 @@ $categories = get_categories();
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
   $palavras = preg_split('/\s+/', trim($frase));
-  $iniciais = '';
+  $palavrasValidas = [];
 
   foreach ($palavras as $palavra) {
     $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
 
-    if (in_array($palavraMinuscula, $ignorar) || empty($palavraMinuscula)) {
+    if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
       continue;
     }
 
-    $iniciais .= mb_substr($palavra, 0, 1, 'UTF-8');
+    $palavrasValidas[] = $palavra;
   }
 
-  return mb_strtoupper($iniciais, 'UTF-8');
+  $quantidade = count($palavrasValidas);
+
+  if ($quantidade === 0) {
+    return '';
+  }
+
+  if ($quantidade === 1) {
+    return mb_strtoupper(
+      mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
+      'UTF-8'
+    );
+  }
+
+  if ($quantidade === 2) {
+    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+    $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+
+    return mb_strtoupper($primeira . $ultima, 'UTF-8');
+  }
+
+  $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+  $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+  $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
+
+  return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
 }
 
 ?>
@@ -37,58 +61,95 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cashfy — Compra e venda entre estudantes</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-  <link rel="stylesheet" href="MVC/view/style.css">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
   <div class="page">
+
+    <!-- Cabeçalho -->
+
     <header class="site-header">
       <div class="container">
-        <a href="index.php" class="brand"><span class="brand-mark"></span>CashFY</a>
-        <label class="theme-switch">
-          <input type="checkbox" id="theme-toggle" onchange="toggleDarkMode()">
-          <span class="slider"></span>
-        </label>
+        <a href="index.php" class="brand">
+          <span class="brand-mark"></span>CashFY
+        </a>
+        <div class="theme-switch-div desktop-theme">
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle-desktop">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <button class="menu-btn" id="menuToggle" aria-label="Abrir menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
         <ul class="nav-links">
-          <li><a href="index.php" class="active">Home</a></li>
-          <li><a href="MVC/view/contact.php">Contato</a></li>
-          <li><a href="MVC/view/sobre.php">Sobre nós</a></li>
-        </ul>
-        <?php if (isset($_SESSION['id'])): ?>
+          <li class="home">
+            <a href="index.php" class="active">Home</a>
+          </li>
+          <li>
+            <a href="MVC/view/contact.php">Contato</a>
+          </li>
+          <li class="about">
+            <a href="MVC/view/sobre.php">Sobre nós</a>
+          </li>
+          <li class="mobile-theme">
+            <div class="theme-switch-div">
+              <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle-mobile">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </li>
+
           <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
-            <div class="header-actions">
-              <a href="MVC/view/perfil.php?vendedor=true" class="btn btn-gradient btn-sm">Vender aqui</a>
-            </div>
-          <?php else: ?>
-            <div class="header-actions">
-              <a href="MVC/controller/log-out.php" class="btn btn-gradient btn-sm">Fazer log-out</a>
-            </div>
+
+            <!-- Cliente -->
+            <li class="mobile-action">
+              <a href="MVC/view/perfil.php?vendedor=true">
+                Vender aqui
+              </a>
+            </li>
+
           <?php endif; ?>
-        <?php else: ?>
+        </ul>
+
+
+        <?php if (!isset($_SESSION['id'])): ?>
+
+          <!-- DESLOGADO: LOGIN FICA FORA DO MENU -->
           <div class="header-actions">
-            <a href="MVC/view/login.php" class="btn btn-gradient btn-sm">Fazer log-in</a>
-          </div>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['id'])): ?>
-          <?php if (!empty($_SESSION['profile_photo'])): ?>
-            <a href="MVC/view/perfil.php" class="account">
-              <div class="profile-photo-icon-mother">
-                <span class="account-mark"><img src="<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
-                </span>
-              </div>
+            <a href="MVC/view/login.php" class="btn btn-gradient btn-sm">
+              Fazer log-in
             </a>
-          <?php else: ?>
-            <a href="MVC/view/perfil.php" class="account">
-              <div class="profile-photo-icon-mother">
+          </div>
+
+        <?php else: ?>
+
+          <!-- LOGADO: FOTO FICA FORA DO MENU -->
+          <a href="MVC/view/perfil.php" class="account">
+            <div class="profile-photo-icon-mother">
+
+              <?php if (!empty($_SESSION['profile_photo'])): ?>
+
+                <span class="account-mark">
+                  <img src="<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+                </span>
+
+              <?php else: ?>
                 <span class="index-account-mark-child">
                   <?= pegarIniciais($_SESSION['name']); ?>
                 </span>
-              </div>
-            </a>
-          <?php endif; ?>
+              <?php endif; ?>
+            </div>
+          </a>
         <?php endif; ?>
       </div>
     </header>
+
+    <!-- Barra de pesquisa -->
 
     <main class="container" style="flex:1;">
 
@@ -120,7 +181,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <?php endforeach; ?>
         <?php endif; ?>
 
-          <!-- Categoria pesquisada aqui -->
+        <!-- Categoria pesquisada aqui -->
 
         <?php if (isset($_SESSION['search-categories'])): ?>
           <?php foreach ($_SESSION['search-categories'] as $category): ?>
@@ -142,11 +203,25 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <?php foreach ($users as $seller): ?>
             <?php if ($seller['role_id'] == 2): ?>
               <div class="seller-card">
-                <div class="thumb">🛍️</div>
+                <div class="thumb">
+                  <img src="<?= $seller['profile_photo']; ?>" alt="Foto de perfil">
+                </div>
+
                 <div class="seller-info">
-                  <p class="seller-name"><?= htmlspecialchars($seller['name']); ?></p>
-                  <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
-                  <span class="stars">★★★★<span class="off">★</span></span>
+
+                  <p class="seller-name">
+                    <?= htmlspecialchars($seller['name']); ?>
+                  </p>
+
+                  <div>
+                    <span class="stars">★★★★
+                      <span class="off">★</span>
+                    </span>
+                  </div>
+                  <p class="seller-desc">
+                    <?= htmlspecialchars($seller['description'] ?? ''); ?>
+                  </p>
+
                 </div>
                 <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
               </div>
@@ -157,13 +232,22 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <?php foreach ($_SESSION['search-users'] as $seller): ?>
             <?php if ($seller['role_id'] == 2): ?>
               <div class="seller-card" id="seller-<?= $seller['id'] ?>">
-                <div class="thumb">🛍️</div>
-                <div class="seller-info">
-                  <p class="seller-name"><?= htmlspecialchars($seller['name']); ?></p>
-                  <p class="seller-desc"><?= htmlspecialchars($seller['description'] ?? ''); ?></p>
-                  <span class="stars">★★★★<span class="off">★</span></span>
+                <div class="thumb">
+                  <img src="<?= $seller['profile_photo']; ?>" alt="foto de perfil">
                 </div>
-                <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
+                <div class="seller-info">
+
+                  <p class="seller-name">
+                    <?= htmlspecialchars($seller['name']); ?>
+                  </p>
+                  <p class="seller-desc">
+                    <?= htmlspecialchars($seller['description'] ?? ''); ?>
+                  </p>
+                  <span class="stars">★★★★</span>
+                  <span class="off">★</span>
+                </div>
+                <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']);
+                ?>">Comprar</a>
               </div>
             <?php endif; ?>
           <?php endforeach; ?>
@@ -181,53 +265,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       <a href="MVC/view/pp.php">Políticas de privacidade</a>
     </footer>
   </div>
-  <script>
-    const themeToggle = document.getElementById("theme-toggle");
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-
-      localStorage.setItem(
-        "theme",
-        document.body.classList.contains("dark-mode") ? "dark" : "light"
-      );
-    }
-
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark-mode");
-      themeToggle.checked = true;
-    }
-  </script>
-  <script>
-    window.addEventListener('load', function () {
-
-      const hash = window.location.hash;
-
-      if (!hash) {
-        return;
-      }
-
-      const vendedor = document.getElementById(hash.substring(1));
-
-      if (!vendedor) {
-        return;
-      }
-
-      const rect = vendedor.getBoundingClientRect();
-
-      const posicao =
-        window.scrollY +
-        rect.top -
-        (window.innerHeight / 2) +
-        (rect.height / 2);
-
-      window.scrollTo({
-        top: posicao,
-        behavior: 'smooth'
-      });
-
-    });
-  </script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/menu-toggle.js"></script>
 </body>
 
 </html>

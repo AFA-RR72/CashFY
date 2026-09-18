@@ -18,14 +18,16 @@ if (empty($_POST['email']) || empty($_POST['password'])) {
         $_SESSION['email'] = $user['email'];
         $_SESSION['role_id'] = $user['role_id'];
         $_SESSION['msg'] = "Log-in realizado com sucesso.";
-        header("Location: ../view/login.php");
+        header("Location: ../view/login.php#msg");
+        exit;
     } else {
         $_SESSION['msg'] = "Senha incorreta.";
-        header("Location: ../view/login.php?id=" . $user['id']);
+        header("Location: ../view/login.php?id=" . $user['id'] . "#msg");
+        exit;
     }
 } else {
     $_SESSION['msg'] = "Email não encontrado.";
-    header("Location: ../view/login.php");
+    header("Location: ../view/login.php#msg");
 }
 
 ?>

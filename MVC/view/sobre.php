@@ -3,19 +3,43 @@
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
   $palavras = preg_split('/\s+/', trim($frase));
-  $iniciais = '';
+  $palavrasValidas = [];
 
   foreach ($palavras as $palavra) {
     $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
 
-    if (in_array($palavraMinuscula, $ignorar) || empty($palavraMinuscula)) {
+    if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
       continue;
     }
 
-    $iniciais .= mb_substr($palavra, 0, 1, 'UTF-8');
+    $palavrasValidas[] = $palavra;
   }
 
-  return mb_strtoupper($iniciais, 'UTF-8');
+  $quantidade = count($palavrasValidas);
+
+  if ($quantidade === 0) {
+    return '';
+  }
+
+  if ($quantidade === 1) {
+    return mb_strtoupper(
+      mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
+      'UTF-8'
+    );
+  }
+
+  if ($quantidade === 2) {
+    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+    $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+
+    return mb_strtoupper($primeira . $ultima, 'UTF-8');
+  }
+
+  $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+  $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+  $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
+
+  return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
 }
 
 ?>
@@ -27,7 +51,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sobre nós — Cashfy</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body>
@@ -35,11 +60,28 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
     <header class="site-header">
       <div class="container">
-        <a href="../../index.php" class="brand"><span class="brand-mark"></span> Cashfy</a>
+        <a href="../../index.php" class="brand"><span class="brand-mark"></span> CashFY</a>
         <ul class="nav-links">
-          <li><a href="../../index.php">Home</a></li>
-          <li><a href="../../index.php#contato">Contato</a></li>
-          <li><a href="sobre.php" class="active">Sobre nós</a></li>
+          <div class="theme-switch-div desktop-theme">
+            <label class="theme-switch">
+              <input type="checkbox" id="theme-toggle-desktop">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <button class="menu-btn" id="menuToggle" aria-label="Abrir menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </button>
+          <li class="home">
+            <a href="../../index.php">Home</a>
+          </li>
+          <li>
+            <a href="../../index.php#contato">Contato</a>
+          </li>
+          <li>
+            <a href="sobre.php" class="active">Sobre nós</a>
+          </li>
         </ul>
         <?php if (isset($_SESSION['id'])): ?>
           <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
@@ -130,7 +172,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       Cashfy — feito por estudantes, para estudantes. &nbsp;·&nbsp; <span id="contato">contato@cashfy.com</span>
     </footer>
   </div>
-  <script src="theme.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="../../assets/js/menu-toggle.js"></script>
 </body>
 
 </html>

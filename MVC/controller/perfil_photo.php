@@ -7,12 +7,14 @@
     if (isset($_POST['delete_profile_photo'])) {
         if (empty($user['profile_photo'])) {
             $_SESSION['msg'] = "Você não tem uma foto de perfil.";
-            header("Location: ../view/perfil_photo.php");
+            header("Location: ../view/perfil_photo.php#msg");
+            exit;
         } else {
             $caminho = BASE_PATH . $user['profile_photo'];
             unlink($caminho);
             update_photo($user['id'], null);
-            header("Location: ../view/perfil.php");
+            header("Location: ../view/perfil.php#msg");
+            exit;
         }
     } elseif (!empty($user['profile_photo'])) {
         if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK){
@@ -20,10 +22,12 @@
             $caminho = (BASE_PATH . $user['profile_photo']);
             move_uploaded_file($foto['tmp_name'], $caminho);
             $_SESSION['msg'] = "Foto alterada com sucesso.";
-            header("Location: ../view/perfil.php");
+            header("Location: ../view/perfil.php#msg");
+            exit;
         } else {
             $_SESSION['msg'] = "Você precisa inserir uma foto.";
-            header("Location: ../view/perfil_photo.php");
+            header("Location: ../view/perfil_photo.php#msg");
+            exit;
         }
 
     } else {
@@ -41,10 +45,12 @@
             $_SESSION['profile_photo'] = $user['profile_photo'];
 
             $_SESSION['msg'] = "Foto adicionada com sucesso.";
-            header("Location: ../view/perfil.php");
+            header("Location: ../view/perfil.php#msg");
+            exit;
         } else {
             $_SESSION['msg'] = "Você precisa inserir uma foto.";
-            header("Location: ../view/perfil_photo.php");
+            header("Location: ../view/perfil_photo.php#msg");
+            exit;
         }
 
     }

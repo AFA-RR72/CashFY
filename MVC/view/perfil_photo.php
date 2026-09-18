@@ -21,7 +21,7 @@ $user = get_user_by_id($_SESSION['id']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu perfil - CashFY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body>
@@ -60,7 +60,8 @@ $user = get_user_by_id($_SESSION['id']);
                     <div class="photo-text">
                         <strong>Escolher foto</strong>
                         <span>Clique para selecionar uma imagem</span>
-                        <strong><?php if (isset($_SESSION['msg'])): ?>
+                        <strong>
+                            <?php if (isset($_SESSION['msg'])): ?>
                                 <div id="msg">
                                     <?php echo ($_SESSION['msg']);
                                     unset($_SESSION['msg']);
@@ -114,8 +115,8 @@ $user = get_user_by_id($_SESSION['id']);
             reader.readAsDataURL(file);
         });
     </script>
-    <script src="return.js"></script>
-    <script src="theme.js"></script>
+    <script src="../../assets/js/return.js"></script>
+    <script src="../../assets/js/theme.js"></script>
 </body>
 
 </html>

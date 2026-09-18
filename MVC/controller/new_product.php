@@ -15,24 +15,31 @@ if (
     empty($_POST['product_description'])
 ) {
     $_SESSION['msg'] = "Você precisa preencher todos o campos";
-    header("Location: ../view/new_product.php");
+    header("Location: ../view/new_product.php#msg");
     exit;
 } elseif (strlen($_POST['product_description']) < 10){
     $_SESSION['msg'] = "A descrição precisa conter ao menos 10 caracteres";
-    header("Location: ../view/new_product.php");
+    header("Location: ../view/new_product.php#msg");
     exit;
-} elseif (check_category($_POST['product_category'])){
+} elseif (!check_category($_POST['product_category'])){
      $_SESSION['msg'] = "Selecione uma categoria válida";
-    header("Location: ../view/new_product.php");
+    header("Location: ../view/new_product.php#msg");
     exit;
 } else {
     $name = uniqid() . ".jpg";
     $path = (BASE_PATH . "uploads/products/");
     $db_path = "uploads/products/" . $name;
     move_uploaded_file($_FILES['product_photo']['tmp_name'], $path . $name);
-    create_product($user['id'], $_POST['product_name'], $_POST['product_category'], $_POST['product_description'], $_POST['product_price'], $db_path);
+    create_product(
+        $user['id'], 
+        $_POST['product_name'], 
+        $_POST['product_category'], 
+        $_POST['product_description'], 
+        $_POST['product_price'], 
+        $db_path
+        );
      $_SESSION['msg'] = "Produto criado com sucesso";
-    header("Location: ../view/new_product.php");
+    header("Location: ../view/new_product.php#msg");
     exit;
     
 }

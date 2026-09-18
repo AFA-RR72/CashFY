@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entrar — Cashfy</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body>
@@ -46,7 +46,7 @@
         <div class="field">
           <?php if (isset($_SESSION['msg'])): ?>
 
-            <div class="session-msg <?= $_SESSION['msg'] === 'Log-in realizado com sucesso.' ? 'success' : '' ?>">
+            <div class="session-msg <?= $_SESSION['msg'] === 'Log-in realizado com sucesso.' ? 'success' : '' ?>" id="msg">
               <?= htmlspecialchars($_SESSION['msg']) ?>
             </div>
 
@@ -69,9 +69,9 @@
       <p class="auth-foot">Não tem uma conta? <a href="cadastro.php">Criar</a></p>
     </div>
   </div>
-  <script src="return.js"></script>
-  <script src="toggle.js"></script>
-  <script src="theme.js"></script>
+  <script src="../../assets/js/return.js"></script>
+  <script src="../../assets/js/toggle.js"></script>
+  <script src="../../assets/js/theme.js"></script>
 </body>
 
 </html>

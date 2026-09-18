@@ -1,4 +1,4 @@
-<?php require_once("cashfy.php");
+<?php require_once(__DIR__ . "/../config/cashfy.php");
 
 function check_email($email){
     $conn = conn();
@@ -123,6 +123,17 @@ function update_to_seller($id, $contact, $description){
 
     $stmt -> execute();
     $stmt -> close();
+}
+
+function update_user($id, $name, $institute, $phone_number, $description, $email){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("UPDATE users SET name = ?, institute_id = ?, phone_number = ?, description = ?, email = ? WHERE id = ?");
+    $stmt -> bind_param('sisssi', $name, $institute, $phone_number, $description, $email, $id);
+    
+    $stmt -> execute();
+    $stmt -> close();
+    return;
 }
 
 ?>

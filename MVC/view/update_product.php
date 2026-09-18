@@ -1,12 +1,23 @@
 <?php
 require_once('../config/auth.php');
-require_once("../model/category.php");
+require_once('../model/category.php');
+require_once('../model/products.php');
 ob_start();
 
 check_login();
 check_role();
 
+check_get_id();
+
+$product = get_product_by_id($_GET['id']);
+
+if (!$product || $product['user_id'] != $_SESSION['id']) {
+    header('Location: perfil.php');
+    exit;
+}
+
 $categories = get_categories();
+
 
 ?>
 
@@ -30,7 +41,7 @@ $categories = get_categories();
 
             <div class="form-page-head">
 
-                <a href="#" onclick="voltarPagina(event)" class="back-link" style="padding:0;">
+                <a href="perfil.php" class="back-link" style="padding:0;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                         stroke-linecap="round">
                         <line x1="19" y1="12" x2="5" y2="12" />
@@ -43,9 +54,9 @@ $categories = get_categories();
 
             <div class="form-card">
 
-                <h1 id="form-title">+ Adicionar produto</h1>
+                <h1 id="form-title"><i class="fa-solid fa-pen-to-square"></i> Alterar Produto</h1>
 
-                <form method="post" action="../controller/new_product.php" enctype="multipart/form-data" novalidate>
+                <form method="post" action="../controller/update_product.php?id=<?= $product['id'] ?>" enctype="multipart/form-data" novalidate>
 
                     <!-- Imagem -->
 
@@ -145,7 +156,7 @@ $categories = get_categories();
 
                     <?php if (isset($_SESSION['msg'])): ?>
 
-                        <div class="session-msg <?= $_SESSION['msg'] === 'Produto criado com sucesso' ? 'success' : '' ?>" id="msg">
+                        <div class="session-msg <?= $_SESSION['msg'] === 'Produto alterado com sucesso' ? 'success' : '' ?>" id="msg">
                             <?= htmlspecialchars($_SESSION['msg']) ?>
                         </div>
 
@@ -222,6 +233,25 @@ $categories = get_categories();
 
             reader.readAsDataURL(file);
         });
+    </script>
+    <script>
+        const product = <?= json_encode($product); ?>;
+
+        document.getElementById('product_name').value = product.name;
+        document.getElementById('description').value = product.description;
+        document.getElementById('category').value = product.category_id;
+
+        const price = Number(product.price);
+        document.getElementById('price').value = price.toFixed(2);
+
+        if (product.product_photo) {
+            const img = document.createElement('img');
+
+            img.src = '../../' + product.product_photo;
+
+            document.getElementById('photoPreview').appendChild(img);
+            document.querySelector('.drop-label').style.display = 'none';
+        }
     </script>
     <script src="../../assets/js/return.js"></script>
     <script src="../../assets/js/theme.js"></script>

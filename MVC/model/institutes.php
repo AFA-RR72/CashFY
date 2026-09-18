@@ -1,4 +1,4 @@
-<?php require_once("cashfy.php");
+<?php require_once(__DIR__ . "/../config/cashfy.php");
 
 function check_institute($institute_id)
 {

@@ -1,7 +1,6 @@
-<?php require_once("cashfy.php");
+<?php require_once(__DIR__ . "/../config/cashfy.php");
 
-function get_categories()
-{
+function get_categories(){
     $conn = conn();
 
     $sql = "SELECT * FROM category";
@@ -11,47 +10,47 @@ function get_categories()
     return $result;
 }
 
-function check_category($category_id)
-{
+function check_category($category_id){
     $conn = conn();
 
-    $stmt = $conn->prepare("SELECT * FROM category WHERE id = ?");
-    $stmt->bind_param("i", $category_id);
+    $stmt = $conn -> prepare("SELECT * FROM category WHERE id = ?");
+    $stmt -> bind_param("i", $category_id);
 
-    $stmt->execute();
-    if (($stmt->num_rows()) > 1) {
-        $stmt->close();
+    $stmt -> execute();
+    $result = $stmt -> get_result();
+
+    if ($result -> num_rows > 0) {
+        $stmt -> close();
         return true;
-    }
-    $stmt->close();
-    return false;
+    } elseif ($result -> num_rows == 0){
+        $stmt -> close();
+        return false;
+    }    
 }
 
-function get_category_by_slug($slug)
-{
+function get_category_by_slug($slug){
     $conn = conn();
 
-    $stmt = $conn->prepare("SELECT * FROM category WHERE slug = ?");
-    $stmt->bind_param("s", $slug);
+    $stmt = $conn -> prepare("SELECT * FROM category WHERE slug = ?");
+    $stmt -> bind_param("s", $slug);
 
-    $stmt->execute();
+    $stmt -> execute();
 
-    $result = $stmt->get_result();
-    $category = $result->fetch_assoc();
+    $result = $stmt -> get_result();
+    $category = $result -> fetch_assoc();
 
-    $stmt->close();
+    $stmt -> close();
     return $category;
 }
 
-function search_categories($category_name)
-{
+function search_categories($category_name){
     $conn = conn();
 
     $name = trim($category_name);
     $search = "%$category_name%";
     $start = "$category_name%";
 
-    $stmt = $conn->prepare(
+    $stmt = $conn -> prepare(
         "SELECT * FROM category
         WHERE name LIKE ?
         ORDER BY

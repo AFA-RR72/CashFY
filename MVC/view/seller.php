@@ -4,22 +4,48 @@ require_once('../model/products.php');
 $seller = get_user_by_id($_GET['id']);
 $products = get_products();
 
+$user = get_user_by_id($_SESSION['id']);
+
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
   $palavras = preg_split('/\s+/', trim($frase));
-  $iniciais = '';
+  $palavrasValidas = [];
 
   foreach ($palavras as $palavra) {
     $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
 
-    if (in_array($palavraMinuscula, $ignorar) || empty($palavraMinuscula)) {
+    if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
       continue;
     }
 
-    $iniciais .= mb_substr($palavra, 0, 1, 'UTF-8');
+    $palavrasValidas[] = $palavra;
   }
 
-  return mb_strtoupper($iniciais, 'UTF-8');
+  $quantidade = count($palavrasValidas);
+
+  if ($quantidade === 0) {
+    return '';
+  }
+
+  if ($quantidade === 1) {
+    return mb_strtoupper(
+      mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
+      'UTF-8'
+    );
+  }
+
+  if ($quantidade === 2) {
+    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+    $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+
+    return mb_strtoupper($primeira . $ultima, 'UTF-8');
+  }
+
+  $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+  $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+  $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
+
+  return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
 }
 ?>
 
@@ -30,25 +56,92 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vendedor — Cashfy</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body>
   <div class="page">
 
-    <!-- Links -->
+    <!-- Cabeçalho -->
 
     <header class="site-header">
       <div class="container">
-        <a href="../../index.php" class="brand"><span class="brand-mark"></span> Cashfy</a>
-        <ul class="nav-links">
-          <li><a href="../../index.php">Home</a></li>
-          <li><a href="../../index.php#contato">Contato</a></li>
-          <li><a href="sobre.php">Sobre nós</a></li>
-        </ul>
-        <div class="header-actions">
-          <a href="login.php" class="btn btn-gradient btn-sm">Vender aqui</a>
+        <a href="../../index.php" class="brand">
+          <span class="brand-mark"></span>CashFY
+        </a>
+        <div class="theme-switch-div desktop-theme">
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle-desktop">
+            <span class="slider"></span>
+          </label>
         </div>
+        <button class="menu-btn" id="menuToggle" aria-label="Abrir menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <ul class="nav-links">
+          <li class="home">
+            <a href="../../index.php">Home</a>
+          </li>
+          <li>
+            <a href="contact.php">Contato</a>
+          </li>
+          <li>
+            <a href="sobre.php">Sobre nós</a>
+          </li>
+          <li class="mobile-theme">
+            <div class="theme-switch-div">
+              <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle-mobile">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </li>
+
+          <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
+
+            <!-- Cliente -->
+            <li class="mobile-action">
+              <a href="perfil.php?vendedor=true">
+                Vender aqui
+              </a>
+            </li>
+
+          <?php endif; ?>
+        </ul>
+
+
+        <?php if (!isset($_SESSION['id'])): ?>
+
+          <!-- DESLOGADO: LOGIN FICA FORA DO MENU -->
+          <div class="header-actions">
+            <a href="login.php" class="btn btn-gradient btn-sm">
+              Fazer log-in
+            </a>
+          </div>
+
+        <?php else: ?>
+
+          <!-- LOGADO: FOTO FICA FORA DO MENU -->
+          <a href="perfil.php" class="account">
+            <div class="profile-photo-icon-mother">
+
+              <?php if (!empty($_SESSION['profile_photo'])): ?>
+
+                <span class="account-mark">
+                  <img src="../../<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+                </span>
+
+              <?php else: ?>
+                <span class="index-account-mark-child">
+                  <?= pegarIniciais($_SESSION['name']); ?>
+                </span>
+              <?php endif; ?>
+            </div>
+          </a>
+        <?php endif; ?>
       </div>
     </header>
 
@@ -75,7 +168,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <?php endif; ?>
             <?php if (empty($seller['profile_photo'])): ?>
               <div class="avatar" id="pf-avatar">
-                  <?= pegarIniciais($_SESSION['name']); ?>
+                <?= pegarIniciais($seller['name']); ?>
               </div>
             <?php endif; ?>
           </div>
@@ -116,7 +209,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
     <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
   </div>
-  <script src="return.js"></script>
-  <script src="theme.js"></script>
+  <script src="../../assets/js/return.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="../../assets/js/menu-toggle.js"></script>
 </body>
 </html>

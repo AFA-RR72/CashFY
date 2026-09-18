@@ -4,7 +4,7 @@ require_once("../model/category.php");
 require_once("../model/products.php");
 require_once("../model/user.php");
 
-if (!isset($_GET['cat']) || empty($_GET['cat']) || check_category($_GET['cat'])) {
+if (!isset($_GET['cat']) || empty($_GET['cat']) || !check_category($_GET['cat'])) {
   echo '<script>
         history.back();
     </script>';
@@ -24,7 +24,7 @@ $products = get_products_by_category($category['id']);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Categoria — Cashfy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body>
@@ -34,15 +34,75 @@ $products = get_products_by_category($category['id']);
 
     <header class="site-header">
       <div class="container">
-        <a href="../../index.php" class="brand"><span class="brand-mark"></span> Cashfy</a>
-        <ul class="nav-links">
-          <li><a href="../../index.php">Home</a></li>
-          <li><a href="../../index.php#contato">Contato</a></li>
-          <li><a href="sobre.php">Sobre nós</a></li>
-        </ul>
-        <div class="header-actions">
-          <a href="login.php" class="btn btn-gradient btn-sm">Vender aqui</a>
+        <a href="../../index.php" class="brand">
+          <span class="brand-mark"></span> CashFY
+        </a>
+        <div class="theme-switch-div desktop-theme">
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle-desktop">
+            <span class="slider"></span>
+          </label>
         </div>
+        <button class="menu-btn" id="menuToggle" aria-label="Abrir menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <ul class="nav-links">
+          <li class="home">
+            <a href="../../index.php">Home</a>
+          </li>
+          <li>
+            <a href="contact.php">Contato</a>
+          </li>
+          <li>
+            <a href="sobre.php">Sobre nós</a>
+          </li>
+          <li class="mobile-theme">
+            <div class="theme-switch-div">
+              <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle-mobile">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </li>
+
+          <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
+
+            <!-- Cliente -->
+            <li class="mobile-action">
+              <a href="MVC/view/perfil.php?vendedor=true">
+                Vender aqui
+              </a>
+            </li>
+
+          <?php endif; ?>
+
+        </ul>
+        <?php if (isset($_SESSION['id'])): ?>
+          <a href="perfil.php" class="account">
+            <div class="profile-photo-icon-mother">
+
+              <?php if (!empty($_SESSION['profile_photo'])): ?>
+
+                <span class="account-mark">
+                  <img src="../../<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+                </span>
+
+              <?php else: ?>
+                <span class="index-account-mark-child">
+                  <?= pegarIniciais($_SESSION['name']); ?>
+                </span>
+              <?php endif; ?>
+            </div>
+          </a>
+        <?php else: ?>
+          <div class="header-actions">
+            <a href="login.php" class="btn btn-gradient btn-sm">
+              Fazer log-in
+            </a>
+          </div>
+        <?php endif; ?>
       </div>
     </header>
 
@@ -50,7 +110,7 @@ $products = get_products_by_category($category['id']);
 
     <main class="container" style="flex:1;">
       <div class="crumb-row">
-        <a class="back-link" href="#" onclick="voltarPagina(event)">
+        <a class="back-link" href="../../index.php">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
             stroke-linecap="round">
             <line x1="19" y1="12" x2="5" y2="12" />
@@ -117,8 +177,9 @@ $products = get_products_by_category($category['id']);
 
     <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
   </div>
-  <script src="return.js"></script>
-  <script src="theme.js"></script>
+  <script src="../../assets/js/return.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="../../assets/js/menu-toggle.js"></script>
 </body>
 
 </html>
