@@ -383,12 +383,14 @@ function format_phone_number($phone_number)
                                 <div class="stat-card stat-orange">
                                     <div class="stat-label">Vendas do Mês</div>
                                     <div class="stat-value" id="stat-month">R$
-                                        <?= htmlspecialchars(get_total_mouth($user['id'])); ?>
+                                        <?= htmlspecialchars(get_total_month($user['id'])); ?>
                                     </div>
                                 </div>
                                 <div class="stat-card stat-blue">
-                                    <div class="stat-label">Itens vendidos</div>
-                                    <div class="stat-value" id="stat-items">0</div>
+                                    <div class="stat-label">Itens vendidos no Mês</div>
+                                    <div class="stat-value" id="stat-items">
+                                        <?= htmlspecialchars(get_saled_items_month($user['id'])) ?>
+                                    </div>
                                 </div>
                             </div>
                             <div class="chart-card">
@@ -429,7 +431,8 @@ function format_phone_number($phone_number)
                                         </div>
                                         <div class="field phone">
                                             <label for="phone">Telefone</label>
-                                            <input type="tel" name="phone" id="phone_number" placeholder="(00) 0 0000-0000" maxlength="16" required>
+                                            <input type="tel" name="phone" id="phone_number" placeholder="(00) 0 0000-0000"
+                                                maxlength="16" required>
                                         </div>
                                     </div>
                                     <div class="field">
@@ -460,6 +463,54 @@ function format_phone_number($phone_number)
 
                     <?php endif; ?>
                 </div>
+            <?php endif; ?>
+
+            <!-- Perfil do client -->
+
+            <?php if (isset($user['role_id']) && $user['role_id'] == 3): ?>
+                <?php $institutes = get_institutes(); ?>
+
+                <section class="tab-panel" id="tab-perfil">
+                    <div class="form-card seller-profile">
+                        <h1>Editar seus dados</h1>
+                        <form id="profile-form" action="../controller/update_user.php" method="post" novalidate>
+                            <div class="row">
+                                <div class="field profile-name">
+                                    <label for="p-name">Nome</label>
+                                    <input type="text" id="p-name" name="name" placeholder="Seu nome completo">
+                                </div>
+                                <div class="field select">
+                                    <label for="p-inst">Instituição</label>
+                                    <select name="inst" id="p-inst">
+                                        <option value="" selected disabled>Selecione uma Instituição</option>
+                                        <?php foreach ($institutes as $institute): ?>
+                                            <option value="<?= $institute['id'] ?>">
+                                                <?= htmlspecialchars($institute['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="email">E-mail</label>
+                                <input type="email" id="p-email" name="email" placeholder="voce@exemplo.com"
+                                    autocomplete="email" required>
+                            </div>
+                            <div class="field">
+                                <label for="p-pass">Senha</label>
+                                <input type="password" id="p-pass" name="password" placeholder="••••••••">
+                            </div>
+                            <?php if (isset($_SESSION['msg-form'])): ?>
+                                <div class="session-msg <?= $_SESSION['msg-form'] === 'Perfil alterado com sucesso' ? 'success' : ''; ?>"
+                                    id="msg-form">
+                                    <?= htmlspecialchars($_SESSION['msg-form']); ?>
+                                    <?php unset($_SESSION['msg-form']); ?>
+                                </div>
+                            <?php endif; ?>
+                            <button class="btn btn-gradient" type="submit">Editar</button>
+                        </form>
+                    </div>
+                </section>
             <?php endif; ?>
         </main>
 

@@ -17,7 +17,7 @@ if (
     if ($isSeller) {
         header("Location: ../view/perfil.php?profile#msg-form");
     } else {
-        header("Location: ../view/perfil.php?clientprofile#msg-form");
+        header("Location: ../view/perfil.php#msg-form");
     }
 
     exit;
@@ -48,7 +48,7 @@ if (!password_verify($_POST['password'], $user['password'])) {
     if ($isSeller) {
         header("Location: ../view/perfil.php?profile#msg-form");
     } else {
-        header("Location: ../view/perfil.php?clientprofile#msg-form");
+        header("Location: ../view/perfil.php#msg-form");
     }
 
     exit;
@@ -80,7 +80,7 @@ if ($isSeller) {
     );
 
     $_SESSION['msg-form'] = 'Perfil alterado com sucesso';
-    header("Location: ../view/perfil.php?clientprofile#msg-form");
+    header("Location: ../view/perfil.php#msg-form");
 }
 exit;
 ?>

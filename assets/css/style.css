@@ -2206,6 +2206,210 @@ body.dark-mode .delete_profile_photo {
 }
 
 /* ============================================
+   CASHFY — Cookie Banner
+============================================ */
+
+#cookie-banner {
+    display: none;
+}
+
+#cookie-banner {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    z-index: 9999;
+
+    width: min(440px, calc(100% - 48px));
+    padding: 24px;
+
+    background: var(--cream);
+    border: 2px solid var(--gold-400);
+    border-radius: 18px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+    font-family: 'Nunito', sans-serif;
+}
+
+#cookie-banner h3 {
+    margin: 0 0 12px;
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+
+    color: var(--teal-700);
+}
+
+#cookie-banner p {
+    margin: 0 0 10px;
+
+    font-size: 0.92rem;
+    line-height: 1.5;
+
+    color: var(--text);
+}
+
+#cookie-banner p:last-of-type {
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+#cookie-banner button {
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 10px;
+
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 800;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#cookie-accept {
+    background: transparent;
+    color: var(--teal-700);
+
+    border: 2px solid var(--teal-700) !important;
+}
+
+#cookie-accept:hover {
+    background: var(--teal-700);
+    color: var(--ink);
+}
+
+#cookie-reject {
+    margin-left: 8px;
+
+    background: transparent;
+    color: rgb(239, 75, 75);
+
+    border: 2px solid rgb(239, 75, 75) !important;
+}
+
+#cookie-reject:hover {
+    background: rgba(239, 75, 75, 0.784);
+    color: rgba(246, 137, 137, 0.695);
+}
+
+
+/* ============================================
+   Dark mode
+============================================ */
+
+body.dark-mode #cookie-banner {
+    background: var(--cream-deep);
+    border-color: var(--gold-400);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode #cookie-banner h3 {
+    color: var(--gold-400);
+}
+
+body.dark-mode #cookie-banner p {
+    color: var(--text);
+}
+
+body.dark-mode #cookie-reject {
+    color: var(--gold-400);
+    border-color: var(--gold-400) !important;
+}
+
+body.dark-mode #cookie-reject:hover {
+    background: var(--gold-400);
+    color: var(--cream-deep);
+}
+
+
+/* ============================================
+   Mobile
+============================================ */
+
+@media (max-width: 600px) {
+    #cookie-banner {
+        left: 12px;
+        bottom: 12px;
+
+        width: calc(100% - 24px);
+        padding: 20px;
+
+        border-radius: 16px;
+    }
+
+    #cookie-banner h3 {
+        font-size: 1.1rem;
+    }
+
+    #cookie-banner p {
+        font-size: 0.88rem;
+    }
+
+    #cookie-banner button {
+        width: 100%;
+        padding: 11px;
+    }
+
+    #cookie-reject {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+
+/* ============================================
+    Carrinho
+============================================ */
+
+#cart {
+    position: fixed;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+
+    border: none;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+#cart::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+#cart img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.cart-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#cart form {
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    display: flex;
+    flex-direction: row;
+}
+
+.cart-quantity input {
+    border: none;
+    width: 15px;
+
+}
+
+/* ============================================
    Responsive
 ============================================ */
 

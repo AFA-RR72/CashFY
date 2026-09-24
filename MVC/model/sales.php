@@ -54,7 +54,8 @@ function get_total_week($user_id)
     return $total;
 }
 
-function get_total_mouth($user_id){
+function get_total_month($user_id)
+{
     $conn = conn();
 
     $stmt = $conn->prepare("
@@ -70,12 +71,39 @@ function get_total_mouth($user_id){
     $stmt->bind_param('i', $user_id);
 
     $stmt->execute();
+
     $result = $stmt->get_result()->fetch_assoc();
+
     $stmt->close();
 
     $total = number_format($result['total_month'], 2, ',', '.');
 
     return $total;
+}
+
+function get_saled_items_month($user_id)
+{
+    $conn = conn();
+
+    $stmt = $conn->prepare("
+    SELECT COUNT(id) as 'saled_items'
+    FROM sales
+    WHERE user_id = ?
+    AND date >= CURDATE() - INTERVAL DAY(CURDATE() - 1) DAY
+    AND date < DATE_ADD(
+        CURDATE() - INTERVAL (DAY(CURDATE()) - 1) DAY,
+        INTERVAL 1 MONTH
+    );
+    ");
+    $stmt->bind_param('i', $user_id);
+
+    $stmt->execute();
+
+    $result = $stmt->get_result()->fetch_assoc();
+
+    $stmt->close(); 
+
+    return $result['saled_items'];
 }
 
 ?>

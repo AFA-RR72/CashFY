@@ -2,6 +2,8 @@
 require_once('../model/user.php');
 
 $email = $_POST['email'];
+$_SESSION['form'] = $_POST;
+
 
 if (empty($_POST['name']) || empty($_POST['institute']) || empty($_POST['email']) || empty($_POST['password'])) {
     $_SESSION['msg'] = "Você precisa preencher todos os campos";

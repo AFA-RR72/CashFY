@@ -119,7 +119,7 @@ function update_to_seller($id, $contact, $description){
     $conn = conn();
 
     $stmt  = $conn -> prepare("UPDATE users SET description = ?, phone_number = ?, role_id = 2 WHERE id = ?");
-    $stmt -> bind_param("sii", $description, $contact, $id);
+    $stmt -> bind_param("ssi", $description, $contact, $id);
 
     $stmt -> execute();
     $stmt -> close();

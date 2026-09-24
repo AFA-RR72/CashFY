@@ -1,10 +1,10 @@
-const BASE_URL = 'http://localhost/activities/CashFY/';
+const BASE_URL = "http://localhost/activities/CashFY/";
 
 function voltarPagina(event) {
     event.preventDefault();
 
     if (!document.referrer.startsWith(BASE_URL)) {
-        window.location.href = BASE_URL + 'index.php';
+        window.location.href = BASE_URL + "index.php";
         return;
     }
 

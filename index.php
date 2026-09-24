@@ -265,8 +265,29 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       <a href="MVC/view/pp.php">Políticas de privacidade</a>
     </footer>
   </div>
+  <div id="cookie-banner">
+    <h3>Usamos cookies</h3>
+
+    <p>
+      O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+      preferências e garantir o funcionamento correto do site.
+    </p>
+
+    <p>
+      Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+      determinadas configurações enquanto navega pelo CashFY.
+    </p>
+
+    <p>
+      Ao continuar navegando, você concorda com o uso desses cookies.
+    </p>
+
+    <button id="cookie-accept">Aceitar</button>
+    <button id="cookie-reject">Sair</button>
+  </div>
   <script src="assets/js/theme.js"></script>
   <script src="assets/js/menu-toggle.js"></script>
+  <script src="assets/js/cookies.js"></script>
 </body>
 
 </html>
