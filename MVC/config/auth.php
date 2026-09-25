@@ -1,7 +1,7 @@
 <?php session_start();
 require_once('init.php');
-require_once('../model/user.php');
-require_once('../model/products.php');
+require_once(__DIR__ . '/../model/user.php');
+require_once(__DIR__ . '/../model/products.php');
 
 function check_login()
 {

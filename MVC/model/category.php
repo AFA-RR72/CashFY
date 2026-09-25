@@ -28,6 +28,21 @@ function check_category($category_id){
     }    
 }
 
+function get_category_by_id($id){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("SELECT * FROM category WHERE id = ?");
+    $stmt -> bind_param("i", $id);
+
+    $stmt -> execute();
+
+    $result = $stmt -> get_result();
+    $category = $result -> fetch_assoc();
+
+    $stmt -> close();
+    return $category;
+}
+
 function get_category_by_slug($slug){
     $conn = conn();
 

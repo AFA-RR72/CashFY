@@ -83,17 +83,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <a href="sobre.php" class="active">Sobre nós</a>
           </li>
         </ul>
-        <?php if (isset($_SESSION['id'])): ?>
-          <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
-            <div class="header-actions">
-              <a href="perfil.php?vendedor=true" class="btn btn-gradient btn-sm">Vender aqui</a>
-            </div>
-          <?php else: ?>
-            <div class="header-actions">
-              <a href="../controller/log-out.php" class="btn btn-gradient btn-sm">Fazer log-out</a>
-            </div>
-          <?php endif; ?>
-        <?php else: ?>
+        <?php if (!isset($_SESSION['id'])): ?>
           <div class="header-actions">
             <a href="login.php" class="btn btn-gradient btn-sm">Fazer log-in</a>
           </div>

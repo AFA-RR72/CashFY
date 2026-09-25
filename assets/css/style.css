@@ -2222,7 +2222,7 @@ body.dark-mode .delete_profile_photo {
     width: min(440px, calc(100% - 48px));
     padding: 24px;
 
-    background: var(--cream);
+    background: var(--card);
     border: 2px solid var(--gold-400);
     border-radius: 18px;
 
@@ -2292,7 +2292,7 @@ body.dark-mode .delete_profile_photo {
 
 #cookie-reject:hover {
     background: rgba(239, 75, 75, 0.784);
-    color: rgba(246, 137, 137, 0.695);
+    color: rgba(87, 44, 44, 0.812);
 }
 
 
@@ -2407,6 +2407,15 @@ body.dark-mode #cookie-reject:hover {
     border: none;
     width: 15px;
 
+}
+
+/* ============================================
+    Diálogo para ser vendedor
+============================================ */
+
+#seller-quest {
+    position: fixed;
+    top: 50%;
 }
 
 /* ============================================

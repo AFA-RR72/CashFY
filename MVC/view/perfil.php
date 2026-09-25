@@ -176,47 +176,6 @@ function format_phone_number($phone_number)
                 </div>
 
             </div>
-            <!-- Form para virar vendedor -->
-
-            <?php if (isset($_GET['vendedor']) && $_GET['vendedor'] == true): ?>
-                <div class="be-seller-form">
-                    <div class="titulo-form-vendedor">Atualize seu perfil para tornar-se um vendedor <span
-                            class="cashfy">CashFY</span></div>
-                    <form action="../controller/seja_vendedor.php" method="post" novalidate>
-                        <div class="field">
-                            <label for="phone_number">Contato</label>
-                            <input type="tel" name="phone_number" id="phone_number" placeholder="(00) 0 0000-0000"
-                                pattern="[0-9]{10,11}" maxlength="16" required>
-                        </div>
-                        <div class="field">
-                            <label for="description">Descrição</label>
-                            <textarea name="description" id="description" class="description" placeholder="min. 20 letras."
-                                required></textarea>
-                        </div>
-                        <div class="field">
-                            <label for="pass">Senha</label>
-                            <div class="password-wrapper">
-                                <input type="password" id="password" name="password" placeholder="••••••••"
-                                    autocomplete="current-password" required minlength="8">
-                                <button type="button" id="toggle_pass" class="password-toggle" onclick="toggle()"
-                                    title="Mostrar senha">
-                                    <img id="eye-icon" src="../../uploads/icones/olhof.png" alt="Mostrar senha">
-                                </button>
-                            </div>
-                        </div>
-                        <?php if (isset($_SESSION['msg-form'])): ?>
-                            <div class="session-msg <?= $_SESSION['msg-form'] === 'Perfil atualizado com sucesso.' ? 'success' : ''; ?>"
-                                id="msg-form">
-                                <?= htmlspecialchars($_SESSION['msg-form']); ?>
-                                <?php unset($_SESSION['msg-form']); ?>
-                            </div>
-                        <?php endif; ?>
-                        <div class="field">
-                            <button class="btn btn-gradient btn-block" type="submit">Atualizar perfil</button>
-                        </div>
-                    </form>
-                </div>
-            <?php endif; ?>
 
             <!-- Parte do vendedor -->
 
@@ -465,7 +424,7 @@ function format_phone_number($phone_number)
                 </div>
             <?php endif; ?>
 
-            <!-- Perfil do client -->
+            <!-- Perfil do cliente -->
 
             <?php if (isset($user['role_id']) && $user['role_id'] == 3): ?>
                 <?php $institutes = get_institutes(); ?>

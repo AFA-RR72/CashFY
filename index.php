@@ -1,13 +1,15 @@
 <?php ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-session_start();
 require_once('MVC/config/init.php');
+require_once('MVC/config/auth.php');
 require_once('MVC/model/user.php');
 require_once('MVC/model/category.php');
 
 $users = get_users();
 $categories = get_categories();
+
+check_login();
 
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
@@ -103,17 +105,6 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
               </label>
             </div>
           </li>
-
-          <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
-
-            <!-- Cliente -->
-            <li class="mobile-action">
-              <a href="MVC/view/perfil.php?vendedor=true">
-                Vender aqui
-              </a>
-            </li>
-
-          <?php endif; ?>
         </ul>
 
 
@@ -174,7 +165,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         <?php if (!isset($_SESSION['search-categories'])): ?>
           <?php foreach ($categories as $i => $category): ?>
             <?php $class = $classes[$i % count($classes)]; ?>
-            <a class="cat-card <?= $class; ?>" href="MVC/view/categoria.php?cat=<?= $category['slug']; ?>">
+            <a class="cat-card <?= $class; ?>" href="MVC/view/categoria.php?cat=<?= $category['id']; ?>">
               <div class="cat-icon "><?= $category['icon']; ?></div>
               <span class="cat-name"><?= $category['name']; ?></span>
             </a>

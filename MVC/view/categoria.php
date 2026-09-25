@@ -11,8 +11,51 @@ if (!isset($_GET['cat']) || empty($_GET['cat']) || !check_category($_GET['cat'])
   exit;
 }
 
-$category = get_category_by_slug($_GET['cat']);
+$category = get_category_by_id($_GET['cat']);
 $products = get_products_by_category($category['id']);
+
+
+function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
+{
+  $palavras = preg_split('/\s+/', trim($frase));
+  $palavrasValidas = [];
+
+  foreach ($palavras as $palavra) {
+    $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
+
+    if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
+      continue;
+    }
+
+    $palavrasValidas[] = $palavra;
+  }
+
+  $quantidade = count($palavrasValidas);
+
+  if ($quantidade === 0) {
+    return '';
+  }
+
+  if ($quantidade === 1) {
+    return mb_strtoupper(
+      mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
+      'UTF-8'
+    );
+  }
+
+  if ($quantidade === 2) {
+    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+    $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+
+    return mb_strtoupper($primeira . $ultima, 'UTF-8');
+  }
+
+  $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+  $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+  $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
+
+  return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
+}
 
 ?>
 
@@ -66,18 +109,6 @@ $products = get_products_by_category($category['id']);
               </label>
             </div>
           </li>
-
-          <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3): ?>
-
-            <!-- Cliente -->
-            <li class="mobile-action">
-              <a href="MVC/view/perfil.php?vendedor=true">
-                Vender aqui
-              </a>
-            </li>
-
-          <?php endif; ?>
-
         </ul>
         <?php if (isset($_SESSION['id'])): ?>
           <a href="perfil.php" class="account">
