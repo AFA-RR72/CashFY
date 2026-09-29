@@ -2843,3 +2843,1179 @@ body.dark-mode ::selection {
 .photo-preview i {
     color: var(--leaf-700);
 }
+/* ============================================================
+   ============================================================
+   MELHORIAS DE CSS — adicionadas ao final para não alterar
+   nenhuma regra existente. Tudo funciona em light e dark mode.
+   ============================================================
+   ============================================================ */
+
+/* ============================================
+   1. SELECT — acabamento
+============================================ */
+
+.field select {
+    height: auto;
+    min-height: 46px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+}
+
+.field select:hover {
+    border-color: var(--teal-300);
+}
+
+.field select:focus {
+    box-shadow: 0 0 0 3px rgba(62, 156, 142, .18);
+}
+
+.field select option {
+    padding: 10px 12px;
+}
+
+.field select:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.field select::-ms-expand {
+    display: none;
+}
+
+/* Selects fora de .field herdam o mesmo visual */
+select:not(.field select) {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+/* ============================================
+   2. INPUT TYPE=DATE — ícone customizado
+============================================ */
+
+.field input[type="date"] {
+    position: relative;
+    min-height: 46px;
+    cursor: pointer;
+    color: var(--ink);
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-right: -2px;
+    cursor: pointer;
+    opacity: 1;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F0862B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3Cline x1='8' y1='3' x2='8' y2='7'/%3E%3Cline x1='16' y1='3' x2='16' y2='7'/%3E%3C/svg%3E");
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px;
+    border-radius: 6px;
+
+    transition:
+        background-color .15s ease,
+        transform .15s ease;
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    background-color: rgba(240, 134, 43, .16);
+    transform: scale(1.1);
+}
+
+body.dark-mode .field input[type="date"]::-webkit-calendar-picker-indicator {
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F2A15F' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3Cline x1='8' y1='3' x2='8' y2='7'/%3E%3Cline x1='16' y1='3' x2='16' y2='7'/%3E%3C/svg%3E");
+}
+
+.field input[type="date"]::-webkit-datetime-edit {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.field input[type="date"]:focus::-webkit-datetime-edit-day-field:focus,
+.field input[type="date"]:focus::-webkit-datetime-edit-month-field:focus,
+.field input[type="date"]:focus::-webkit-datetime-edit-year-field:focus {
+    background: var(--teal-500);
+    color: #fff;
+    border-radius: 4px;
+    outline: none;
+}
+
+/* ============================================
+   3. DESCRIÇÃO DO PRODUTO — corta com "..."
+============================================ */
+
+.product-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+.product-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+
+    line-height: 1.35;
+    min-height: 4.05em;
+    max-height: 4.05em;
+}
+
+/* Descrição do vendedor também corta no card da home */
+.seller-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.35;
+}
+
+/* ============================================
+   4. DIÁRIO — card de registrar vendas mais visível
+============================================ */
+
+.daily-card {
+    position: relative;
+    border-color: var(--orange-500);
+    background:
+        linear-gradient(140deg,
+            #FFF3E2 0%,
+            #FFE7CC 100%);
+    box-shadow: 0 10px 26px rgba(232, 103, 43, .18);
+    overflow: hidden;
+}
+
+.daily-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background:
+        linear-gradient(180deg,
+            var(--orange-500),
+            var(--gold-400));
+}
+
+.daily-card h3 {
+    color: var(--orange-600);
+    font-weight: 800;
+    font-size: 1.08rem;
+}
+
+body.dark-mode .daily-card {
+    border-color: #A65A2A;
+    background:
+        linear-gradient(140deg,
+            #33241B 0%,
+            #2A1F19 100%);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
+}
+
+body.dark-mode .daily-card h3 {
+    color: #F2A15F;
+}
+
+/* Linhas do histórico de vendas mais legíveis */
+.sale-row {
+    transition:
+        transform .15s ease,
+        border-color .15s ease;
+}
+
+.sale-row:hover {
+    border-color: var(--teal-300);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   5. PERFIL — menu de abas e conteúdo
+============================================ */
+
+.menu_details {
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    min-height: 44px;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border: 1.5px solid var(--line);
+}
+
+.menu_details_options {
+    border-radius: var(--radius-sm);
+    transition:
+        background .15s ease,
+        color .15s ease;
+}
+
+.menu_details_options:hover {
+    background: var(--teal-700);
+}
+
+.menu_details_options:hover a {
+    color: #fff;
+}
+
+.menu_details_options a {
+    font-weight: 700;
+    color: var(--ink);
+    transition: color .15s ease;
+}
+
+.seller-profile .row {
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.profile-name,
+.select,
+.phone {
+    max-width: 100%;
+}
+
+.profile-meta h1 {
+    overflow-wrap: anywhere;
+}
+
+.profile-meta p {
+    overflow-wrap: anywhere;
+}
+
+/* Mensagem de atualização de foto */
+#msg {
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--teal-700);
+    text-align: center;
+    margin-top: 6px;
+}
+
+/* ============================================
+   6. PÁGINAS DE TEXTO (Termos, Privacidade, Contato)
+============================================ */
+
+.page-header {
+    background:
+        linear-gradient(120deg,
+            var(--teal-700),
+            var(--teal-500));
+    border-radius: var(--radius-lg);
+    padding: 40px 34px;
+    color: #fff;
+    text-align: center;
+    margin: 24px 0 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::after {
+    content: "";
+    position: absolute;
+    right: -40px;
+    top: -50px;
+    width: 240px;
+    height: 240px;
+    background:
+        radial-gradient(circle,
+            rgba(255, 255, 255, .13) 0 4px,
+            transparent 5px) 0 0/34px 34px;
+}
+
+.page-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    letter-spacing: .5px;
+    margin: 0 0 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.page-header h3 {
+    margin: 0;
+    font-weight: 600;
+    font-size: .95rem;
+    opacity: .92;
+    position: relative;
+    z-index: 2;
+}
+
+.page-header a {
+    display: inline-block;
+    margin-top: 16px;
+    background: rgba(255, 255, 255, .18);
+    border: 2px solid rgba(255, 255, 255, .35);
+    border-radius: var(--radius-pill);
+    padding: 8px 20px;
+    font-weight: 800;
+    font-size: .85rem;
+    position: relative;
+    z-index: 2;
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+
+.page-header a:hover {
+    background: #fff;
+    border-color: #fff;
+    color: var(--teal-700);
+}
+
+.page hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 24px 0;
+}
+
+.page .card {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 26px 30px;
+    margin-bottom: 18px;
+    scroll-margin-top: 90px;
+}
+
+.page .card h1 {
+    font-family: var(--font-display);
+    color: var(--teal-900);
+    font-size: 1.15rem;
+    margin: 0 0 12px;
+}
+
+.page .card h2 {
+    font-family: var(--font-display);
+    color: var(--teal-700);
+    font-size: 1rem;
+    margin: 18px 0 6px;
+}
+
+.page .card>div:first-of-type h2 {
+    margin-top: 4px;
+}
+
+.page .card p,
+.page .card li {
+    color: var(--ink-soft);
+    font-size: .95rem;
+    line-height: 1.65;
+}
+
+.page .card p {
+    margin: 0 0 10px;
+}
+
+.page .card p:last-child {
+    margin-bottom: 0;
+}
+
+.page .card ul,
+.page .card ol {
+    padding-left: 22px;
+    margin: 8px 0 4px;
+}
+
+.page .card li {
+    margin-bottom: 7px;
+}
+
+.page .card strong {
+    color: var(--ink);
+}
+
+.page .card a {
+    color: var(--teal-700);
+    font-weight: 700;
+    transition: color .15s ease;
+}
+
+.page .card a:hover {
+    color: var(--orange-600);
+    text-decoration: underline;
+}
+
+/* Sumário numerado com destaque */
+.page .card ol li::marker {
+    color: var(--orange-500);
+    font-weight: 800;
+}
+
+/* Blocos de contato (cards com @ e ✆) */
+.page .card h2:first-child {
+    font-size: 1.8rem;
+    color: var(--orange-500);
+    margin: 0 0 4px;
+}
+
+#return {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 10px 0 40px;
+}
+
+/* ============================================
+   7. BOTÃO "VOLTAR PARA A PÁGINA INICIAL"
+============================================ */
+
+.btn-home,
+#return a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    border: 2px solid var(--teal-700);
+    background: transparent;
+    color: var(--teal-700);
+
+    font-weight: 800;
+    font-size: .95rem;
+    padding: 12px 26px;
+    border-radius: var(--radius-pill);
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.btn-home svg,
+.btn-home i {
+    transition: transform .2s ease;
+}
+
+.btn-home:hover,
+.btn-home:focus-visible,
+#return a:hover,
+#return a:focus-visible {
+    background:
+        linear-gradient(100deg,
+            var(--orange-600),
+            var(--orange-500));
+    border-color: var(--orange-600);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(232, 103, 43, .30);
+}
+
+.btn-home:hover svg,
+.btn-home:hover i {
+    transform: translateX(-4px);
+}
+
+.btn-home:active,
+#return a:active {
+    transform: translateY(0);
+}
+
+.home-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    margin: 30px 0 10px;
+}
+
+/* Hover de cor nos botões e links que já existiam */
+.btn-gradient:hover {
+    background:
+        linear-gradient(100deg,
+            var(--teal-900),
+            var(--teal-500));
+}
+
+.btn-outline:hover {
+    background: var(--orange-500);
+    color: #fff;
+}
+
+.btn-ghost:hover {
+    background: var(--teal-300);
+    color: var(--teal-900);
+}
+
+.back-link:hover {
+    color: var(--orange-600);
+}
+
+.auth-back {
+    transition:
+        color .18s ease,
+        transform .18s ease;
+}
+
+.auth-back:hover {
+    color: var(--orange-600);
+    transform: translateX(-3px);
+}
+
+.brand:hover {
+    color: var(--teal-700);
+}
+
+.icon-btn.danger:hover {
+    background: #C0503D;
+    color: #fff;
+}
+
+.update-product,
+.delete-product {
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+}
+
+.update-product:hover,
+.delete-product:hover {
+    transform: scale(1.18);
+    opacity: .85;
+}
+
+/* Rodapé com links */
+.site-footer a {
+    color: var(--ink-soft);
+    font-weight: 700;
+    transition: color .15s ease;
+}
+
+.site-footer a:hover {
+    color: var(--orange-600);
+    text-decoration: underline;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 16px;
+    margin-top: 10px;
+}
+
+.cookie-reopen {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    color: var(--ink-soft);
+    transition: color .15s ease;
+}
+
+.cookie-reopen:hover {
+    color: var(--orange-600);
+    text-decoration: underline;
+}
+
+/* ============================================
+   8. BANNER DE COOKIES (somente front-end)
+============================================ */
+
+.cookie-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%) translateY(150%);
+
+    width: min(960px, calc(100% - 32px));
+
+    background: var(--card);
+    border: 2px solid var(--teal-300);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-pop);
+    padding: 22px 26px;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+
+    opacity: 0;
+    pointer-events: none;
+    z-index: 300;
+
+    transition:
+        transform .35s cubic-bezier(.2, .8, .3, 1),
+        opacity .35s ease;
+}
+
+.cookie-banner.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.cookie-text {
+    flex: 1;
+    min-width: 240px;
+}
+
+.cookie-text h3 {
+    font-family: var(--font-display);
+    font-size: 1.02rem;
+    color: var(--teal-900);
+    margin: 0 0 6px;
+}
+
+.cookie-text p {
+    margin: 0;
+    font-size: .89rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+}
+
+.cookie-text a {
+    color: var(--teal-700);
+    font-weight: 800;
+}
+
+.cookie-text a:hover {
+    color: var(--orange-600);
+    text-decoration: underline;
+}
+
+.cookie-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.cookie-prefs {
+    width: 100%;
+    display: none;
+    padding-top: 4px;
+}
+
+.cookie-banner.prefs-open .cookie-prefs {
+    display: block;
+}
+
+.cookie-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    margin-top: 14px;
+}
+
+.cookie-opt .opt-text {
+    flex: 1;
+}
+
+.cookie-opt h4 {
+    font-family: var(--font-display);
+    font-size: .92rem;
+    color: var(--teal-900);
+    margin: 0 0 3px;
+}
+
+.cookie-opt p {
+    margin: 0;
+    font-size: .84rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+}
+
+/* Switch do banner (mesma linguagem visual do theme-switch) */
+.cookie-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.cookie-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cookie-switch .slider {
+    position: absolute;
+    inset: 0;
+    background: #D8CDBB;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background .2s ease;
+}
+
+.cookie-switch .slider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+    transition: transform .2s ease;
+}
+
+.cookie-switch input:checked+.slider {
+    background: var(--teal-500);
+}
+
+.cookie-switch input:checked+.slider::before {
+    transform: translateX(20px);
+}
+
+.cookie-switch input:disabled+.slider {
+    background: var(--teal-300);
+    cursor: not-allowed;
+    opacity: .75;
+}
+
+.cookie-switch input:focus-visible+.slider {
+    outline: 3px solid var(--sky-400);
+    outline-offset: 2px;
+}
+
+body.dark-mode .cookie-switch .slider {
+    background: #3A4B47;
+}
+
+/* ============================================
+   9. BOTÃO FLUTUANTE "VOLTAR AO TOPO"
+============================================ */
+
+.to-top {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+
+    background: var(--teal-700);
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: var(--shadow-pop);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(14px);
+    z-index: 250;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease,
+        background .2s ease;
+}
+
+.to-top.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.to-top:hover {
+    background: var(--orange-500);
+    transform: translateY(-3px);
+}
+
+body.cookie-open .to-top {
+    bottom: 160px;
+}
+
+/* ============================================
+   10. RESPONSIVIDADE
+============================================ */
+
+@media (max-width: 1024px) {
+
+    .product-card {
+        margin-left: 0;
+    }
+
+    .seller-products {
+        padding: 0 10px 24px;
+    }
+
+    .sale-row {
+        width: 100%;
+    }
+
+    .pill-tag-perfil,
+    .menu_details {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 880px) {
+
+    .container {
+        padding: 0 22px;
+    }
+
+    .page-header {
+        padding: 32px 24px;
+    }
+
+    .page-header h1 {
+        font-size: 1.55rem;
+    }
+
+    .page .card {
+        padding: 22px 22px;
+    }
+
+    .about-hero {
+        padding: 32px 24px;
+    }
+
+    .about-hero h1 {
+        font-size: 1.55rem;
+    }
+
+    .cat-banner {
+        padding: 24px 22px;
+    }
+
+    .cat-banner h1 {
+        font-size: 1.4rem;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 14px;
+    }
+
+    .seller-profile .row {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .seller-profile .row .field {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .phone {
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .chart-wrap {
+        height: 230px;
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 0 16px;
+    }
+
+    .brand {
+        font-size: 1.25rem;
+    }
+
+    .brand-mark {
+        width: 28px;
+        height: 28px;
+    }
+
+    .btn {
+        padding: 11px 20px;
+        font-size: .9rem;
+    }
+
+    .btn-sm {
+        padding: 8px 14px;
+        font-size: .8rem;
+    }
+
+    .search-wrap {
+        padding: 22px 0 6px;
+    }
+
+    .search-box {
+        padding: 11px 16px;
+    }
+
+    .section-title {
+        font-size: 1.05rem;
+        margin: 24px 0 12px;
+    }
+
+    /* ---- Abas do perfil ---- */
+
+    .menu_details {
+        width: 100%;
+        max-width: 100%;
+        padding: 8px 10px;
+        margin: 18px 0;
+        justify-content: space-around;
+        gap: 4px;
+    }
+
+    .menu_details_options {
+        padding: 6px 8px;
+        font-size: .88rem;
+    }
+
+    .pill-tag-perfil {
+        margin: 16px 0;
+    }
+
+    /* ---- Produtos ---- */
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .product-card {
+        margin: 0;
+        padding: 10px;
+    }
+
+    .product-name {
+        font-size: .9rem;
+    }
+
+    .product-desc {
+        font-size: .78rem;
+    }
+
+    .product-price {
+        font-size: .95rem;
+    }
+
+    .badge-new {
+        top: 16px;
+        left: 16px;
+        font-size: .66rem;
+        padding: 3px 9px;
+    }
+
+    .seller-products {
+        padding: 0;
+    }
+
+    /* ---- Diário ---- */
+
+    .daily-card {
+        padding: 20px 16px;
+    }
+
+    .daily-card .field-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .price-wrapper {
+        max-width: 100%;
+    }
+
+    .sale-row {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        border-radius: var(--radius-md);
+        padding: 14px 18px;
+    }
+
+    .sale-row .row-duos,
+    .sale-row .row-duos:nth-child(2) {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    /* ---- Rendimento ---- */
+
+    .stat-card {
+        padding: 16px 18px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.35rem;
+    }
+
+    .chart-card {
+        padding: 20px 16px 6px;
+    }
+
+    .chart-wrap {
+        height: 210px;
+    }
+
+    /* ---- Formulários ---- */
+
+    .form-card {
+        padding: 24px 20px;
+    }
+
+    .form-card .field-row {
+        flex-direction: column;
+    }
+
+    .form-page-wrap {
+        padding: 16px 16px 50px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .auth-card {
+        padding: 30px 22px 26px;
+    }
+
+    .auth-page {
+        padding: 84px 16px 40px;
+    }
+
+    .auth-back {
+        top: 20px;
+        left: 20px;
+    }
+
+    /* ---- Perfil ---- */
+
+    .profile-body {
+        padding: 0 18px 20px;
+        gap: 12px;
+    }
+
+    .profile-meta h1 {
+        font-size: 1.2rem;
+    }
+
+    .profile-contact {
+        margin-top: 0;
+    }
+
+    .perfil-photo {
+        width: 150px;
+        height: 150px;
+    }
+
+    /* ---- Páginas de texto ---- */
+
+    .page-header {
+        padding: 28px 18px;
+        margin-top: 16px;
+    }
+
+    .page-header h1 {
+        font-size: 1.35rem;
+    }
+
+    .page-header h3 {
+        font-size: .86rem;
+    }
+
+    .page .card {
+        padding: 20px 18px;
+    }
+
+    .page .card h1 {
+        font-size: 1.05rem;
+    }
+
+    .home-btn-row .btn-home,
+    #return a {
+        width: 100%;
+    }
+
+    /* ---- Cookies / topo ---- */
+
+    .cookie-banner {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        transform: translateX(0) translateY(150%);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        border-width: 2px 0 0;
+        padding: 20px 18px;
+        gap: 16px;
+        max-height: 86vh;
+        overflow-y: auto;
+    }
+
+    .cookie-banner.show {
+        transform: translateX(0) translateY(0);
+    }
+
+    .cookie-actions {
+        width: 100%;
+    }
+
+    .cookie-actions .btn {
+        flex: 1 1 100%;
+    }
+
+    .to-top {
+        right: 14px;
+        bottom: 14px;
+        width: 44px;
+        height: 44px;
+    }
+
+    body.cookie-open .to-top {
+        bottom: 14px;
+    }
+
+    .toast {
+        width: calc(100% - 32px);
+        text-align: center;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .menu_details_options {
+        font-size: .82rem;
+        padding: 6px 4px;
+    }
+}

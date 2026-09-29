@@ -42,8 +42,6 @@
 
             $user = get_user_by_id($user['id']);
 
-            $_SESSION['profile_photo'] = $user['profile_photo'];
-
             $_SESSION['msg'] = "Foto adicionada com sucesso.";
             header("Location: ../view/perfil.php#msg");
             exit;

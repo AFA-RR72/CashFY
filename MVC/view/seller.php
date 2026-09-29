@@ -1,6 +1,10 @@
-<?php session_start();
+<?php
+require_once('../config/auth.php');
 require_once('../model/user.php');
 require_once('../model/products.php');
+
+check_login();
+
 $seller = get_user_by_id($_GET['id']);
 $products = get_products();
 

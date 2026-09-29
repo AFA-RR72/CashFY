@@ -1,4 +1,7 @@
-<?php session_start();
+<?php
+require_once('../config/auth.php');
+
+check_login();
 
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {

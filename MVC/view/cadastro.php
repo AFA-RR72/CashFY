@@ -1,12 +1,17 @@
 <?php
-session_start();
 require_once("../model/institutes.php");
+require_once("../config/auth.php");
+
+check_login();
 
 $institutes = get_institutes();
 
+$oldAccType = $_SESSION['form']['account_type'] ?? '';
 $oldName = $_SESSION['form']['name'] ?? '';
 $oldInstitute = $_SESSION['form']['institute'] ?? '';
 $oldEmail = $_SESSION['form']['email'] ?? '';
+$oldPhone = $_SESSION['form']['phone_number'] ?? '';
+$oldDesc = $_SESSION['form']['description'] ?? '';
 $oldTos = isset($_SESSION['form']['tos']);
 $oldPp = isset($_SESSION['form']['pp']);
 ?>
@@ -81,60 +86,22 @@ $oldPp = isset($_SESSION['form']['pp']);
 
           <select name="account_type" id="account-type">
 
-            <option value="client">
+            <option
+            value="client"
+            >
               Cliente
             </option>
 
-            <option value="seller">
+            <option
+            value="seller"
+            <?= $oldAccType == 'seller' ? 'selected' : '' ?>
+            >
               Vendedor
             </option>
 
           </select>
 
         </div>
-
-
-        <!-- Foto -->
-
-        <div class="field">
-
-          <p class="photo-subtitle">
-            Escolha uma foto para usar no seu perfil. <br>
-            (não é obrigatório)
-          </p>
-
-          <label class="photo-upload" for="profile_photo">
-
-            <div class="photo-preview" id="photoPreview">
-
-              <span class="photo-icon">
-                <i class="fa-solid fa-user"></i>
-              </span>
-
-            </div>
-
-            <div class="photo-text">
-
-              <strong>Escolher foto</strong>
-
-              <span>
-                Clique para selecionar uma imagem
-              </span>
-
-            </div>
-
-            <input
-              type="file"
-              name="profile_photo"
-              id="profile_photo"
-              accept="image/*"
-              hidden
-            >
-
-          </label>
-
-        </div>
-
 
         <!-- Nome -->
 
@@ -228,6 +195,7 @@ $oldPp = isset($_SESSION['form']['pp']);
               id="phone_number"
               placeholder="(00) 0 0000-0000"
               maxlength="16"
+              value="<?= htmlspecialchars($oldPhone) ?>"
             >
 
           </div>
@@ -244,6 +212,7 @@ $oldPp = isset($_SESSION['form']['pp']);
               id="p-description"
               class="description"
               placeholder="min. 20 letras."
+              value="<?= htmlspecialchars($oldDesc) ?>"
             ></textarea>
 
           </div>
@@ -393,6 +362,7 @@ $oldPp = isset($_SESSION['form']['pp']);
 
             <?php
             }
+            unset($_SESSION['msg']);
             ?>
 
           <?php endif; ?>
@@ -460,61 +430,29 @@ $oldPp = isset($_SESSION['form']['pp']);
   </dialog>
 
 
-  <!-- Preview da foto -->
-
-  <script>
-
-    const input = document.getElementById('profile_photo');
-    const preview = document.getElementById('photoPreview');
-
-    input.addEventListener('change', function () {
-
-      const file = this.files[0];
-
-      if (!file) return;
-
-      const reader = new FileReader();
-
-      reader.onload = function (e) {
-
-        preview.innerHTML = `
-          <img src="${e.target.result}" alt="Prévia da foto">
-        `;
-
-        preview.classList.add('has-photo');
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-  </script>
-
-
   <!-- Tipo de conta / Dialog -->
 
   <script>
 
     const account = document.getElementById('account-type');
 
-    const sellerProfile =
-      document.getElementById('seller-profile');
+    const sellerProfile = document.getElementById('seller-profile');
 
-    const quest =
-      document.getElementById('seller-quest');
+    const quest = document.getElementById('seller-quest');
 
-    const acceptSeller =
-      document.getElementById('accept-seller');
+    const acceptSeller = document.getElementById('accept-seller');
 
-    const denySeller =
-      document.getElementById('deny-seller');
+    const denySeller = document.getElementById('deny-seller');
 
-    const phone =
-      document.getElementById('phone_number');
+    const phone = document.getElementById('phone_number');
 
-    const description =
-      document.getElementById('p-description');
+    const description = document.getElementById('p-description');
+
+    if (account.value === 'seller') {
+      sellerProfile.style.display = "block";
+      phone.required = true;
+      description.required = true; 
+    }
 
 
     account.addEventListener('change', () => {

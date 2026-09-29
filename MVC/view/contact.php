@@ -1,3 +1,11 @@
+<?php 
+require_once('../config/auth.php');
+
+check_login();
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 

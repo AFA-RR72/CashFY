@@ -1,4 +1,9 @@
-<?php session_start(); ?>
+<?php 
+require_once('../config/auth.php');
+
+check_login();
+
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -11,14 +16,6 @@
 
 <body>
   <div class="auth-page">
-    <a href="../../index.php" class="auth-back">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-        stroke-linecap="round">
-        <line x1="19" y1="12" x2="5" y2="12" />
-        <polyline points="12 19 5 12 12 5" />
-      </svg>
-      Voltar
-    </a>
 
     <div class="auth-card">
       <p class="brand"><span class="brand-mark"></span> Cashfy</p>
@@ -69,9 +66,30 @@
       <p class="auth-foot">Não tem uma conta? <a href="cadastro.php">Criar</a></p>
     </div>
   </div>
+  <div id="cookie-banner">
+    <h3>Usamos cookies</h3>
+
+    <p>
+      O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+      preferências e garantir o funcionamento correto do site.
+    </p>
+
+    <p>
+      Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+      determinadas configurações enquanto navega pelo CashFY.
+    </p>
+
+    <p>
+      Ao continuar navegando, você concorda com o uso desses cookies.
+    </p>
+
+    <button id="cookie-accept">Aceitar</button>
+    <button id="cookie-reject">Sair</button>
+  </div>
   <script src="../../assets/js/return.js"></script>
   <script src="../../assets/js/toggle.js"></script>
   <script src="../../assets/js/theme.js"></script>
+  <script src="assets/js/cookies.js"></script>
 </body>
 
 </html>

@@ -1,8 +1,11 @@
-<?php session_start();
+<?php 
 require_once("../config/init.php");
+require_once("../config/auth.php");
 require_once("../model/category.php");
 require_once("../model/products.php");
 require_once("../model/user.php");
+
+check_login();
 
 if (!isset($_GET['cat']) || empty($_GET['cat']) || !check_category($_GET['cat'])) {
   echo '<script>

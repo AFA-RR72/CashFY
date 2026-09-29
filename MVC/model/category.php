@@ -1,4 +1,5 @@
-<?php require_once(__DIR__ . "/../config/cashfy.php");
+<?php
+require_once(__DIR__ . "/../config/cashfy.php");
 
 function get_categories(){
     $conn = conn();

@@ -18,11 +18,23 @@ function check_email($email){
     }
 }
 
-function criar($name, $institute_id, $email, $password, $role){
+function create($name, $institute_id, $email, $password, $role){
     $conn = conn();
 
     $stmt = $conn -> prepare("INSERT INTO users (name, institute_id, email, password, role_id) VALUES (?,?,?,?,?)");
     $stmt -> bind_param("sissi", $name, $institute_id, $email, $password, $role);
+    
+    $stmt -> execute();
+    $stmt -> close();
+
+    return true;
+}
+
+function create_seller($name, $institute_id, $email, $contact, $description, $password, $role){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("INSERT INTO users (name, institute_id, email, phone_number, description, password, role_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt -> bind_param("sissssi", $name, $institute_id, $email, $contact, $description, $password, $role);
     
     $stmt -> execute();
     $stmt -> close();
