@@ -59,7 +59,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vendedor — Cashfy</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
@@ -184,13 +184,13 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         $product = get_product_by_id($_GET['product']);
         ?>
         <dialog id="cart" open>
-          <h2><?= $product['name'] ?></h2>
+          <h2><?= htmlspecialchars($product['name']); ?></h2>
           <?php unset($params['product']);
           $url = http_build_query($params); ?>
           <a href="seller.php?<?= htmlspecialchars($url); ?>"><i class="fa-solid fa-arrow-left-long"></i></a>
               <div class="cart-form">
                 <div>
-                  <img src="../../<?= $product['product_photo'] ?>" alt="">
+                  <img src="../../<?= $product['product_photo'] ?>" alt="<?= htmlspecialchars($product['name']); ?>">
                 </div>
                 <div>
                   <form action="../controller/cart.php?<?= htmlspecialchars($url); ?>" method="post">

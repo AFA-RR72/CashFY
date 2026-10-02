@@ -2,7 +2,7 @@
    CASHFY — Design tokens
 ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
-@import url("https://cloudflare.com");
+@import url("../fontawesome-free-7.3.1-web/css/all.min.css");
 
 :root {
     --cream: #FBF2E4;
@@ -340,7 +340,7 @@ img {
 .theme-switch .slider::before {
     content: "\f185";
     color: var(--orange-500);
-    font-family: "Font Awesome 6 Free";
+    font-family: "FontAwesome";
     font-weight: 900;
     position: absolute;
     width: 22px;
