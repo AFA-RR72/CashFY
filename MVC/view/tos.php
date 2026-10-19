@@ -1,8 +1,5 @@
 <?php
 require_once('../config/auth.php');
-
-check_login();
-
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +15,118 @@ check_login();
 <body>
 
     <main class="page">
+
+        <header class="site-header">
+
+            <div class="container">
+
+                <a href="../../index.php" class="brand">
+                    <span class="brand-mark"></span>
+                    CashFY
+                </a>
+
+                <div class="theme-switch-div desktop-theme">
+                    <label class="theme-switch">
+                        <input type="checkbox" id="theme-toggle-desktop">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button class="menu-btn" id="menuToggle" aria-label="Abrir menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+
+                <ul class="nav-links">
+
+                    <li class="home">
+                        <a href="../../index.php">Home</a>
+                    </li>
+
+                    <li>
+                        <a href="contact.php">Contato</a>
+                    </li>
+
+                    <li>
+                        <a href="sobre.php">Sobre nós</a>
+                    </li>
+
+                    <li class="mobile-theme">
+                        <div class="theme-switch-div">
+                            <label class="theme-switch">
+                                <input type="checkbox" id="theme-toggle-mobile">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </li>
+
+                </ul>
+
+                <?php if (!isset($_SESSION['id'])): ?>
+
+                    <div class="header-actions">
+                        <a href="login.php" class="btn btn-gradient btn-sm">
+                            Fazer log-in
+                        </a>
+                    </div>
+
+                <?php else: ?>
+
+                    <a href="perfil.php" class="account">
+
+                        <div class="profile-photo-icon-mother">
+
+                            <?php if (!empty($_SESSION['profile_photo'])): ?>
+
+                                <span class="account-mark">
+                                    <img
+                                        src="../../<?= $_SESSION['profile_photo'] ?>"
+                                        alt="Perfil">
+                                </span>
+
+                            <?php else: ?>
+
+                                <span class="index-account-mark-child">
+                                    <?= pegarIniciais($_SESSION['name']); ?>
+                                </span>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                    </a>
+
+                <?php endif; ?>
+
+            </div>
+
+        </header>
+
         <div class="container">
+
+            <a
+                class="back-link"
+                href="#"
+                onclick="voltarPagina(event)">
+
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round">
+
+                    <line x1="19" y1="12" x2="5" y2="12" />
+                    <polyline points="12 19 5 12 12 5" />
+
+                </svg>
+
+                Voltar
+
+            </a>
 
             <div class="page-header">
                 <h1>Termos de Uso</h1>
@@ -103,11 +211,9 @@ check_login();
                 <ul>
                     <li>Estudantes cadastram seus projetos, produtos ou serviços, com descrição, preço e imagens;</li>
                     <li>A plataforma atua como intermediária tecnológica, facilitando a conexão entre vendedores e
-                        compradores, mas não é parte da relação de compra e venda em si, salvo disposição em contrário;
-                    </li>
+                        compradores, mas não é parte da relação de compra e venda em si, salvo disposição em contrário;</li>
                     <li>Prazos de entrega, retirada ou prestação do serviço são definidos por cada projeto/vendedor,
-                        respeitando eventuais regras da instituição de ensino (ex.: feiras, eventos, datas letivas).
-                    </li>
+                        respeitando eventuais regras da instituição de ensino (ex.: feiras, eventos, datas letivas).</li>
                 </ul>
             </div>
 
@@ -228,13 +334,20 @@ check_login();
                     <li>Telefone/WhatsApp: (95)99999-9999</li>
                 </ul>
             </div>
+
             <hr>
+
             <div id="return">
-                <a href="#" onclick="voltarPagina(event)">Voltar</a>
+                <a href="#" onclick="window.history.back()">
+                    Voltar para o topo
+                </a>
             </div>
+
         </div>
     </main>
     <script src="../../assets/js/return.js"></script>
     <script src="../../assets/js/theme.js"></script>
+
 </body>
+
 </html>

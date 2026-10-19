@@ -9,8 +9,6 @@ require_once('MVC/model/category.php');
 $users = get_users();
 $categories = get_categories();
 
-check_login();
-
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
   $palavras = preg_split('/\s+/', trim($frase));

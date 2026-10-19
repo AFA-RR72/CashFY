@@ -1,8 +1,6 @@
 <?php
 require_once('../config/auth.php');
 
-check_login();
-
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
   $palavras = preg_split('/\s+/', trim($frase));
@@ -62,57 +60,109 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <div class="page">
 
     <header class="site-header">
+
       <div class="container">
-        <a href="../../index.php" class="brand"><span class="brand-mark"></span> CashFY</a>
+
+        <a href="../../index.php" class="brand">
+          <span class="brand-mark"></span>
+          CashFY
+        </a>
+
+        <div class="theme-switch-div desktop-theme">
+
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle-desktop">
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+        <button class="menu-btn" id="menuToggle" aria-label="Abrir menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+
         <ul class="nav-links">
-          <div class="theme-switch-div desktop-theme">
-            <label class="theme-switch">
-              <input type="checkbox" id="theme-toggle-desktop">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <button class="menu-btn" id="menuToggle" aria-label="Abrir menu">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-          </button>
+
           <li class="home">
             <a href="../../index.php">Home</a>
           </li>
+
           <li>
-            <a href="../../index.php#contato">Contato</a>
+            <a href="contact.php">Contato</a>
           </li>
+
           <li>
-            <a href="sobre.php" class="active">Sobre nós</a>
+            <a href="sobre.php">Sobre nós</a>
           </li>
+
+          <li class="mobile-theme">
+
+            <div class="theme-switch-div">
+
+              <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle-mobile">
+                <span class="slider"></span>
+              </label>
+
+            </div>
+
+          </li>
+
         </ul>
+
         <?php if (!isset($_SESSION['id'])): ?>
+
+          <!-- DESLOGADO -->
+
           <div class="header-actions">
-            <a href="login.php" class="btn btn-gradient btn-sm">Fazer log-in</a>
+
+            <a href="login.php" class="btn btn-gradient btn-sm">
+              Fazer log-in
+            </a>
+
           </div>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['id'])): ?>
-          <?php if (!empty($_SESSION['profile_photo'])): ?>
-            <a href="perfil.php" class="account">
-              <div class="profile-photo-icon-mother">
-                <span class="account-mark"><img src="../../<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+
+        <?php else: ?>
+
+          <!-- LOGADO -->
+
+          <a href="perfil.php" class="account">
+
+            <div class="profile-photo-icon-mother">
+
+              <?php if (!empty($_SESSION['profile_photo'])): ?>
+
+                <span class="account-mark">
+
+                  <img
+                    src="../../<?= $_SESSION['profile_photo'] ?>"
+                    alt="Perfil">
+
                 </span>
-              </div>
-            </a>
-          <?php else: ?>
-            <a href="perfil.php" class="account">
-              <div class="profile-photo-icon-mother">
-                <span class="index-account-mark-child"> <?= pegarIniciais($_SESSION['name']) ?></span>
-              </div>
-            </a>
-          <?php endif; ?>
+
+              <?php else: ?>
+
+                <span class="index-account-mark-child">
+                  <?= pegarIniciais($_SESSION['name']); ?>
+                </span>
+
+              <?php endif; ?>
+
+            </div>
+
+          </a>
+
         <?php endif; ?>
+
       </div>
+
     </header>
 
     <main class="container" style="flex:1;">
 
-      <div class="about-hero">
+      <div class="page-header">
         <h1>Sobre nós</h1>
         <p>Conheça quem faz o Cashfy acontecer — um projeto feito por estudantes, para estudantes.</p>
       </div>

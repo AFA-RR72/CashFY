@@ -82,5 +82,22 @@ function delete_product($id){
     return $success && $rows_affecteds > 0;
 }
 
+function check_product($product_id){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("SELECT * FROM products WHERE id = ?");
+    $stmt -> bind_param("i", $product_id);
+
+    $stmt -> execute();
+
+    $result = $stmt -> get_result();
+    if($result -> num_rows > 0){
+        $stmt -> close();
+        return true;
+    }else{
+        $stmt -> close();
+        return false;
+    }
+}
 
 ?>
