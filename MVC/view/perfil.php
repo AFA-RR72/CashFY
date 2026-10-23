@@ -65,6 +65,10 @@ function format_phone_number($phone_number)
     return $number;
 }
 
+if (empty($_GET)){
+    $_GET['profile'] = true;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +149,7 @@ function format_phone_number($phone_number)
                         </a>
                     <?php else: ?>
                         <div class="avatar" id="pf-avatar"><a href="perfil_photo.php" title="Adicionar foto">
-                                <?= pegarIniciais($_SESSION['name']) ?></a>
+                                <?= pegarIniciais($user['name']) ?></a>
                         </div>
                         <?php if (isset($_SESSION['msg'])): ?>
                             <div id="msg">

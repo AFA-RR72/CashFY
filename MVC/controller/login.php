@@ -9,14 +9,7 @@ if (empty($_POST['email']) || empty($_POST['password'])) {
     if (password_verify($_POST['password'], $user['password'])) {
         $_SESSION['id'] = $user['id'];
         
-        if (!empty($user['profile_photo'])) {
-            $_SESSION['profile_photo'] = $user['profile_photo'];
-        }
         $_SESSION['id'] = $user['id'];
-        $_SESSION['name'] = $user['name'];
-        $_SESSION['institute'] = $user['institute'];
-        $_SESSION['email'] = $user['email'];
-        $_SESSION['role_id'] = $user['role_id'];
         $_SESSION['msg'] = "Log-in realizado com sucesso.";
         header("Location: ../view/login.php#msg");
         exit;

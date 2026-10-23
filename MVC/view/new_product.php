@@ -30,7 +30,7 @@ $categories = get_categories();
 
             <div class="form-page-head">
 
-                <a href="#" onclick="voltarPagina(event)" class="back-link" style="padding:0;">
+                <a href="perfil.php?products" class="back-link" style="padding:0;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                         stroke-linecap="round">
                         <line x1="19" y1="12" x2="5" y2="12" />
@@ -153,7 +153,7 @@ $categories = get_categories();
 
                             unset($_SESSION['msg']);
 
-                            header("Refresh: 1; url=perfil.php");
+                            header("Refresh: 2; url=perfil.php?products");
                         }
 
                         ?>

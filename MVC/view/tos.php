@@ -1,5 +1,52 @@
 <?php
 require_once('../config/auth.php');
+
+if (isset($_SESSION['id'])) {
+  $user = get_user_by_id($_SESSION['id']);
+}
+
+function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
+{
+    $palavras = preg_split('/\s+/', trim($frase));
+    $palavrasValidas = [];
+
+    foreach ($palavras as $palavra) {
+        $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
+
+        if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
+            continue;
+        }
+
+        $palavrasValidas[] = $palavra;
+    }
+
+    $quantidade = count($palavrasValidas);
+
+    if ($quantidade === 0) {
+        return '';
+    }
+
+    if ($quantidade === 1) {
+        return mb_strtoupper(
+            mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
+            'UTF-8'
+        );
+    }
+
+    if ($quantidade === 2) {
+        $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+        $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+
+        return mb_strtoupper($primeira . $ultima, 'UTF-8');
+    }
+
+    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
+    $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
+    $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
+
+    return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -77,18 +124,18 @@ require_once('../config/auth.php');
 
                         <div class="profile-photo-icon-mother">
 
-                            <?php if (!empty($_SESSION['profile_photo'])): ?>
+                            <?php if (!empty($user['profile_photo'])): ?>
 
                                 <span class="account-mark">
                                     <img
-                                        src="../../<?= $_SESSION['profile_photo'] ?>"
+                                        src="../../<?= $user['profile_photo'] ?>"
                                         alt="Perfil">
                                 </span>
 
                             <?php else: ?>
 
                                 <span class="index-account-mark-child">
-                                    <?= pegarIniciais($_SESSION['name']); ?>
+                                    <?= pegarIniciais($user['name']); ?>
                                 </span>
 
                             <?php endif; ?>
@@ -338,13 +385,22 @@ require_once('../config/auth.php');
             <hr>
 
             <div id="return">
-                <a href="#" onclick="window.history.back()">
+                <a href="#" onclick="scroll()">
                     Voltar para o topo
                 </a>
             </div>
 
         </div>
     </main>
+    <script>
+        window.addEventListener('load', function scroll() {
+            if (window.location.hash === '#return') {
+                window.history.back();
+            } else {
+                window.location.href = '#start-page';
+            }
+        });
+    </script>
     <script src="../../assets/js/return.js"></script>
     <script src="../../assets/js/theme.js"></script>
 

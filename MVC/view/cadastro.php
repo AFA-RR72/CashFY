@@ -2,8 +2,6 @@
 require_once("../model/institutes.php");
 require_once("../config/auth.php");
 
-check_login();
-
 $institutes = get_institutes();
 
 $oldAccType = $_SESSION['form']['account_type'] ?? '';

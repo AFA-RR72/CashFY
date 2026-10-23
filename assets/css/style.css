@@ -728,6 +728,14 @@ body.dark-mode .cat-green {
     display: block;
 }
 
+.thumb span {
+    font-size: large;
+    color: var(--card);
+    background: linear-gradient(160deg,
+            var(--gold-400),
+            var(--orange-300));
+}
+
 .thumb.round {
     border-radius: 50%;
 }
@@ -3345,31 +3353,12 @@ body.dark-mode .field input[type="date"]::-webkit-calendar-picker-indicator {
 .daily-card {
     position: relative;
     border-color: var(--orange-500);
-    background:
-        linear-gradient(140deg,
-            #FFF3E2 0%,
-            #FFE7CC 100%);
     box-shadow: 0 10px 26px rgba(232, 103, 43, .18);
     overflow: hidden;
 }
 
-.daily-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6px;
-    background:
-        linear-gradient(180deg,
-            var(--orange-500),
-            var(--gold-400));
-}
-
 .daily-card h3 {
     color: var(--orange-600);
-    font-weight: 800;
-    font-size: 1.08rem;
 }
 
 body.dark-mode .daily-card {

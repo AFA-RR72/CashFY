@@ -39,7 +39,7 @@ if (
         $db_path
         );
      $_SESSION['msg'] = "Produto criado com sucesso";
-    header("Location: ../view/new_product.php#msg");
+    header("Location: ../view/new_product.php?products#msg");
     exit;
     
 }

@@ -9,6 +9,10 @@ require_once('MVC/model/category.php');
 $users = get_users();
 $categories = get_categories();
 
+if (isset($_SESSION['id'])) {
+  $user = get_user_by_id($_SESSION['id']);
+}
+
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
   $palavras = preg_split('/\s+/', trim($frase));
@@ -121,15 +125,15 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <a href="MVC/view/perfil.php" class="account">
             <div class="profile-photo-icon-mother">
 
-              <?php if (!empty($_SESSION['profile_photo'])): ?>
+              <?php if (!empty($user['profile_photo'])): ?>
 
                 <span class="account-mark">
-                  <img src="<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+                  <img src="<?= $user['profile_photo'] ?>" alt="Perfil">
                 </span>
 
               <?php else: ?>
                 <span class="index-account-mark-child">
-                  <?= pegarIniciais($_SESSION['name']); ?>
+                  <?= pegarIniciais($user['name']); ?>
                 </span>
               <?php endif; ?>
             </div>
@@ -193,7 +197,13 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <?php if ($seller['role_id'] == 2): ?>
               <div class="seller-card">
                 <div class="thumb">
-                  <img src="<?= $seller['profile_photo']; ?>" alt="Foto de perfil">
+                  <?php if (empty($seller['profile_photo'])): ?>
+                    <span class="seller-slang-name">
+                      <?= pegarIniciais($seller['name']); ?>
+                    </span>
+                  <?php else: ?>
+                    <img src="<?= $seller['profile_photo']; ?>" alt="Foto de perfil">
+                  <?php endif; ?>
                 </div>
 
                 <div class="seller-info">
@@ -212,7 +222,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   </p>
 
                 </div>
-                <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']); ?>">Comprar</a>
+                <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']); ?>">Ver loja</a>
               </div>
             <?php endif; ?>
           <?php endforeach; ?>
@@ -236,7 +246,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   <span class="off">★</span>
                 </div>
                 <a class="btn btn-orange" href="MVC/view/seller.php?id=<?= htmlspecialchars($seller['id']);
-                ?>">Comprar</a>
+                                                                        ?>">Ver loja</a>
               </div>
             <?php endif; ?>
           <?php endforeach; ?>

@@ -15,6 +15,10 @@ if (!isset($_GET['cat']) || empty($_GET['cat']) || !check_category($_GET['cat'])
 $category = get_category_by_id($_GET['cat']);
 $products = get_products_by_category($category['id']);
 
+if (isset($_SESSION['id'])) {
+  $user = get_user_by_id($_SESSION['id']);
+}
+
 
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
@@ -115,15 +119,15 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <a href="perfil.php" class="account">
             <div class="profile-photo-icon-mother">
 
-              <?php if (!empty($_SESSION['profile_photo'])): ?>
+              <?php if (!empty($user['profile_photo'])): ?>
 
                 <span class="account-mark">
-                  <img src="../../<?= $_SESSION['profile_photo'] ?>" alt="Perfil">
+                  <img src="../../<?= $user['profile_photo'] ?>" alt="Perfil">
                 </span>
 
               <?php else: ?>
                 <span class="index-account-mark-child">
-                  <?= pegarIniciais($_SESSION['name']); ?>
+                  <?= pegarIniciais($user['name']); ?>
                 </span>
               <?php endif; ?>
             </div>

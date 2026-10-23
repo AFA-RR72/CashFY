@@ -6,6 +6,10 @@ require_once('../model/products.php');
 $seller = get_user_by_id($_GET['id']);
 $products = get_products();
 
+if (isset($_SESSION['id'])) {
+  $user = get_user_by_id($_SESSION['id']);
+}
+
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
   $palavras = preg_split('/\s+/', trim($frase));
@@ -141,12 +145,12 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
             <div class="profile-photo-icon-mother">
 
-              <?php if (!empty($_SESSION['profile_photo'])): ?>
+              <?php if (!empty($user['profile_photo'])): ?>
 
                 <span class="account-mark">
 
                   <img
-                    src="../../<?= $_SESSION['profile_photo'] ?>"
+                    src="../../<?= $user['profile_photo'] ?>"
                     alt="Perfil">
 
                 </span>
@@ -154,7 +158,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
               <?php else: ?>
 
                 <span class="index-account-mark-child">
-                  <?= pegarIniciais($_SESSION['name']); ?>
+                  <?= pegarIniciais($user['name']); ?>
                 </span>
 
               <?php endif; ?>

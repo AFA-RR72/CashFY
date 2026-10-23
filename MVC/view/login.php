@@ -15,13 +15,19 @@ require_once('../config/auth.php');
 <body>
   <div class="auth-page">
 
-    <a href="#" onclick="voltarPagina(event)" class="auth-back">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+    <a href="../../index.php" class="auth-back">
+
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="3"
         stroke-linecap="round">
+
         <line x1="19" y1="12" x2="5" y2="12" />
         <polyline points="12 19 5 12 12 5" />
+
       </svg>
+
       Voltar
+
     </a>
 
     <div class="auth-card">
