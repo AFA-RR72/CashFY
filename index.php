@@ -5,6 +5,7 @@ require_once('MVC/config/init.php');
 require_once('MVC/config/auth.php');
 require_once('MVC/model/user.php');
 require_once('MVC/model/category.php');
+require_once('MVC/model/orders.php');
 
 $users = get_users();
 $categories = get_categories();
@@ -131,7 +132,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   <img src="<?= $user['profile_photo'] ?>" alt="Perfil">
                 </span>
 
-              <?php else: ?>
+              <?php elseif(isset($user)): ?>
                 <span class="index-account-mark-child">
                   <?= pegarIniciais($user['name']); ?>
                 </span>

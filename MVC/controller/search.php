@@ -14,6 +14,16 @@ $user = $result_users[0];
 
 if (!empty($user)) {
     $_SESSION['search-users'] = $result_users;
+
+
+    $category = $result_categories[0];
+
+    if (!empty($category)) {
+        $_SESSION['search-categories'] = $result_categories;
+        header("Location: ../../index.php#category-" . $category['id']);
+        exit;
+    }
+
     header("Location: ../../index.php#seller-" . $user['id']);
     exit;
 } else {
@@ -28,4 +38,3 @@ if (!empty($user)) {
     header("Location: ../../index.php");
     exit;
 }
-?>

@@ -10,6 +10,9 @@ check_login();
 
 $user = get_user_by_id($_SESSION['id']);
 $products = get_products();
+$show_revenue_chart = false;
+
+// $sse_cursor = get_order_cursor($user['id']);
 
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
@@ -194,6 +197,9 @@ if (empty($_GET)){
                             <a href="?diary">Diário</a>
                         </div>
                         <div class="menu_details_options">
+                            <a href="?orders">Pedidos<span id="orders-badge" class="orders-badge"></span>
+                        </div>
+                        <div class="menu_details_options">
                             <a href="?income">Rendimento</a>
                         </div>
                         <div class="menu_details_options">
@@ -203,7 +209,15 @@ if (empty($_GET)){
 
 
 
-                    <?php if (isset($_GET['products']) && !isset($_GET['diary']) && !isset($_GET['income']) && !isset($_GET['profile'])): ?>
+                    <?php if (isset($_GET['orders'])): ?>
+
+                        <section class="tab-panel" id="tab-pedidos">
+                            <div class="history-sale">
+                                <h2 class="section-title" style="margin-top:0;">PEDIDOS RECEBIDOS</h2>
+                            </div>
+                        </section>
+
+                    <?php elseif (isset($_GET['products']) && !isset($_GET['diary']) && !isset($_GET['income']) && !isset($_GET['profile'])): ?>
 
                         <!-- Produtos do vendedor -->
 
@@ -252,9 +266,8 @@ if (empty($_GET)){
 
                         <section class="tab-panel" id="tab-diario">
 
-                            <div class="diary">
+                            <div class="diary"><h2 class="section-title" style="margin-top:0;">REGISTRAR VENDAS</h2>
                                 <div class="daily-card">
-                                    <h3>+ REGISTRAR VENDAS</h3>
                                     <form action="../controller/sales.php" method="post" novalidate>
                                         <div class="field-row">
                                             <div class="field">
@@ -356,12 +369,55 @@ if (empty($_GET)){
                                     </div>
                                 </div>
                             </div>
-                            <div class="chart-card">
-                                <h3>Vendas por produto</h3>
-                                <!-- gráfico removido junto com o JS. Quando o back-end estiver pronto, o Andrei pode gerar esse gráfico com PHP (ex: GD, ou devolvendo os dados pra uma lib JS por fora deste projeto).-->
-                                <div class="chart-wrap"
-                                    style="display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-weight:700;">
-                                    Gráfico será plugado aqui pelo back-end
+                            <?php
+                            $show_revenue_chart = true;
+                            $seller_products = get_products_by_user($user['id']);
+                            $revenue_months = get_revenue_months($user['id']); // mais recente (atual) primeiro
+                            $month_names = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+                            ?>
+                            <div class="chart-card" id="revenue-chart-card"
+                                data-endpoint="../controller/revenue_chart.php">
+                                <div class="chart-header">
+                                    <h3>Faturamento</h3>
+                                    <div class="chart-mode" role="group" aria-label="Modo de visualização do gráfico">
+                                        <button type="button" class="chart-mode-btn active" data-mode="month"
+                                            aria-pressed="true">Vendas por mês</button>
+                                        <button type="button" class="chart-mode-btn" data-mode="product"
+                                            aria-pressed="false">Por produto</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-filters">
+                                    <div class="field chart-filter">
+                                        <label for="chart-month">Mês</label>
+                                        <select id="chart-month">
+                                            <option value="all">Todos os meses</option>
+                                            <?php foreach ($revenue_months as $i => $ym): ?>
+                                                <option value="<?= htmlspecialchars($ym); ?>" <?= $i === 0 ? 'selected' : ''; ?>>
+                                                    <?= $month_names[(int) substr($ym, 5, 2) - 1] . ' de ' . substr($ym, 0, 4); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="field chart-filter" id="chart-product-filter" hidden>
+                                        <label for="chart-product">Produto</label>
+                                        <select id="chart-product">
+                                            <option value="" disabled selected>Selecione um produto:</option>
+                                            <?php foreach ($seller_products as $seller_product): ?>
+                                                <option value="<?= (int) $seller_product['id']; ?>">
+                                                    <?= htmlspecialchars($seller_product['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <p class="chart-summary" id="chart-summary" aria-live="polite"></p>
+                                <p class="chart-message" id="chart-message" hidden></p>
+                                <div class="chart-wrap" id="chart-wrap">
+                                    <canvas id="revenue-chart" role="img"
+                                        aria-label="Gráfico de barras do faturamento mensal"></canvas>
                                 </div>
                             </div>
                         </section>
@@ -483,6 +539,10 @@ if (empty($_GET)){
     <script src="../../assets/js/theme.js"></script>
     <script src="../../assets/js/toggle.js"></script>
     <script src="../../assets/js/menu-toggle.js"></script>
+    <?php if ($show_revenue_chart): ?>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+        <script src="../../assets/js/revenue-chart.js"></script>
+    <?php endif; ?>
     <script>
         const productSelect = document.getElementById('product');
         const priceInput = document.getElementById('price');

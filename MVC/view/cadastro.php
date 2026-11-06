@@ -69,8 +69,7 @@ $oldPp = isset($_SESSION['form']['pp']);
         method="post"
         action="../controller/cadastro.php"
         enctype="multipart/form-data"
-        novalidate
-      >
+        novalidate>
 
 
         <!-- Tipo de conta -->
@@ -84,15 +83,13 @@ $oldPp = isset($_SESSION['form']['pp']);
           <select name="account_type" id="account-type">
 
             <option
-            value="client"
-            >
+              value="client">
               Cliente
             </option>
 
             <option
-            value="seller"
-            <?= $oldAccType == 'seller' ? 'selected' : '' ?>
-            >
+              value="seller"
+              <?= $oldAccType == 'seller' ? 'selected' : '' ?>>
               Vendedor
             </option>
 
@@ -115,8 +112,7 @@ $oldPp = isset($_SESSION['form']['pp']);
             placeholder="Seu nome completo"
             autocomplete="name"
             required
-            value="<?= htmlspecialchars($oldName) ?>"
-          >
+            value="<?= htmlspecialchars($oldName) ?>">
 
         </div>
 
@@ -134,8 +130,7 @@ $oldPp = isset($_SESSION['form']['pp']);
             <option
               value=""
               disabled
-              <?= $oldInstitute === '' ? 'selected' : '' ?>
-            >
+              <?= $oldInstitute === '' ? 'selected' : '' ?>>
               Selecione uma instituição
             </option>
 
@@ -143,8 +138,7 @@ $oldPp = isset($_SESSION['form']['pp']);
 
               <option
                 value="<?= $inst['id'] ?>"
-                <?= $oldInstitute == $inst['id'] ? 'selected' : '' ?>
-              >
+                <?= $oldInstitute == $inst['id'] ? 'selected' : '' ?>>
                 <?= htmlspecialchars($inst['name']) ?>
               </option>
 
@@ -170,8 +164,7 @@ $oldPp = isset($_SESSION['form']['pp']);
             placeholder="voce@exemplo.com"
             autocomplete="email"
             required
-            value="<?= htmlspecialchars($oldEmail) ?>"
-          >
+            value="<?= htmlspecialchars($oldEmail) ?>">
 
         </div>
 
@@ -192,8 +185,7 @@ $oldPp = isset($_SESSION['form']['pp']);
               id="phone_number"
               placeholder="(00) 0 0000-0000"
               maxlength="16"
-              value="<?= htmlspecialchars($oldPhone) ?>"
-            >
+              value="<?= htmlspecialchars($oldPhone) ?>">
 
           </div>
 
@@ -208,9 +200,8 @@ $oldPp = isset($_SESSION['form']['pp']);
               name="description"
               id="p-description"
               class="description"
-              placeholder="min. 20 letras."
-              value="<?= htmlspecialchars($oldDesc) ?>"
-            ></textarea>
+              placeholder="min. 10 letras."
+              value="<?= htmlspecialchars($oldDesc) ?>"></textarea>
 
           </div>
 
@@ -234,22 +225,19 @@ $oldPp = isset($_SESSION['form']['pp']);
               placeholder="••••••••"
               autocomplete="new-password"
               required
-              minlength="8"
-            >
+              minlength="8">
 
             <button
               type="button"
               id="toggle_pass"
               class="password-toggle"
               onclick="toggle()"
-              title="Mostrar senha"
-            >
+              title="Mostrar senha">
 
               <img
                 id="eye-icon"
                 src="../../uploads/icones/olhof.png"
-                alt="Mostrar senha"
-              >
+                alt="Mostrar senha">
 
             </button>
 
@@ -275,8 +263,7 @@ $oldPp = isset($_SESSION['form']['pp']);
               placeholder="••••••••"
               autocomplete="new-password"
               required
-              minlength="8"
-            >
+              minlength="8">
 
           </div>
 
@@ -292,8 +279,7 @@ $oldPp = isset($_SESSION['form']['pp']);
             <input
               type="checkbox"
               name="tos"
-              <?= $oldTos ? 'checked' : '' ?>
-            >
+              <?= $oldTos ? 'checked' : '' ?>>
 
             Li e concordo com os&nbsp;
 
@@ -309,8 +295,7 @@ $oldPp = isset($_SESSION['form']['pp']);
             <input
               type="checkbox"
               name="pp"
-              <?= $oldPp ? 'checked' : '' ?>
-            >
+              <?= $oldPp ? 'checked' : '' ?>>
 
             Li e concordo com a&nbsp;
 
@@ -331,8 +316,7 @@ $oldPp = isset($_SESSION['form']['pp']);
 
             <div
               class="session-msg <?= $_SESSION['msg'] === 'Usuário criado com sucesso.' ? 'success' : '' ?>"
-              id="msg"
-            >
+              id="msg">
 
               <?= $_SESSION['msg']; ?>
 
@@ -348,13 +332,11 @@ $oldPp = isset($_SESSION['form']['pp']);
             ?>
 
               <script>
-
                 setTimeout(() => {
 
                   window.location.href = "login.php";
 
                 }, 1000);
-
               </script>
 
             <?php
@@ -373,8 +355,7 @@ $oldPp = isset($_SESSION['form']['pp']);
 
           <button
             class="btn btn-gradient btn-block"
-            type="submit"
-          >
+            type="submit">
             Criar perfil
           </button>
 
@@ -400,37 +381,36 @@ $oldPp = isset($_SESSION['form']['pp']);
 
   <!-- Dialog vendedor -->
 
-  <dialog id="seller-quest">
+  <div class="warning-overlay">
+    <dialog id="seller-quest">
 
-    <h2>Atenção</h2>
+      <h2>Atenção</h2>
 
-    <p>
-      Ao selecionar essa opção, você criará uma conta do tipo
-      vendedor. Podendo oferecer produtos e necessitando que
-      disponibilize seu telefone e uma breve descrição de seu perfil.
-    </p>
+      <p>
+        Ao selecionar essa opção, você criará uma conta do tipo
+        vendedor. Podendo oferecer produtos e necessitando que
+        disponibilize seu telefone e uma breve descrição de seu perfil.
+      </p>
 
-    <button
-      type="button"
-      id="accept-seller"
-    >
-      Continuar
-    </button>
+      <button
+        type="button"
+        id="accept-seller">
+        Continuar
+      </button>
 
-    <button
-      type="button"
-      id="deny-seller"
-    >
-      Voltar
-    </button>
+      <button
+        type="button"
+        id="deny-seller">
+        Voltar
+      </button>
 
-  </dialog>
+    </dialog>
+  </div>
 
 
   <!-- Tipo de conta / Dialog -->
 
   <script>
-
     const account = document.getElementById('account-type');
 
     const sellerProfile = document.getElementById('seller-profile');
@@ -448,7 +428,7 @@ $oldPp = isset($_SESSION['form']['pp']);
     if (account.value === 'seller') {
       sellerProfile.style.display = "block";
       phone.required = true;
-      description.required = true; 
+      description.required = true;
     }
 
 
@@ -516,16 +496,10 @@ $oldPp = isset($_SESSION['form']['pp']);
       }
 
     });
-
   </script>
-
-
   <script src="../../assets/js/return.js"></script>
-
   <script src="../../assets/js/PhoneFormat.js"></script>
-
   <script src="../../assets/js/toggle.js"></script>
-
 </body>
 
 </html>

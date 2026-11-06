@@ -146,8 +146,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
                                 </span>
 
-                            <?php else: ?>
-
+                            <?php elseif (isset($user)): ?>
                                 <span class="index-account-mark-child">
                                     <?= pegarIniciais($user['name']); ?>
                                 </span>

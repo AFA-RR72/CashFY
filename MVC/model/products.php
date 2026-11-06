@@ -100,4 +100,36 @@ function check_product($product_id){
     }
 }
 
+// Produtos de um vendedor (usado no seletor do gráfico de faturamento)
+function get_products_by_user($user_id){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("SELECT id, name FROM products WHERE user_id = ? ORDER BY name");
+    $stmt -> bind_param('i', $user_id);
+
+    $stmt -> execute();
+
+    $result = $stmt -> get_result() -> fetch_all(MYSQLI_ASSOC);
+
+    $stmt -> close();
+
+    return $result;
+}
+
+// Retorna o produto (id, name) somente se pertencer ao vendedor informado; senão null
+function get_product_of_user($product_id, $user_id){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("SELECT id, name FROM products WHERE id = ? AND user_id = ?");
+    $stmt -> bind_param('ii', $product_id, $user_id);
+
+    $stmt -> execute();
+
+    $result = $stmt -> get_result() -> fetch_assoc();
+
+    $stmt -> close();
+
+    return $result ?: null;
+}
+
 ?>

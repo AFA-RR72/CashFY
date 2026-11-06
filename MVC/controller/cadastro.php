@@ -45,21 +45,23 @@ if (empty($_POST['name']) || empty($_POST['institute']) || empty($_POST['email']
     ) {
         $_SESSION['msg'] = "Você precisa preencher todos os campos";
         header("Location: ../view/cadastro.php#msg");
+    } elseif (
+        strlen(preg_replace('/[^a-zA-Z]/', '', $_POST['description'])) < 10
+    ) {
+        $_SESSION['msg'] = "Preencha a descrição com pelo menos 10 letras";
+        header("Location: ../view/cadastro.php#msg");
+    } else {
+        $name = $_POST['name'];
+        $institute_id = $_POST['institute'];
+        $email = $_POST['email'];
+        $contact = $_POST['phone'];
+        $description = $_POST['description'];
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+        create_seller($name, $institute_id, $email, $contact, $description, $password, 2);
+
+        $_SESSION['msg'] = "Usuário criado com sucesso.";
+        header("Location: ../view/cadastro.php#msg");
+        exit;
     }
-
-    $name = $_POST['name'];
-    $institute_id = $_POST['institute'];
-    $email = $_POST['email'];
-    $contact = $_POST['phone'];
-    $description = $_POST['description'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-    create_seller($name, $institute_id, $email, $contact, $description, $password, 2);
-
-    $_SESSION['msg'] = "Usuário criado com sucesso.";
-    header("Location: ../view/cadastro.php#msg");
-    exit;
 }
-
-
-?>

@@ -2,6 +2,7 @@
 require_once('../config/auth.php');
 require_once('../model/user.php');
 require_once('../model/products.php');
+require_once('../model/orders.php');
 
 $seller = get_user_by_id($_GET['id']);
 $products = get_products();
@@ -155,12 +156,10 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
                 </span>
 
-              <?php else: ?>
-
+              <?php elseif (isset($user)): ?>
                 <span class="index-account-mark-child">
                   <?= pegarIniciais($user['name']); ?>
                 </span>
-
               <?php endif; ?>
 
             </div>
@@ -180,8 +179,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
       <a
         class="back-link"
-        href="#"
-        onclick="voltarPagina(event)">
+        href="../../index.php">
 
         <svg
           width="16"
@@ -524,9 +522,55 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
               <?= htmlspecialchars($item['product']); ?>
             </p>
 
-            <p class="cart-item-qty">
-              <?= (int) $item['quantity']; ?>x
-            </p>
+            <?php $cart_form_url = http_build_query(['id' => $_GET['id']]); ?>
+
+            <form
+              class="cart-item-qty"
+              action="../controller/cart.php?<?= htmlspecialchars($cart_form_url); ?>"
+              method="post"
+              style="display:inline-flex; align-items:center; gap:10px; margin:0;">
+
+              <input
+                type="hidden"
+                name="product_id"
+                value="<?= (int) $id; ?>">
+
+              <?php if ((int) $item['quantity'] > 1): ?>
+
+                <button
+                  type="submit"
+                  name="action"
+                  value="decrease"
+                  aria-label="Diminuir quantidade"
+                  style="background:none; border:none; color:inherit; font:inherit; cursor:pointer;">
+                  -
+                </button>
+
+              <?php else: ?>
+
+                <button
+                  type="submit"
+                  name="action"
+                  value="remove"
+                  aria-label="Remover produto do carrinho"
+                  style="background:none; border:none; color:inherit; font:inherit; cursor:pointer;">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+
+              <?php endif; ?>
+
+              <span><?= (int) $item['quantity']; ?></span>
+
+              <button
+                type="submit"
+                name="action"
+                value="increase"
+                aria-label="Aumentar quantidade"
+                style="background:none; border:none; color:inherit; font:inherit; cursor:pointer;">
+                +
+              </button>
+
+            </form>
 
             <p class="cart-item-price">
               R$
@@ -551,16 +595,21 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
       </div>
 
+      <form id="checkout-form"
+      action="../controller/checkout.php"
+      method="post"></form>
 
       <button
-        type="button"
-        class="btn btn-gradient cart-finalize">
+        type="submit"
+        form="checkout-form"
+        class="btn btn-gradient cart-finalize"
+        <?= empty($cart_items) ? 'disabled' : ''; ?>>
         Finalizar compra
       </button>
       <button
-      type="button"
-      class="btn btn-transparent cart-continue"
-      onclick="cart.close()">
+        type="button"
+        class="btn btn-transparent cart-continue"
+        onclick="cart.close()">
         Continuar comprando
       </button>
 
@@ -590,27 +639,37 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <script>
     function more() {
 
-      const inputQuantity =
-        document.getElementById('cart-quantity');
+      const inputQuantity = document.getElementById('cart-quantity');
 
-      inputQuantity.value =
-        Number(inputQuantity.value) + 1;
+      inputQuantity.value = Number(inputQuantity.value) + 1;
 
     }
 
 
     function less() {
 
-      const inputQuantity =
-        document.getElementById('cart-quantity');
+      const inputQuantity = document.getElementById('cart-quantity');
 
       if (Number(inputQuantity.value) > 1) {
 
-        inputQuantity.value =
-          Number(inputQuantity.value) - 1;
+        inputQuantity.value = Number(inputQuantity.value) - 1;
 
       }
 
+    }
+  </script>
+
+  <?php if (!empty($_SESSION['open_cart'])): ?>
+    <?php unset($_SESSION['open_cart']); ?>
+    <script>
+      document.getElementById('cart').showModal();
+    </script>
+  <?php endif; ?>
+  <script>
+    const cart = document.getElementById('cart');
+
+    if (cart) {
+      
     }
   </script>
 
