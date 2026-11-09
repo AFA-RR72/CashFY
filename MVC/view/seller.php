@@ -356,6 +356,22 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
                 </div>
 
+                <?php if (isset($_SESSION['msg'])): ?>
+
+                  <div class="session-msg-product <?= $_SESSION['msg'] === 'Produto adicionado com sucesso.' ? 'success' : '' ?>" id="msg">
+                    <?= htmlspecialchars($_SESSION['msg']) ?>
+                  </div>
+
+
+                  <?php if ($_SESSION['msg'] === 'Log-in realizado com sucesso.') {
+                    unset($_SESSION['msg']);
+                    header("Refresh: 1; url=../../index.php");
+                  } else {
+                    unset($_SESSION['msg']);
+                  }
+                  ?>
+
+                <?php endif; ?>
 
                 <input
                   type="number"
@@ -596,8 +612,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       </div>
 
       <form id="checkout-form"
-      action="../controller/checkout.php"
-      method="post"></form>
+        action="../controller/checkout.php"
+        method="post"></form>
 
       <button
         type="submit"
@@ -665,14 +681,6 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       document.getElementById('cart').showModal();
     </script>
   <?php endif; ?>
-  <script>
-    const cart = document.getElementById('cart');
-
-    if (cart) {
-      
-    }
-  </script>
-
 </body>
 
 </html>

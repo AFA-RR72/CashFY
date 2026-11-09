@@ -1,10 +1,10 @@
 <?php require_once(__DIR__ . "/../config/cashfy.php");
 
-function create_product($user, $name, $category, $description, $price, $product_photo){
+function create_product(int $user_id, string $name, int $category, string $description, float $price, string $product_photo){
     $conn = conn();
 
     $stmt = $conn -> prepare("INSERT INTO products (user_id, name, category_id, description, price, product_photo) VALUE (?, ?, ?, ?, ?, ?)");
-    $stmt -> bind_param("isisds", $user, $name, $category, $description, $price, $product_photo);
+    $stmt -> bind_param("isisds", $user_id, $name, $category, $description, $price, $product_photo);
 
     $stmt -> execute();
     $stmt -> close();
@@ -21,7 +21,7 @@ function get_products(){
     return $result; 
 }
 
-function get_products_by_category($category_id){
+function get_products_by_category(int $category_id){
     $conn = conn();
 
     $stmt = $conn -> prepare('SELECT * FROM products WHERE category_id = ?');
@@ -36,7 +36,7 @@ function get_products_by_category($category_id){
     return $result;
 }
 
-function get_product_by_id($id){
+function get_product_by_id(int $id){
     $conn = conn();
 
     $stmt = $conn -> prepare("SELECT * FROM products WHERE id = ?");
@@ -51,7 +51,7 @@ function get_product_by_id($id){
     return $result;
 }
 
-function update_product($id, $name, $price, $category_id, $description){
+function update_product(int $id, string $name, float $price, int $category_id, string $description){
     $conn = conn();
 
     $stmt = $conn -> prepare("UPDATE products SET name = ?, price = ?, category_id = ?, description = ? WHERE id = ?");
@@ -63,7 +63,7 @@ function update_product($id, $name, $price, $category_id, $description){
     return;
 }
 
-function delete_product($id){
+function delete_product(int $id){
     $conn = conn();
 
     $stmt = $conn -> prepare("DELETE FROM products where id = ?");
@@ -82,7 +82,7 @@ function delete_product($id){
     return $success && $rows_affecteds > 0;
 }
 
-function check_product($product_id){
+function check_product(int $product_id){
     $conn = conn();
 
     $stmt = $conn -> prepare("SELECT * FROM products WHERE id = ?");
@@ -101,7 +101,7 @@ function check_product($product_id){
 }
 
 // Produtos de um vendedor (usado no seletor do gráfico de faturamento)
-function get_products_by_user($user_id){
+function get_products_by_user(int $user_id){
     $conn = conn();
 
     $stmt = $conn -> prepare("SELECT id, name FROM products WHERE user_id = ? ORDER BY name");
@@ -117,7 +117,7 @@ function get_products_by_user($user_id){
 }
 
 // Retorna o produto (id, name) somente se pertencer ao vendedor informado; senão null
-function get_product_of_user($product_id, $user_id){
+function get_product_of_user(int $product_id, int $user_id){
     $conn = conn();
 
     $stmt = $conn -> prepare("SELECT id, name FROM products WHERE id = ? AND user_id = ?");

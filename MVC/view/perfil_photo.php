@@ -62,14 +62,14 @@ $user = get_user_by_id($_SESSION['id']);
                         <span>Clique para selecionar uma imagem</span>
                         <strong>
                             <?php if (isset($_SESSION['msg'])): ?>
-                                <div id="msg">
+                                <div id="msg-profile">
                                     <?php echo ($_SESSION['msg']);
                                     unset($_SESSION['msg']);
                                     ?>
                                 </div>
                                 <script>
                                     setTimeout(() => {
-                                        document.getElementById("msg").style.display = "none";
+                                        document.getElementById("msg-profile").style.display = "none";
                                     }, 3000);
                                 </script>
                             <?php endif; ?>

@@ -11,7 +11,7 @@ function get_categories(){
     return $result;
 }
 
-function check_category($category_id){
+function check_category(int $category_id){
     $conn = conn();
 
     $stmt = $conn -> prepare("SELECT * FROM category WHERE id = ?");
@@ -29,7 +29,7 @@ function check_category($category_id){
     }    
 }
 
-function get_category_by_id($id){
+function get_category_by_id(int $id){
     $conn = conn();
 
     $stmt = $conn -> prepare("SELECT * FROM category WHERE id = ?");
@@ -44,7 +44,7 @@ function get_category_by_id($id){
     return $category;
 }
 
-function get_category_by_slug($slug){
+function get_category_by_slug(string $slug){
     $conn = conn();
 
     $stmt = $conn -> prepare("SELECT * FROM category WHERE slug = ?");
@@ -59,7 +59,7 @@ function get_category_by_slug($slug){
     return $category;
 }
 
-function search_categories($category_name){
+function search_categories( string $category_name){
     $conn = conn();
 
     $name = trim($category_name);

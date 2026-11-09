@@ -1,11 +1,9 @@
--- CashFY SQL Dump corrigido para modelagem de pedidos e preparação para SSE
--- Gerado a partir do dump enviado pelo usuário
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 25/10/2026 às 20:14
+-- Tempo de geração: 09/11/2026 às 03:39
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -79,24 +77,11 @@ INSERT INTO `educational_institute` (`id`, `name`) VALUES
 
 CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
-  `seller_id` int(11) NOT NULL,
   `buyer_id` int(11) NOT NULL,
-  `status` enum('pending','accepted','rejected','completed') NOT NULL DEFAULT 'pending',
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `order_items`
---
-
-CREATE TABLE `order_items` (
-  `id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `price` decimal(10,2) NOT NULL
+  `seller_id` int(11) NOT NULL,
+  `total` decimal(10,0) NOT NULL,
+  `status` enum('pending','accepted','rejected','completed') DEFAULT 'pending',
+  `date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -145,9 +130,9 @@ INSERT INTO `products` (`id`, `user_id`, `name`, `category_id`, `description`, `
 (20, 53, 'olho aberto', 5, 'addsf avgrghgfjhjghrgfegbtgfbn dtbfgh', 22, 'uploads/products/6aa4019f76366.jpg'),
 (21, 53, 'olho fechado', 8, 'OOOOOOOOLLLLLLLho FEchadoOOOOOOOOLLLLLLLho FEchadoOOOOOOOOLLLLLLLho FEchadoOOOOOOOOLLLLLLLho FEchadoOOOOOOOOLLLLLLLho FEchadoOOOOOOOOLLLLLLLho FEchadoOOOOOOOOLLLLLLLho FEchadoOOOOOOOOLLLLLLLho FEchado', 0.99, 'uploads/products/6aa40478a0bd8.jpg'),
 (25, 53, 'anita', 7, 'aaaaniiitaaaaaaaaaa', 12, 'uploads/products/6aa7ed9bbdea4.jpg'),
-(26, 53, 'Sorvetão', 3, 'Sorvetão bem grandão gostosão', 10, 'uploads/products/6ab538e205a29.jpg'),
 (27, 83, 'Aisha', 4, 'aishasijhshjhuu', 2.99, 'uploads/products/6abbf7df03a95.jpg'),
-(28, 85, 'Salgado de peixe assado', 6, 'O melhor salgado de peixe da cidade, compre e se arrependa por toda a sua vida!!!!', 67, 'uploads/products/6ad7be5e47c13.jpg');
+(28, 85, 'Salgado de peixe assado', 6, 'O melhor salgado de peixe da cidade, compre e se arrependa por toda a sua vida!!!!', 67, 'uploads/products/6ad7be5e47c13.jpg'),
+(32, 61, 'pixels', 7, 'pixels de um computador', 23.112, 'uploads/products/6af0c66c9a104.jpg');
 
 -- --------------------------------------------------------
 
@@ -191,6 +176,13 @@ INSERT INTO `role_permissions` (`role_id`, `permissions_id`) VALUES
 (1, 4),
 (2, 1),
 (2, 2),
+(2, 3),
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 1),
+(2, 2),
 (2, 3);
 
 -- --------------------------------------------------------
@@ -201,33 +193,11 @@ INSERT INTO `role_permissions` (`role_id`, `permissions_id`) VALUES
 
 CREATE TABLE `sales` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
-  `price` float NOT NULL,
-  `date` date NOT NULL
+  `price` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `sales`
---
-
-INSERT INTO `sales` (`id`, `user_id`, `product_id`, `quantity`, `price`, `date`) VALUES
-(1, 53, 18, 2, 99.57, '2026-09-09'),
-(2, 53, 18, 4, 122, '2026-09-10'),
-(3, 53, 25, 5, 12, '2026-09-15'),
-(4, 53, 21, 1, 0.99, '2026-09-16'),
-(5, 53, 20, 5, 21, '2026-09-15'),
-(6, 53, 18, 1, 99.57, '2026-09-15'),
-(7, 53, 20, 1, 22, '2026-09-15'),
-(8, 53, 18, 1, 99.57, '2026-09-15'),
-(9, 53, 25, 1, 12, '2026-09-15'),
-(10, 53, 21, 1, 0.99, '2026-09-15'),
-(11, 53, 21, 1, 0.99, '2026-09-15'),
-(12, 53, 20, 1, 22, '2026-08-10'),
-(13, 53, 20, 1, 22, '2026-09-11'),
-(14, 53, 18, 2, 97.67, '2026-10-19'),
-(15, 85, 28, 67, 67, '2028-04-05');
 
 -- --------------------------------------------------------
 
@@ -253,7 +223,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `institute_id`, `phone_number`, `description`, `email`, `password`, `profile_photo`, `role_id`, `remember_token`) VALUES
-(53, 'Andrei Freire de Almeida', 1, '(95) 9 8113-8069', 'auraauraauraauraauraaura', 'andreifalmeida08@gmail.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', NULL, 2, NULL),
+(53, 'Andrei Freire de Almeida', 1, '(95) 9 8113-8069', 'auraauraauraauraauraaura', 'andreifalmeida08@gmail.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', 'uploads/perfil/6ade57091ae56.jpg', 2, NULL),
 (54, 'Lenalinda', 4, NULL, NULL, 'lena@email.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', NULL, 3, NULL),
 (55, 'Carlos Henrique', 3, '95991535938', 'Carlos Henrique, vendedor de xp do fortnite', 'carlos@email.com', '$2y$10$joXcvHldaNoTljNbFfyVT.Zimx2Ac.Ntl66wLxiUk1Clbz6IMi2Ua', 'uploads/perfil/6a9bc33ea138f.jpg', 2, NULL),
 (56, 'Mateus Costa de Sousa', 1, NULL, NULL, 'mininolocoiala@gmail.com', '$2y$10$J2IzklEz17HNSPG1Obn2fOdUt2VxTz0eK5R7VxOFO9jU.Wb75YGsO', NULL, 3, NULL),
@@ -313,14 +283,6 @@ ALTER TABLE `orders`
   ADD KEY `seller_id` (`seller_id`);
 
 --
--- Índices de tabela `order_items`
---
-ALTER TABLE `order_items`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `order_id` (`order_id`),
-  ADD KEY `product_id` (`product_id`);
-
---
 -- Índices de tabela `permissions`
 --
 ALTER TABLE `permissions`
@@ -352,8 +314,8 @@ ALTER TABLE `role_permissions`
 --
 ALTER TABLE `sales`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_product_sale` (`user_id`),
-  ADD KEY `product_sale` (`product_id`);
+  ADD KEY `product_sale` (`product_id`),
+  ADD KEY `fk_user_sale` (`order_id`);
 
 --
 -- Índices de tabela `users`
@@ -387,12 +349,6 @@ ALTER TABLE `orders`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de tabela `order_items`
---
-ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de tabela `permissions`
 --
 ALTER TABLE `permissions`
@@ -402,7 +358,7 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT de tabela `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de tabela `roles`
@@ -414,13 +370,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de tabela `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- Restrições para tabelas despejadas
@@ -432,13 +388,6 @@ ALTER TABLE `users`
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`seller_id`) REFERENCES `users` (`id`);
-
---
--- Restrições para tabelas `order_items`
---
-ALTER TABLE `order_items`
-  ADD CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Restrições para tabelas `products`
@@ -458,7 +407,7 @@ ALTER TABLE `role_permissions`
 -- Restrições para tabelas `sales`
 --
 ALTER TABLE `sales`
-  ADD CONSTRAINT `fk_user_sale` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_sale` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `product_sale` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 
 --

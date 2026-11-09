@@ -72,7 +72,7 @@ function get_user_by_id($id){
     $stmt -> close();
     return $user;
 }
-function search_user_by_name($name)
+function search_user_by_name(string $name)
 {
     $conn = conn();
 
@@ -117,7 +117,7 @@ function get_users(){
     return $users;
 }
 
-function update_photo($id, $profile_photo){
+function update_photo(int $id, string $profile_photo){
     $conn = conn();
 
     $stmt = $conn -> prepare("UPDATE users SET profile_photo = ? WHERE id = ?");
@@ -127,7 +127,7 @@ function update_photo($id, $profile_photo){
     $stmt -> close();
 }
 
-function update_to_seller($id, $contact, $description){
+function update_to_seller(int $id, string $contact, string $description){
     $conn = conn();
 
     $stmt  = $conn -> prepare("UPDATE users SET description = ?, phone_number = ?, role_id = 2 WHERE id = ?");
@@ -137,11 +137,11 @@ function update_to_seller($id, $contact, $description){
     $stmt -> close();
 }
 
-function update_user($id, $name, $institute, $phone_number, $description, $email){
+function update_user(int $id, string $name, int $institute_id, string $phone_number, string $description, string $email){
     $conn = conn();
 
     $stmt = $conn -> prepare("UPDATE users SET name = ?, institute_id = ?, phone_number = ?, description = ?, email = ? WHERE id = ?");
-    $stmt -> bind_param('sisssi', $name, $institute, $phone_number, $description, $email, $id);
+    $stmt -> bind_param('sisssi', $name, $institute_id, $phone_number, $description, $email, $id);
     
     $stmt -> execute();
     $stmt -> close();

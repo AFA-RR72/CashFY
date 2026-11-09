@@ -84,6 +84,11 @@ body.dark-mode {
 
 html {
     scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+    display: none; /* Chrome, Edge e Safari */
 }
 
 body {
@@ -405,7 +410,7 @@ img {
 
 .btn-transparent {
     background-color: #ffffff00;
-    color: var(--teal-500) ;
+    color: var(--teal-500);
     border: 2.5px solid var(--teal-300)
 }
 
@@ -1538,6 +1543,22 @@ body.dark-mode .field.invalid select {
     border-color: #CDE9C6;
 }
 
+.session-msg-product {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #C0503D;
+    background: #FBEAE6;
+    border: 1px solid #F2C7BE;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+}
+
+.session-msg-product.success {
+    color: var(--leaf-700);
+    background: #E6F3E2;
+    border-color: #CDE9C6;
+}
+
 body.dark-mode .session-msg {
     background: #3A2420;
     border-color: #694039;
@@ -1748,12 +1769,32 @@ body.dark-mode .img-drop:hover {
    Diário
 ============================================ */
 
-
-.history-sale .section-title {
-    margin-bottom: 42px;
+.diary-btn {
+    font-size: medium;
+    background: none;
+    border: none;
+    color: var( --teal-900);
+    rotate: -90deg;
+    transition: rotate 0.2s ease;
 }
 
-.daily-card {
+.diary-btn.active {
+    rotate: 0deg;
+}
+
+.diary-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+.diary-content.active {
+    max-height: 600px;
+    opacity: 1;
+}
+
+.diary-card {
     border: 2px solid var(--gold-400);
     background: var(--cream-light);
     border-radius: var(--radius-lg);
@@ -1761,70 +1802,21 @@ body.dark-mode .img-drop:hover {
     margin-bottom: 26px;
 }
 
-body.dark-mode .daily-card {
+body.dark-mode .diary-card {
     border: 2px solid var(--blue-grey);
 }
 
-.daily-card h3 {
+.diary-card h3 {
     color: var(--teal-700);
     font-family: var(--font-display);
     margin: 0 0 18px;
     font-size: 1.02rem;
 }
 
-.sales-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
 
-.sale-row {
-    display: flex;
-    align-items: center;
-    justify-self: center;
-    justify-content: space-between;
-    width: 70%;
-    background-color: var(--cream-light);
-    border: 2px solid var(--line);
-    border-radius: var(--radius-pill);
-    padding: 12px 22px;
-    font-weight: 700;
-}
 
 .diary {
     max-width: none;
-}
-
-.sale-row .row-duos {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 41.5%;
-}
-
-.sale-row .row-duos:nth-child(2) {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-}
-
-.sale-row .sale-name {
-    color: var(--ink);
-}
-
-.sale-row .sale-date {
-    color: var(--ink);
-
-}
-
-.sale-row .sale-qty {
-    color: var(--muted);
-    font-weight: 600;
-
-}
-
-.sale-row .sale-total {
-    color: var(--teal-700);
-    font-weight: 800;
 }
 
 .seller-profile {
@@ -1849,6 +1841,95 @@ body.dark-mode .daily-card {
 .phone {
     max-width: 155px !important;
     min-width: 155px !important;
+}
+
+/* ============================================
+   Histórico
+============================================ */
+.diary button {
+    background: none;
+    border: none;
+}
+
+.history-btn {
+    font-size: medium;
+    background: none;
+    border: none;
+    color: var( --teal-900);
+    rotate: -90deg;
+    transition: rotate 0.2s ease;
+}
+
+.history-btn.active {
+    rotate: 0deg;
+}
+
+.history-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.4s ease;
+}
+
+.history-content.active {
+    max-height: 100vh;
+    opacity: 1;
+}
+
+.history-sale .section-title {
+    margin-bottom: 42px;
+}
+
+.history-sale {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    overflow-y: visible;
+}
+
+.sale-row {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    justify-content: space-between;
+    width: 70%;
+    background-color: var(--cream-light);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-pill);
+    padding: 12px 22px;
+    font-weight: 700;
+}
+
+.sale-row .row-duos {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 41.5%;
+}
+
+.sale-row .row-duos:nth-child(2) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.sale-row .sale-name {
+    color: var(--ink);
+}
+
+.sale-row .sale-date {
+    color: var(--ink);
+}
+
+.sale-row .sale-qty {
+    color: var(--muted);
+    font-weight: 600;
+
+}
+
+.sale-row .sale-total {
+    color: var(--teal-700);
+    font-weight: 800;
 }
 
 /* ============================================
@@ -2417,26 +2498,33 @@ body.dark-mode #cookie-reject:hover {
 
 /* Definição da animação de pulo */
 @keyframes jump {
-  0% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateX(-50px) translateY(-50px) scale(2); /* Sobe 15px */
-  }
-  50% {
-    transform: translatex(0) translateY(0) scale(1);     /* Volta à posição original */
-  }
-  70% {
-    transform: translateX(-10px) translateY(-10px) scale(1.2);  /* Pulo menor para suavizar */
-  }
-  100% {
-    transform: translateX(0) translateY(0) scale(1);
-  }
+    0% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateX(-50px) translateY(-50px) scale(2);
+        /* Sobe 15px */
+    }
+
+    50% {
+        transform: translatex(0) translateY(0) scale(1);
+        /* Volta à posição original */
+    }
+
+    70% {
+        transform: translateX(-10px) translateY(-10px) scale(1.2);
+        /* Pulo menor para suavizar */
+    }
+
+    100% {
+        transform: translateX(0) translateY(0) scale(1);
+    }
 }
 
 /* Classe aplicada ao botão */
 .cart-button {
-  animation: jump 0.6s ease-in-out;
+    animation: jump 0.6s ease-in-out;
 }
 
 /* ---------- Modal do carrinho ---------- */
@@ -2889,10 +2977,11 @@ body.dark-mode #cookie-reject:hover {
         width: 100%;
     }
 
-    #seller-quest button + button {
+    #seller-quest button+button {
         margin-top: 10px;
     }
 }
+
 /* ============================================
    Responsive
 ============================================ */
@@ -3466,27 +3555,25 @@ body.dark-mode .field input[type="date"]::-webkit-calendar-picker-indicator {
    4. DIÁRIO — card de registrar vendas mais visível
 ============================================ */
 
-.daily-card {
+.diary-card {
     position: relative;
     border-color: var(--orange-500);
-    box-shadow: 0 10px 26px rgba(232, 103, 43, .18);
     overflow: hidden;
 }
 
-.daily-card h3 {
+.diary-card h3 {
     color: var(--orange-600);
 }
 
-body.dark-mode .daily-card {
+body.dark-mode .diary-card {
     border-color: #A65A2A;
     background:
         linear-gradient(140deg,
             #33241B 0%,
             #2A1F19 100%);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
 }
 
-body.dark-mode .daily-card h3 {
+body.dark-mode .diary-card h3 {
     color: #F2A15F;
 }
 
@@ -3558,7 +3645,7 @@ body.dark-mode .daily-card h3 {
 }
 
 /* Mensagem de atualização de foto */
-#msg {
+#msg-profile {
     font-size: .8rem;
     font-weight: 700;
     color: var(--teal-700);
@@ -4292,11 +4379,11 @@ body.cookie-open .to-top {
 
     /* ---- Diário ---- */
 
-    .daily-card {
+    .diary-card {
         padding: 20px 16px;
     }
 
-    .daily-card .field-row {
+    .diary-card .field-row {
         display: grid;
         grid-template-columns: 1fr;
         gap: 4px;

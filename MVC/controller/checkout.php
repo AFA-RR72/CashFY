@@ -2,5 +2,9 @@
 var_dump($_SESSION);
 echo '<br><br>';
 var_dump($_SESSION['cart']);
+echo '<br><br>';
+
+
+
 
 ?>

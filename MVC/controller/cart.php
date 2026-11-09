@@ -44,7 +44,7 @@ if (
 ) {
     header("Location: ../../index.php");
     exit;
-}
+} 
 
 $params = $_GET;
 $url = '?' . http_build_query($params);
@@ -53,6 +53,20 @@ if (check_product($_POST['product_id'])) {
     $product = get_product_by_id($_POST['product_id']);
 } else {
     $params['product'] = null;
+    header("Location: ../view/seller.php$url");
+    exit;
+}
+
+if (isset($_SESSION['cart'])){
+    $firstItem = (int) reset($_SESSION['cart'])['seller'];
+}
+
+if (
+    isset($firstItem) &&
+    $firstItem !== $product['user_id'] &&
+    !empty($_SESSION['cart'])
+){
+    $_SESSION['msg'] = 'Só é possível comprar em uma loja por vez';
     header("Location: ../view/seller.php$url");
     exit;
 }

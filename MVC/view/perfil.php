@@ -68,7 +68,7 @@ function format_phone_number($phone_number)
     return $number;
 }
 
-if (empty($_GET)){
+if (empty($_GET)) {
     $_GET['profile'] = true;
 }
 
@@ -266,81 +266,87 @@ if (empty($_GET)){
 
                         <section class="tab-panel" id="tab-diario">
 
-                            <div class="diary"><h2 class="section-title" style="margin-top:0;">REGISTRAR VENDAS</h2>
-                                <div class="daily-card">
-                                    <form action="../controller/sales.php" method="post" novalidate>
-                                        <div class="field-row">
-                                            <div class="field">
-                                                <label for="product">Produto</label>
-                                                <select name="product" id="product">
-                                                    <option value="" disabled selected>Selecione um produto:</option>
-                                                    <?php foreach ($products as $product): ?>
-                                                        <?php if ($product['user_id'] == $user['id']): ?>
-                                                            <option value="<?= $product['id']; ?>"
-                                                                data-price="<?= $product['price']; ?>">
-                                                                <?= htmlspecialchars($product['name']); ?>
-                                                            </option>
-                                                        <?php endif; ?>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="field">
-                                                <label for="quantity">Quantidade</label>
-                                                <input type="number" name="quantity" id="quantity">
-                                            </div>
-                                            <div class="field">
-                                                <label for="price">Valor</label>
-                                                <div class="price-wrapper diary">
-                                                    <span>R$</span>
-                                                    <input type="number" id="price" name="price" min="0" step="0.01"
-                                                        placeholder="0.00" required>
-                                                </div>
-                                            </div>
-                                            <div class="field date">
-                                                <label for="date">Data</label>
-                                                <input type="date" name="date" id="date">
-                                            </div>
-                                            <div class="field">
-                                                <button class="btn btn-orange" type="submit">Registrar </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    <?php if (isset($_SESSION['msg-form'])): ?>
-                                        <div class="session-msg <?= $_SESSION['msg-form'] === 'Venda registrada' ? 'success' : ''; ?>"
-                                            id="msg">
-                                            <?= htmlspecialchars($_SESSION['msg-form']); ?>
-                                            <?php unset($_SESSION['msg-form']); ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
+                            <div class="diary">
+                                 <button onclick="diary()"><h2 class="section-title" style="margin-top:0;">REGISTRAR VENDAS <i class="fa-solid fa-chevron-down diary-btn" id="diary-btn"></i></h2></button>
 
-                                <div class="history-sale">
-                                    <h2 class="section-title" style="margin-top:0;">HISTÓRICO DE VENDAS</h2>
-                                    <?php $sales = get_sales(); ?>
-                                    <?php foreach ($sales as $sale): ?>
-                                        <?php if ($sale['user_id'] == $user['id']): ?>
-                                            <?php $product = get_product_by_id($sale['product_id']); ?>
-                                            <div class="sale-row">
-                                                <div class="row-duos">
-                                                    <span class="sale-name">
-                                                        <?= $product['name']; ?>
-                                                    </span>
-                                                    <span class="sale-date">
-                                                        <?= date('d/m/y', strtotime($sale['date'])); ?>
-                                                    </span>
+
+                                <div class="diary-content" id="diary">
+                                    <div class="diary-card">
+                                        <form action="../controller/sales.php" method="post" novalidate>
+                                            <div class="field-row">
+                                                <div class="field">
+                                                    <label for="product">Produto</label>
+                                                    <select name="product" id="product">
+                                                        <option value="" disabled selected>Selecione um produto:</option>
+                                                        <?php foreach ($products as $product): ?>
+                                                            <?php if ($product['user_id'] == $user['id']): ?>
+                                                                <option value="<?= $product['id']; ?>"
+                                                                    data-price="<?= $product['price']; ?>">
+                                                                    <?= htmlspecialchars($product['name']); ?>
+                                                                </option>
+                                                            <?php endif; ?>
+                                                        <?php endforeach; ?>
+                                                    </select>
                                                 </div>
-                                                <div class="row-duos">
-                                                    <span class="sale-qty">
-                                                        <?= 'Quantidade: ' . $sale['quantity']; ?>
-                                                    </span>
-                                                    <span class="sale-total">
-                                                        <?= 'Total: R$' . number_format(($sale['quantity'] * $sale['price']), 2, '.', ','); ?>
-                                                    </span>
+                                                <div class="field">
+                                                    <label for="quantity">Quantidade</label>
+                                                    <input type="number" name="quantity" id="quantity">
+                                                </div>
+                                                <div class="field">
+                                                    <label for="price">Valor</label>
+                                                    <div class="price-wrapper diary">
+                                                        <span>R$</span>
+                                                        <input type="number" id="price" name="price" min="0" step="0.01"
+                                                            placeholder="0.00" required>
+                                                    </div>
+                                                </div>
+                                                <div class="field date">
+                                                    <label for="date">Data</label>
+                                                    <input type="date" name="date" id="date">
+                                                </div>
+                                                <div class="field">
+                                                    <button class="btn btn-orange" type="submit">Registrar </button>
                                                 </div>
                                             </div>
-                                            <br>
+                                        </form>
+                                        <?php if (isset($_SESSION['msg-form'])): ?>
+                                            <div class="session-msg <?= $_SESSION['msg-form'] === 'Venda registrada' ? 'success' : ''; ?>"
+                                                id="msg">
+                                                <?= htmlspecialchars($_SESSION['msg-form']); ?>
+                                                <?php unset($_SESSION['msg-form']); ?>
+                                            </div>
                                         <?php endif; ?>
-                                    <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <button onclick="history()"><h2 class="section-title" style="margin-top:0;">HISTÓRICO DE VENDAS <i class="fa-solid fa-chevron-down history-btn" id="history-btn"></i></h2></button>
+                                <div class="history-content" id="history">
+                                    <div class="history-sale">
+                                        <?php $sales = get_sales(); ?>
+                                        <?php foreach ($sales as $sale): ?>
+                                            <?php if ($sale['user_id'] == $user['id']): ?>
+                                                <?php $product = get_product_by_id($sale['product_id']); ?>
+                                                <div class="sale-row">
+                                                    <div class="row-duos">
+                                                        <span class="sale-name">
+                                                            <?= $product['name']; ?>
+                                                        </span>
+                                                        <span class="sale-date">
+                                                            <?= date('d/m/y', strtotime($sale['date'])); ?>
+                                                        </span>
+                                                    </div>
+                                                    <div class="row-duos">
+                                                        <span class="sale-qty">
+                                                            <?= 'Quantidade: ' . $sale['quantity']; ?>
+                                                        </span>
+                                                        <span class="sale-total">
+                                                            <?= 'Total: R$' . number_format(($sale['quantity'] * $sale['price']), 2, '.', ','); ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -549,7 +555,7 @@ if (empty($_GET)){
         const dateInput = document.getElementById('date');
         const quantity = document.getElementById('quantity');
 
-        productSelect.addEventListener('change', function () {
+        productSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
 
             priceInput.value = Number(selectedOption.dataset.price).toFixed(2);
@@ -580,7 +586,31 @@ if (empty($_GET)){
         } else if (phone.value.length === 10) {
             phone.value = `(${phone.value.slice(0, 2)}) ${phone.value.slice(2, 6)}-${phone.value.slice(6)}`;
         }
+    </script>
+    <script>
+        function diary() {
+            const diary = document.getElementById('diary');
+            const diaryBtn = document.getElementById('diary-btn');
+            if (diary.classList.contains('active')) {
+                diary.classList.remove('active');
+                diaryBtn.classList.remove('active');
+            } else {
+                diary.classList.add('active');
+                diaryBtn.classList.add('active');
+            }
+        }
 
+        function history() {
+            const history = document.getElementById('history');
+            const historyBtn = document.getElementById('history-btn');
+            if (history.classList.contains('active')) {
+                history.classList.remove('active');
+                historyBtn.classList.remove('active');
+            } else {
+                history.classList.add('active');
+                historyBtn.classList.add('active');
+            }
+        }
     </script>
     <script src="../../assets/js/ScrollToMsg.js"></script>
 </body>

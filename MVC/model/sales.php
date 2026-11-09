@@ -17,7 +17,7 @@ function get_sales()
     return $result;
 }
 
-function register_sale($user_id, $product_id, $quantity, $price, $date)
+function register_sale(int $user_id, int $product_id, int $quantity, float $price, string $date)
 {
     $conn = conn();
 
@@ -34,7 +34,7 @@ function register_sale($user_id, $product_id, $quantity, $price, $date)
     return;
 }
 
-function get_total_week($user_id)
+function get_total_week(int $user_id)
 {
     $conn = conn();
 
@@ -54,7 +54,7 @@ function get_total_week($user_id)
     return $total;
 }
 
-function get_total_month($user_id)
+function get_total_month(int $user_id)
 {
     $conn = conn();
 
@@ -81,12 +81,12 @@ function get_total_month($user_id)
     return $total;
 }
 
-function get_saled_items_month($user_id)
+function get_saled_items_month(int $user_id)
 {
     $conn = conn();
 
     $stmt = $conn->prepare("
-    SELECT COUNT(id) as 'saled_items'
+    SELECT SUM(quantity) as 'saled_items'
     FROM sales
     WHERE user_id = ?
     AND date >= CURDATE() - INTERVAL DAY(CURDATE() - 1) DAY
