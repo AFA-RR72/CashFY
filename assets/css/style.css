@@ -415,7 +415,7 @@ img {
 }
 
 .btn-orange {
-    background: var(--orange-500);
+    background: var(--orange-500) !important;
     color: #fff;
 }
 
@@ -1554,6 +1554,23 @@ body.dark-mode .field.invalid select {
 }
 
 .session-msg-product.success {
+    color: var(--leaf-700);
+    background: #E6F3E2;
+    border-color: #CDE9C6;
+}
+
+.session-msg-cart {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #C0503D;
+    background: #FBEAE6;
+    border: 1px solid #F2C7BE;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin: 20px 22px 0px;
+}
+
+.session-msg-cart.success {
     color: var(--leaf-700);
     background: #E6F3E2;
     border-color: #CDE9C6;
@@ -3376,19 +3393,39 @@ body.dark-mode ::selection {
 
 .menu_details {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    width: 350px;
-    height: 35px;
-    background-color: var(--blue-grey);
-    border-width: 1px;
-    border-radius: var(--radius-sm);
-    padding: 9px 22px;
-    margin: 20px 30px 18px;
+    grid-template-columns: repeat(6, 1fr);
     align-items: center;
+    gap: 4px;
+
+    width: 350px;
+    min-height: 48px;
+    padding: 6px 10px;
+    margin: 20px 30px 18px;
+
+    background-color: var(--blue-grey);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
 }
 
 .menu_details_options {
-    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 5px;
+    border-radius: var(--radius-sm);
+
+    color: var(--text-color);
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.menu_details_options:hover {
+    background-color: var(--cream);
+    color: var(--teal);
 }
 
 .product-photo {
@@ -4702,5 +4739,394 @@ body.dark-mode .chart-mode-btn.active {
     .chart-filter {
         max-width: 100%;
         flex-basis: 100%;
+    }
+}
+/* ============================================================
+   RESPONSIVIDADE — celulares e tablets (ajustes finais)
+   Fica no fim do arquivo para prevalecer sobre as regras
+   anteriores. Faixas: tablet 601–1024px, celular ≤600px,
+   celular pequeno ≤400px.
+============================================================ */
+
+/* ---------- Base segura (todas as telas) ---------- */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.page {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+video,
+canvas,
+svg {
+    max-width: 100%;
+}
+
+/* Textos longos nunca empurram o layout para o lado */
+.seller-name,
+.seller-desc,
+.product-name,
+.product-desc,
+.profile-meta h1,
+.profile-meta p,
+.order-buyer,
+.order-item,
+.cart-item-name,
+.sale-row .sale-name,
+.team-name,
+.team-role,
+.team-bio {
+    overflow-wrap: anywhere;
+    min-width: 0;
+}
+
+.field input,
+.field select,
+.field textarea {
+    max-width: 100%;
+}
+
+/* Áreas seguras (iPhone com notch / barra home) */
+.site-header .container {
+    padding-left: max(var(--container-pad, 32px), env(safe-area-inset-left));
+    padding-right: max(var(--container-pad, 32px), env(safe-area-inset-right));
+}
+
+.cart-button {
+    right: max(25px, calc(env(safe-area-inset-right) + 12px));
+    bottom: max(25px, calc(env(safe-area-inset-bottom) + 12px));
+}
+
+.to-top {
+    bottom: max(22px, calc(env(safe-area-inset-bottom) + 12px));
+}
+
+.toast {
+    bottom: max(26px, calc(env(safe-area-inset-bottom) + 12px));
+    max-width: calc(100% - 32px);
+}
+
+/* Alvos de toque confortáveis em telas touch */
+@media (pointer: coarse) {
+
+    .btn,
+    .icon-btn,
+    .menu_details_options,
+    .chart-mode-btn,
+    .cart-item-qty button,
+    .nav-links a {
+        min-height: 44px;
+    }
+
+    .icon-btn {
+        min-width: 44px;
+    }
+
+    .menu_details_options a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 36px;
+    }
+}
+
+/* ---------- Tablet e abaixo (≤1024px) ---------- */
+@media (max-width: 1024px) {
+    .container {
+        --container-pad: 28px;
+    }
+
+    .home {
+        padding-left: 0;
+    }
+
+    .page-header,
+    .about-hero,
+    .cat-banner {
+        max-width: 100%;
+    }
+}
+
+/* ---------- Tablet retrato / celular grande (≤880px) ---------- */
+@media (max-width: 880px) {
+
+    /* evita o zoom automático do iOS ao focar nos campos */
+    .field input,
+    .field select,
+    .field textarea,
+    .search-box input,
+    .order-item-fields input {
+        font-size: 16px;
+    }
+
+    .home {
+        padding-left: 0;
+    }
+
+    /* menu hambúrguer: painel mais largo, legível e dentro da tela */
+    .nav-links {
+        min-width: 190px;
+        max-width: calc(100vw - 32px);
+        padding: 12px 16px;
+        gap: 4px;
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow-pop);
+    }
+
+    .nav-links li a {
+        display: block;
+        padding: 10px 4px;
+    }
+
+    .menu-btn {
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        min-height: 44px;
+        padding: 12px 10px;
+        margin-right: -10px;
+    }
+
+    .menu-btn .bar {
+        height: 3px;
+    }
+}
+
+/* ---------- Somente tablets (601–880px) ---------- */
+@media (min-width: 601px) and (max-width: 880px) {
+    .cat-grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: none;
+        grid-auto-flow: row;
+        gap: 16px;
+    }
+
+    .stat-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .menu_details {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-card .field-row,
+    .field-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ---------- Tablet paisagem (881–1024px) ---------- */
+@media (min-width: 881px) and (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .menu_details {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+/* ---------- Celular (≤600px) ---------- */
+@media (max-width: 600px) {
+    .container {
+        --container-pad: 16px;
+    }
+
+    /* abas do perfil: quebram linha em vez de estourar a tela */
+    .menu_details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .menu_details_options {
+        min-width: 0;
+        text-align: center;
+        font-size: .85rem;
+    }
+
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field-row,
+    .form-card .field-row {
+        grid-template-columns: 1fr;
+    }
+
+    .cat-card {
+        aspect-ratio: 1 / .9;
+    }
+
+    .cat-name {
+        font-size: .88rem;
+    }
+
+    /* carrinho e modais ocupam a tela com folga */
+    #cart,
+    #product-modal,
+    #seller-quest {
+        width: calc(100% - 24px);
+        max-height: 88vh;
+        max-height: 88dvh;
+    }
+
+    .cart-header {
+        padding: 14px 16px;
+    }
+
+    /* botões flutuantes não se sobrepõem */
+    .cart-button {
+        width: 54px;
+        height: 54px;
+        font-size: 21px;
+    }
+
+    .to-top {
+        right: max(14px, calc(env(safe-area-inset-right) + 8px));
+        bottom: max(84px, calc(env(safe-area-inset-bottom) + 76px));
+    }
+
+    body.cookie-open .to-top {
+        bottom: max(84px, calc(env(safe-area-inset-bottom) + 76px));
+    }
+
+    /* aviso de pedido novo ocupa a largura da tela */
+    .order-toast {
+        left: 12px;
+        right: 12px;
+        bottom: max(90px, calc(env(safe-area-inset-bottom) + 82px));
+        max-width: none;
+    }
+
+    .order-head {
+        flex-wrap: wrap;
+    }
+
+    .order-item-fields {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .order-item-fields input {
+        flex: 1 1 90px;
+    }
+
+    .order-actions .btn {
+        flex: 1 1 100%;
+    }
+
+    .chart-wrap canvas {
+        max-width: 100%;
+    }
+}
+
+/* ---------- Celular pequeno (≤520px) ---------- */
+@media (max-width: 520px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .team-photo {
+        width: 112px;
+        height: 112px;
+    }
+}
+
+/* ---------- Celular bem pequeno (≤400px) ---------- */
+@media (max-width: 400px) {
+    .container {
+        --container-pad: 12px;
+    }
+
+    .brand {
+        font-size: 1.1rem;
+        gap: 8px;
+    }
+
+    .site-header .container {
+        gap: 10px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .header-actions .btn-sm {
+        padding: 8px 12px;
+        font-size: .78rem;
+    }
+
+    .cat-grid {
+        gap: 10px;
+    }
+
+    .menu_details {
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+    }
+
+    .menu_details_options {
+        font-size: .8rem;
+        padding: 6px 4px;
+    }
+
+    .auth-card {
+        padding: 26px 16px 22px;
+    }
+}
+
+/* ---------- Celular deitado (altura curta) ---------- */
+@media (max-height: 480px) and (orientation: landscape) {
+
+    #cart,
+    #product-modal,
+    #seller-quest {
+        max-height: 94vh;
+        max-height: 94dvh;
+        overflow-y: auto;
+    }
+
+    .cookie-banner,
+    #cookie-banner {
+        max-height: 90vh;
+        max-height: 90dvh;
+        overflow-y: auto;
+    }
+
+    .auth-page {
+        padding-top: 64px;
+    }
+
+    .site-header {
+        position: static;
     }
 }

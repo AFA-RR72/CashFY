@@ -1,5 +1,6 @@
 <?php session_start();
 require_once(__DIR__ . '/../model/products.php');
+require_once(__DIR__ . '/../config/cart_return.php');
 
 // Ações dentro do modal do carrinho: aumentar, diminuir e remover
 if (isset($_POST['action'])) {
@@ -31,7 +32,10 @@ if (isset($_POST['action'])) {
 
     $_SESSION['open_cart'] = true;
 
-    header("Location: ../view/seller.php$url");
+    // Volta para a página onde o carrinho foi usado (index, categoria ou seller)
+    $fallback = !empty($_GET['id']) ? "../view/seller.php$url" : BASE_URL . 'index.php';
+
+    header('Location: ' . cart_return_url($_POST['return'] ?? '', $fallback));
     exit;
 }
 

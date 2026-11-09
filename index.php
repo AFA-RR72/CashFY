@@ -63,7 +63,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Cashfy — Compra e venda entre estudantes</title>
   <link rel="stylesheet" href="assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
@@ -286,165 +286,12 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     <button id="cookie-reject">Sair</button>
   </div>
 
-  <!-- Botão do carrinho -->
-
-    <?php if (!empty($_SESSION['cart'])): ?>
-
-      <button
-        class="cart-button"
-        onclick="cart.showModal()"
-        type="button">
-
-        <i class="fa-solid fa-cart-shopping"></i>
-
-      </button>
-
-    <?php endif; ?>
-
-
-    <!-- Modal do carrinho -->
-
-    <?php
-    $cart_items = $_SESSION['cart'] ?? [];
-    $cart_total = 0;
-    ?>
-
-    <dialog id="cart">
-
-      <div class="cart-header">
-
-        <h3>
-          <i class="fa-solid fa-cart-shopping"></i>
-          Carrinho
-        </h3>
-
-        <button
-          type="button"
-          class="cart-close"
-          aria-label="Fechar carrinho"
-          onclick="cart.close()">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-
-      </div>
-
-
-      <div class="cart-items">
-
-        <?php if (empty($cart_items)): ?>
-
-          <p class="cart-empty">
-            Seu carrinho está vazio.
-          </p>
-
-        <?php endif; ?>
-
-        <?php foreach ($cart_items as $id => $item): ?>
-
-          <?php $cart_total += $item['total']; ?>
-
-          <div class="cart-item">
-
-            <p class="cart-item-name">
-              <?= htmlspecialchars($item['product']); ?>
-            </p>
-
-            <?php $cart_form_url = http_build_query(['id' => $_GET['id']]); ?>
-
-            <form
-              class="cart-item-qty"
-              action="../controller/cart.php?<?= htmlspecialchars($cart_form_url); ?>"
-              method="post"
-              style="display:inline-flex; align-items:center; gap:10px; margin:0;">
-
-              <input
-                type="hidden"
-                name="product_id"
-                value="<?= (int) $id; ?>">
-
-              <?php if ((int) $item['quantity'] > 1): ?>
-
-                <button
-                  type="submit"
-                  name="action"
-                  value="decrease"
-                  aria-label="Diminuir quantidade"
-                  style="background:none; border:none; color:inherit; font:inherit; cursor:pointer;">
-                  -
-                </button>
-
-              <?php else: ?>
-
-                <button
-                  type="submit"
-                  name="action"
-                  value="remove"
-                  aria-label="Remover produto do carrinho"
-                  style="background:none; border:none; color:inherit; font:inherit; cursor:pointer;">
-                  <i class="fa-regular fa-trash-can"></i>
-                </button>
-
-              <?php endif; ?>
-
-              <span><?= (int) $item['quantity']; ?></span>
-
-              <button
-                type="submit"
-                name="action"
-                value="increase"
-                aria-label="Aumentar quantidade"
-                style="background:none; border:none; color:inherit; font:inherit; cursor:pointer;">
-                +
-              </button>
-
-            </form>
-
-            <p class="cart-item-price">
-              R$
-              <?= number_format($item['total'], 2, ',', '.'); ?>
-            </p>
-
-          </div>
-
-        <?php endforeach; ?>
-
-      </div>
-
-
-      <div class="cart-total">
-
-        <span>Total</span>
-
-        <strong>
-          R$
-          <?= number_format($cart_total, 2, ',', '.'); ?>
-        </strong>
-
-      </div>
-
-      <form id="checkout-form"
-      action="../controller/checkout.php"
-      method="post"></form>
-
-      <button
-        type="submit"
-        form="checkout-form"
-        class="btn btn-gradient cart-finalize"
-        <?= empty($cart_items) ? 'disabled' : ''; ?>>
-        Finalizar compra
-      </button>
-      <button
-        type="button"
-        class="btn btn-transparent cart-continue"
-        onclick="cart.close()">
-        Continuar comprando
-      </button>
-
-    </dialog>
+    <?php require __DIR__ . '/MVC/view/partials/cart_modal.php'; ?>
 
   <script src="assets/js/theme.js"></script>
   <script src="assets/js/menu-toggle.js"></script>
   <script src="assets/js/cookies.js"></script>
+  <?php require __DIR__ . '/MVC/view/partials/order_notifier.php'; ?>
 </body>
 
 </html>

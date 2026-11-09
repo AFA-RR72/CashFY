@@ -1,0 +1,208 @@
+/* Aba "Pedidos" do vendedor + contador do menu */
+
+[hidden] {
+    display: none !important;
+}
+
+.orders-badge {
+    display: inline-block;
+    min-width: 20px;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: var(--radius-pill);
+    background: var(--orange-600);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.orders-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.orders-update {
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    background: var(--cream-deep);
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.orders-update a {
+    margin-left: 8px;
+    color: var(--orange-600);
+    text-decoration: underline;
+}
+
+.orders-group-title {
+    margin: 10px 0 0;
+    color: var(--teal-900);
+}
+
+.orders-empty {
+    color: var(--ink-soft);
+}
+
+.order-card {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--card);
+    box-shadow: var(--shadow-card);
+}
+
+.order-head,
+.order-item,
+.order-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.order-head {
+    margin-bottom: 4px;
+}
+
+.order-date,
+.order-buyer {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+}
+
+.order-buyer a {
+    color: var(--teal-700);
+    text-decoration: underline;
+}
+
+.order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.order-item {
+    flex-wrap: wrap;
+}
+
+.order-item-fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.order-item-fields input {
+    width: 90px;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--cream-light);
+    color: var(--ink);
+}
+
+.order-item-fields input[type="number"][name$="[quantity]"] {
+    width: 64px;
+}
+
+.order-total {
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font-weight: 700;
+}
+
+.order-hint {
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
+.order-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+body.dark-mode .order-card {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+}
+
+body.dark-mode .orders-group-title,
+body.dark-mode .orders-update {
+    color: #fff;
+}
+
+body.dark-mode .orders-update {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .order-date,
+body.dark-mode .order-buyer,
+body.dark-mode .order-hint,
+body.dark-mode .orders-empty {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+body.dark-mode .order-item-fields input {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+@media (max-width: 600px) {
+    .order-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* Botão de notificações na aba Pedidos */
+
+.orders-notify {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.orders-notify-status {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+}
+
+body.dark-mode .orders-notify-status {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Aviso de pedido novo (qualquer página) */
+
+.order-toast {
+    position: fixed;
+    right: 25px;
+    bottom: 100px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-width: min(92vw, 340px);
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    background: var(--teal-900);
+    color: #fff;
+    text-decoration: none;
+    box-shadow: var(--shadow-pop);
+}
+
+.order-toast strong {
+    color: var(--orange-300);
+}

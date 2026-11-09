@@ -55,7 +55,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <title>Fale Conosco - CashFy</title>
 </head>

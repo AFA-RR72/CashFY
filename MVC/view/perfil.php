@@ -12,8 +12,6 @@ $user = get_user_by_id($_SESSION['id']);
 $products = get_products();
 $show_revenue_chart = false;
 
-// $sse_cursor = get_order_cursor($user['id']);
-
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
 {
     $palavras = preg_split('/\s+/', trim($frase));
@@ -79,10 +77,11 @@ if (empty($_GET)) {
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Meu perfil — Cashfy</title>
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/orders.css">
 </head>
 <!-- Eu meio que dei ctrl+c ctrl+v no dashboard, porque é a mesma merda basicamente. vou só mudar uns nomes e class -->
 
@@ -187,7 +186,10 @@ if (empty($_GET)) {
             <!-- Parte do vendedor -->
 
             <?php if (isset($user['role_id']) && $user['role_id'] == 2): ?>
-                <?php $products = get_products(); ?>
+                <?php
+                $products = get_products();
+                $order_sig = get_order_signature((int) $user['id']);
+                ?>
                 <div class="main-seller">
                     <div class="menu_details">
                         <div class="menu_details_options">
@@ -197,7 +199,12 @@ if (empty($_GET)) {
                             <a href="?diary">Diário</a>
                         </div>
                         <div class="menu_details_options">
-                            <a href="?orders">Pedidos<span id="orders-badge" class="orders-badge"></span>
+                            <a href="?orders">Pedidos<span id="orders-badge" data-sw-url="/activities/CashFY/service-worker.js" class="orders-badge"
+                                    data-endpoint="../controller/order_stream.php"
+                                    data-orders-url="perfil.php?orders"
+                                    data-pending="<?= $order_sig['pending']; ?>"
+                                    data-last-id="<?= $order_sig['last_id']; ?>"
+                                    <?= $order_sig['pending'] > 0 ? '' : 'hidden'; ?>><?= $order_sig['pending'] > 0 ? $order_sig['pending'] : ''; ?></span></a>
                         </div>
                         <div class="menu_details_options">
                             <a href="?income">Rendimento</a>
@@ -211,9 +218,126 @@ if (empty($_GET)) {
 
                     <?php if (isset($_GET['orders'])): ?>
 
+                        <?php
+                        $orders = get_seller_orders((int) $user['id']);
+                        $pending_orders = array_filter($orders, fn($o) => $o['status'] === 'pending');
+                        $accepted_orders = array_filter($orders, fn($o) => $o['status'] === 'accepted');
+                        $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
+                        ?>
+
                         <section class="tab-panel" id="tab-pedidos">
-                            <div class="history-sale">
+                            <div class="orders-panel">
                                 <h2 class="section-title" style="margin-top:0;">PEDIDOS RECEBIDOS</h2>
+
+                                <div class="orders-notify">
+                                    <button class="btn btn-transparent btn-sm" type="button" id="orders-notify-enable" data-sw-url="/activities/CashFY/service-worker.js" hidden>
+                                        Ativar notificações
+                                    </button>
+                                    <p class="orders-notify-status" id="orders-notify-status"></p>
+                                </div>
+
+                                <div class="orders-update" id="orders-update" hidden>
+                                    Há novidades nos seus pedidos.
+                                    <a href="?orders">Atualizar</a>
+                                </div>
+
+                                <?php if (isset($_SESSION['msg-form'])): ?>
+                                    <div class="session-msg <?= in_array($_SESSION['msg-form'], $order_ok_msgs, true) ? 'success' : ''; ?>"
+                                        id="msg">
+                                        <?= htmlspecialchars($_SESSION['msg-form']); ?>
+                                        <?php unset($_SESSION['msg-form']); ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Pendentes: o vendedor aceita ou recusa -->
+
+                                <h3 class="orders-group-title">Pendentes (<?= count($pending_orders); ?>)</h3>
+
+                                <?php if (empty($pending_orders)): ?>
+                                    <p class="orders-empty">Nenhum pedido pendente.</p>
+                                <?php endif; ?>
+
+                                <?php foreach ($pending_orders as $order): ?>
+                                    <?php $order_total = 0; ?>
+                                    <article class="order-card">
+                                        <div class="order-head">
+                                            <strong>Pedido #<?= (int) $order['id']; ?></strong>
+                                            <span class="order-date"><?= date('d/m/y H:i', strtotime($order['date'])); ?></span>
+                                        </div>
+                                        <p class="order-buyer">
+                                            Cliente: <?= htmlspecialchars($order['buyer_name']); ?>
+                                            <?php if (!empty($order['buyer_phone'])): ?>
+                                                — <a href="https://wa.me/<?= preg_replace('/\D/', '', $order['buyer_phone']); ?>"><?= format_phone_number($order['buyer_phone']); ?></a>
+                                            <?php endif; ?>
+                                        </p>
+                                        <ul class="order-items">
+                                            <?php foreach ($order['items'] as $item): ?>
+                                                <?php $order_total += $item['quantity'] * $item['price']; ?>
+                                                <li class="order-item">
+                                                    <span><?= (int) $item['quantity']; ?>x <?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?></span>
+                                                    <span>R$ <?= number_format($item['quantity'] * $item['price'], 2, ',', '.'); ?></span>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                        <div class="order-total">
+                                            <span>Total</span>
+                                            <span>R$ <?= number_format($order_total, 2, ',', '.'); ?></span>
+                                        </div>
+                                        <form class="order-actions" action="../controller/order_status.php" method="post">
+                                            <input type="hidden" name="order_id" value="<?= (int) $order['id']; ?>">
+                                            <button class="btn btn-orange btn-sm" type="submit" name="action" value="accept">Aceitar</button>
+                                            <button class="btn btn-transparent btn-sm" type="submit" name="action" value="reject">Recusar</button>
+                                        </form>
+                                    </article>
+                                <?php endforeach; ?>
+
+                                <!-- Aceitos: ficam aqui até o vendedor concluir (pode ajustar valores antes) -->
+
+                                <h3 class="orders-group-title">Aceitos (<?= count($accepted_orders); ?>)</h3>
+
+                                <?php if (empty($accepted_orders)): ?>
+                                    <p class="orders-empty">Nenhum pedido aceito aguardando entrega.</p>
+                                <?php endif; ?>
+
+                                <?php foreach ($accepted_orders as $order): ?>
+                                    <article class="order-card">
+                                        <div class="order-head">
+                                            <strong>Pedido #<?= (int) $order['id']; ?></strong>
+                                            <span class="order-date"><?= date('d/m/y H:i', strtotime($order['date'])); ?></span>
+                                        </div>
+                                        <p class="order-buyer">
+                                            Cliente: <?= htmlspecialchars($order['buyer_name']); ?>
+                                            <?php if (!empty($order['buyer_phone'])): ?>
+                                                — <a href="https://wa.me/<?= preg_replace('/\D/', '', $order['buyer_phone']); ?>"><?= format_phone_number($order['buyer_phone']); ?></a>
+                                            <?php endif; ?>
+                                        </p>
+                                        <form action="../controller/order_status.php" method="post">
+                                            <input type="hidden" name="order_id" value="<?= (int) $order['id']; ?>">
+                                            <ul class="order-items">
+                                                <?php foreach ($order['items'] as $item): ?>
+                                                    <li class="order-item">
+                                                        <span><?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?></span>
+                                                        <span class="order-item-fields">
+                                                            <input type="number" min="1" step="1"
+                                                                name="items[<?= (int) $item['id']; ?>][quantity]"
+                                                                value="<?= (int) $item['quantity']; ?>"
+                                                                aria-label="Quantidade">
+                                                            <span>x R$</span>
+                                                            <input type="number" min="0.01" step="0.01"
+                                                                name="items[<?= (int) $item['id']; ?>][price]"
+                                                                value="<?= number_format($item['price'], 2, '.', ''); ?>"
+                                                                aria-label="Valor unitário">
+                                                        </span>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                            <p class="order-hint">Confira ou ajuste os valores antes de concluir. Pedidos concluídos saem desta lista e entram no seu rendimento.</p>
+                                            <div class="order-actions">
+                                                <button class="btn btn-orange btn-sm" type="submit" name="action" value="complete">Concluir pedido</button>
+                                            </div>
+                                        </form>
+                                    </article>
+                                <?php endforeach; ?>
                             </div>
                         </section>
 
@@ -321,30 +445,30 @@ if (empty($_GET)) {
                                 <button onclick="history()"><h2 class="section-title" style="margin-top:0;">HISTÓRICO DE VENDAS <i class="fa-solid fa-chevron-down history-btn" id="history-btn"></i></h2></button>
                                 <div class="history-content" id="history">
                                     <div class="history-sale">
-                                        <?php $sales = get_sales(); ?>
+                                        <?php $sales = get_sales($user['id']); ?>
+                                        <?php if (empty($sales)): ?>
+                                            <p>Nenhuma venda registrada ainda.</p>
+                                        <?php endif; ?>
                                         <?php foreach ($sales as $sale): ?>
-                                            <?php if ($sale['user_id'] == $user['id']): ?>
-                                                <?php $product = get_product_by_id($sale['product_id']); ?>
-                                                <div class="sale-row">
-                                                    <div class="row-duos">
-                                                        <span class="sale-name">
-                                                            <?= $product['name']; ?>
-                                                        </span>
-                                                        <span class="sale-date">
-                                                            <?= date('d/m/y', strtotime($sale['date'])); ?>
-                                                        </span>
-                                                    </div>
-                                                    <div class="row-duos">
-                                                        <span class="sale-qty">
-                                                            <?= 'Quantidade: ' . $sale['quantity']; ?>
-                                                        </span>
-                                                        <span class="sale-total">
-                                                            <?= 'Total: R$' . number_format(($sale['quantity'] * $sale['price']), 2, '.', ','); ?>
-                                                        </span>
-                                                    </div>
+                                            <div class="sale-row">
+                                                <div class="row-duos">
+                                                    <span class="sale-name">
+                                                        <?= htmlspecialchars($sale['product_name'] ?? 'Produto removido'); ?>
+                                                    </span>
+                                                    <span class="sale-date">
+                                                        <?= date('d/m/y', strtotime($sale['date'])); ?>
+                                                    </span>
                                                 </div>
-                                                <br>
-                                            <?php endif; ?>
+                                                <div class="row-duos">
+                                                    <span class="sale-qty">
+                                                        <?= 'Quantidade: ' . (int) $sale['quantity']; ?>
+                                                    </span>
+                                                    <span class="sale-total">
+                                                        <?= 'Total: R$' . number_format(($sale['quantity'] * $sale['price']), 2, '.', ','); ?>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <br>
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
@@ -545,6 +669,9 @@ if (empty($_GET)) {
     <script src="../../assets/js/theme.js"></script>
     <script src="../../assets/js/toggle.js"></script>
     <script src="../../assets/js/menu-toggle.js"></script>
+    <?php if (isset($user['role_id']) && $user['role_id'] == 2): ?>
+        <script src="../../assets/js/orders-sse.js"></script>
+    <?php endif; ?>
     <?php if ($show_revenue_chart): ?>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
         <script src="../../assets/js/revenue-chart.js"></script>

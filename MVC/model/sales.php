@@ -1,14 +1,43 @@
 <?php require_once(__DIR__ . "/../config/cashfy.php");
+require_once(__DIR__ . "/orders.php");
 
-function get_sales()
+/*
+ * Estrutura atual do banco:
+ *   orders (id, buyer_id, seller_id, total, status, date)
+ *   sales  (id, order_id, product_id, quantity, price)
+ *
+ * A tabela sales não tem mais user_id nem date: o vendedor é orders.seller_id e a
+ * data é orders.date. Todo faturamento (histórico, totais e gráfico) conta apenas
+ * pedidos com status 'completed'.
+ */
+
+/**
+ * Últimas vendas (itens de pedidos concluídos) de um vendedor.
+ * Cada linha traz também: user_id (vendedor), date (do pedido) e product_name.
+ */
+function get_sales(int $user_id, int $limit = 10)
 {
     $conn = conn();
 
     $stmt = $conn->prepare("
-    SELECT * FROM sales
-    ORDER BY date DESC
-    LIMIT 10;
+    SELECT
+        s.id,
+        s.order_id,
+        s.product_id,
+        s.quantity,
+        s.price,
+        o.seller_id AS user_id,
+        o.`date` AS `date`,
+        p.name AS product_name
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    LEFT JOIN products p ON p.id = s.product_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    ORDER BY o.`date` DESC, s.id DESC
+    LIMIT ?
     ");
+    $stmt->bind_param('ii', $user_id, $limit);
     $stmt->execute();
 
     $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -17,21 +46,25 @@ function get_sales()
     return $result;
 }
 
+/**
+ * Registro manual do Diário: cria um pedido já 'completed' com um item.
+ * Como orders.buyer_id é obrigatório, o próprio vendedor entra como comprador
+ * (venda presencial/avulsa, sem cliente cadastrado).
+ *
+ * @return int|false id do pedido criado
+ */
 function register_sale(int $user_id, int $product_id, int $quantity, float $price, string $date)
 {
-    $conn = conn();
+    // A data vem do <input type="date">; o horário usado é o do momento do registro
+    $datetime = date('Y-m-d', strtotime($date)) . ' ' . date('H:i:s');
 
-    $date = date('y-m-d', strtotime($date));
-
-    $stmt = $conn->prepare("
-    INSERT INTO sales (user_id, product_id, quantity, price, date) VALUES (?, ?, ?, ?, ?)
-    ");
-    $stmt->bind_param("iiids", $user_id, $product_id, $quantity, $price, $date);
-
-    $stmt->execute();
-    $stmt->close();
-
-    return;
+    return create_order(
+        $user_id,
+        $user_id,
+        [['product_id' => $product_id, 'quantity' => $quantity, 'price' => $price]],
+        'completed',
+        $datetime
+    );
 }
 
 function get_total_week(int $user_id)
@@ -39,9 +72,13 @@ function get_total_week(int $user_id)
     $conn = conn();
 
     $stmt = $conn->prepare("
-    SELECT SUM(price) AS 'total_week' FROM sales WHERE user_id = ?
-    AND date >= CURDATE() - INTERVAL WEEKDAY(CURDATE()) DAY
-    AND date < CURDATE() - INTERVAL WEEKDAY(CURDATE()) DAY + INTERVAL 7 DAY
+    SELECT SUM(s.quantity * s.price) AS total_week
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    AND o.`date` >= CURDATE() - INTERVAL WEEKDAY(CURDATE()) DAY
+    AND o.`date` < CURDATE() - INTERVAL WEEKDAY(CURDATE()) DAY + INTERVAL 7 DAY
     ");
     $stmt->bind_param('i', $user_id);
 
@@ -49,9 +86,7 @@ function get_total_week(int $user_id)
     $result = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
-    $total = number_format($result['total_week'], 2, ',', '.');
-
-    return $total;
+    return number_format((float) ($result['total_week'] ?? 0), 2, ',', '.');
 }
 
 function get_total_month(int $user_id)
@@ -59,26 +94,24 @@ function get_total_month(int $user_id)
     $conn = conn();
 
     $stmt = $conn->prepare("
-    SELECT SUM(price) AS 'total_month'
-    FROM sales
-    WHERE user_id = ?
-    AND date >= CURDATE() - INTERVAL (DAY(CURDATE()) - 1) DAY
-    AND date < DATE_ADD(
+    SELECT SUM(s.quantity * s.price) AS total_month
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    AND o.`date` >= CURDATE() - INTERVAL (DAY(CURDATE()) - 1) DAY
+    AND o.`date` < DATE_ADD(
         CURDATE() - INTERVAL (DAY(CURDATE()) - 1) DAY,
         INTERVAL 1 MONTH
-    );
+    )
     ");
     $stmt->bind_param('i', $user_id);
 
     $stmt->execute();
-
     $result = $stmt->get_result()->fetch_assoc();
-
     $stmt->close();
 
-    $total = number_format($result['total_month'], 2, ',', '.');
-
-    return $total;
+    return number_format((float) ($result['total_month'] ?? 0), 2, ',', '.');
 }
 
 function get_saled_items_month(int $user_id)
@@ -86,24 +119,24 @@ function get_saled_items_month(int $user_id)
     $conn = conn();
 
     $stmt = $conn->prepare("
-    SELECT SUM(quantity) as 'saled_items'
-    FROM sales
-    WHERE user_id = ?
-    AND date >= CURDATE() - INTERVAL DAY(CURDATE() - 1) DAY
-    AND date < DATE_ADD(
+    SELECT SUM(s.quantity) AS saled_items
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    AND o.`date` >= CURDATE() - INTERVAL (DAY(CURDATE()) - 1) DAY
+    AND o.`date` < DATE_ADD(
         CURDATE() - INTERVAL (DAY(CURDATE()) - 1) DAY,
         INTERVAL 1 MONTH
-    );
+    )
     ");
     $stmt->bind_param('i', $user_id);
 
     $stmt->execute();
-
     $result = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 
-    $stmt->close(); 
-
-    return $result['saled_items'];
+    return (int) ($result['saled_items'] ?? 0);
 }
 
 /**
@@ -120,11 +153,13 @@ function get_revenue_period($user_id, $max_months = 24)
 
     $stmt = $conn->prepare("
     SELECT
-        DATE_FORMAT(MIN(`date`), '%Y-%m-01') AS first_month,
+        DATE_FORMAT(MIN(o.`date`), '%Y-%m-01') AS first_month,
         DATE_FORMAT(CURDATE(), '%Y-%m-01') AS current_month
-    FROM sales
-    WHERE user_id = ?
-    AND `date` < DATE_ADD(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH)
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    AND o.`date` < DATE_ADD(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH)
     ");
     $stmt->bind_param('i', $user_id);
     $stmt->execute();
@@ -186,7 +221,7 @@ function get_monthly_revenue_series($user_id, $product_id = null, $max_months = 
     }
 
     $totals = query_revenue_totals(
-        "DATE_FORMAT(`date`, '%Y-%m')",
+        "DATE_FORMAT(o.`date`, '%Y-%m')",
         $user_id,
         $period['start']->format('Y-m-d'),
         $period['end']->format('Y-m-d'),
@@ -222,7 +257,7 @@ function get_daily_revenue_series($user_id, $month, $product_id = null)
     $end = (clone $start)->modify('+1 month');
 
     $totals = query_revenue_totals(
-        "DATE_FORMAT(`date`, '%Y-%m-%d')",
+        "DATE_FORMAT(o.`date`, '%Y-%m-%d')",
         $user_id,
         $start->format('Y-m-d'),
         $end->format('Y-m-d'),
@@ -256,17 +291,19 @@ function query_revenue_totals($group_expr, $user_id, $from, $to, $product_id = n
     $sql = "
     SELECT
         $group_expr AS k,
-        ROUND(SUM(quantity * CAST(price AS DECIMAL(10,2))), 2) AS total
-    FROM sales
-    WHERE user_id = ?
-    AND `date` >= ?
-    AND `date` < ?
+        ROUND(SUM(s.quantity * CAST(s.price AS DECIMAL(10,2))), 2) AS total
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    AND o.`date` >= ?
+    AND o.`date` < ?
     ";
     $types = 'iss';
     $params = [$user_id, $from, $to];
 
     if ($product_id !== null) {
-        $sql .= " AND product_id = ?";
+        $sql .= " AND s.product_id = ?";
         $types .= 'i';
         $params[] = $product_id;
     }
