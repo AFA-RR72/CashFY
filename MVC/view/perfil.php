@@ -303,7 +303,10 @@ if (empty($_GET)) {
                                             <?php foreach ($order['items'] as $item): ?>
                                                 <?php $order_total += $item['quantity'] * $item['price']; ?>
                                                 <li class="order-item">
-                                                    <span><?= (int) $item['quantity']; ?>x <?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?></span>
+                                                    <span class="order-item-name">
+                                                        <?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?>
+                                                        <small><?= (int) $item['quantity']; ?> × R$ <?= number_format($item['price'], 2, ',', '.'); ?></small>
+                                                    </span>
                                                     <span>R$ <?= number_format($item['quantity'] * $item['price'], 2, ',', '.'); ?></span>
                                                 </li>
                                             <?php endforeach; ?>
@@ -349,26 +352,37 @@ if (empty($_GET)) {
                                                 — <a href="https://wa.me/<?= preg_replace('/\D/', '', $order['buyer_phone']); ?>"><?= format_phone_number($order['buyer_phone']); ?></a>
                                             <?php endif; ?>
                                         </p>
-                                        <form action="../controller/order_status.php" method="post">
+                                        <?php
+                                        $accepted_total = 0;
+                                        foreach ($order['items'] as $item) {
+                                            $accepted_total += $item['quantity'] * $item['price'];
+                                        }
+                                        ?>
+                                        <form action="../controller/order_status.php" method="post" data-order-edit>
                                             <input type="hidden" name="order_id" value="<?= (int) $order['id']; ?>">
                                             <ul class="order-items">
                                                 <?php foreach ($order['items'] as $item): ?>
                                                     <li class="order-item">
-                                                        <span><?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?></span>
+                                                        <span class="order-item-name"><?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?></span>
                                                         <span class="order-item-fields">
                                                             <input type="number" min="1" step="1"
                                                                 name="items[<?= (int) $item['id']; ?>][quantity]"
                                                                 value="<?= (int) $item['quantity']; ?>"
                                                                 aria-label="Quantidade">
-                                                            <span>x R$</span>
+                                                            <span>× R$</span>
                                                             <input type="number" min="0.01" step="0.01"
                                                                 name="items[<?= (int) $item['id']; ?>][price]"
                                                                 value="<?= number_format($item['price'], 2, '.', ''); ?>"
                                                                 aria-label="Valor unitário">
+                                                            <span class="order-item-sum" data-item-sum>— R$ <?= number_format($item['quantity'] * $item['price'], 2, ',', '.'); ?></span>
                                                         </span>
                                                     </li>
                                                 <?php endforeach; ?>
                                             </ul>
+                                            <div class="order-total">
+                                                <span>Total</span>
+                                                <span data-order-sum>R$ <?= number_format($accepted_total, 2, ',', '.'); ?></span>
+                                            </div>
                                             <p class="order-hint">Confira ou ajuste os valores antes de concluir. Pedidos concluídos saem desta lista e entram no seu rendimento.</p>
                                             <div class="order-actions">
                                                 <button class="btn btn-orange btn-sm" type="submit" name="action" value="complete">Concluir pedido</button>
@@ -784,6 +798,30 @@ if (empty($_GET)) {
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
         <script src="../../assets/js/revenue-chart.js"></script>
     <?php endif; ?>
+    <script>
+        // Pedidos aceitos: total do item (qtd × unitário) e total do pedido acompanham a edição
+        (function () {
+            const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.querySelectorAll('form[data-order-edit]').forEach(function (form) {
+                function update() {
+                    let total = 0;
+
+                    form.querySelectorAll('.order-item').forEach(function (item) {
+                        const quantity = parseFloat(item.querySelector('input[name$="[quantity]"]').value) || 0;
+                        const price = parseFloat(item.querySelector('input[name$="[price]"]').value) || 0;
+
+                        total += quantity * price;
+                        item.querySelector('[data-item-sum]').textContent = '— ' + brl.format(quantity * price);
+                    });
+
+                    form.querySelector('[data-order-sum]').textContent = brl.format(total);
+                }
+
+                form.addEventListener('input', update);
+            });
+        })();
+    </script>
     <script>
         const productSelect = document.getElementById('product');
         const priceInput = document.getElementById('price');

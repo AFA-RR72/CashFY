@@ -92,6 +92,19 @@
     flex-wrap: wrap;
 }
 
+.order-item-name small {
+    display: block;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.order-item-sum {
+    min-width: 96px;
+    font-weight: 700;
+    text-align: right;
+}
+
 .order-item-fields {
     display: flex;
     align-items: center;

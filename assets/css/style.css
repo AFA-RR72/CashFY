@@ -1342,6 +1342,26 @@ body.dark-mode .field textarea:focus {
     color: var(--teal-700);
 }
 
+/* Estoque no formulário de produto */
+.field .stock-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.field .stock-toggle input {
+    width: auto;
+    padding: 0;
+    accent-color: var(--teal-700);
+}
+
+.stock-qty {
+    max-width: 170px;
+    margin-top: 12px;
+}
+
 /* ============================================
    SELECT
 ============================================ */

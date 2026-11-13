@@ -1,10 +1,11 @@
 <?php require_once(__DIR__ . "/../config/cashfy.php");
 
-function create_product(int $user_id, string $name, int $category, string $description, float $price, string $product_photo){
+// $stock: null = produto sem controle de estoque; inteiro >= 0 = quantidade em estoque
+function create_product(int $user_id, string $name, int $category, string $description, float $price, string $product_photo, ?int $stock = null){
     $conn = conn();
 
-    $stmt = $conn -> prepare("INSERT INTO products (user_id, name, category_id, description, price, product_photo) VALUE (?, ?, ?, ?, ?, ?)");
-    $stmt -> bind_param("isisds", $user_id, $name, $category, $description, $price, $product_photo);
+    $stmt = $conn -> prepare("INSERT INTO products (user_id, name, category_id, description, price, product_photo, stock) VALUE (?, ?, ?, ?, ?, ?, ?)");
+    $stmt -> bind_param("isisdsi", $user_id, $name, $category, $description, $price, $product_photo, $stock);
 
     $stmt -> execute();
     $stmt -> close();
@@ -60,11 +61,12 @@ function get_product_by_id(int $id, bool $include_deleted = false){
     return $result;
 }
 
-function update_product(int $id, string $name, float $price, int $category_id, string $description){
+// $stock: null = produto sem controle de estoque; inteiro >= 0 = quantidade em estoque
+function update_product(int $id, string $name, float $price, int $category_id, string $description, ?int $stock){
     $conn = conn();
 
-    $stmt = $conn -> prepare("UPDATE products SET name = ?, price = ?, category_id = ?, description = ? WHERE id = ? AND deleted_at IS NULL");
-    $stmt -> bind_param('sdisi', $name, $price, $category_id, $description, $id);
+    $stmt = $conn -> prepare("UPDATE products SET name = ?, price = ?, category_id = ?, description = ?, stock = ? WHERE id = ? AND deleted_at IS NULL");
+    $stmt -> bind_param('sdisii', $name, $price, $category_id, $description, $stock, $id);
 
     $stmt -> execute();
     $stmt -> close();
@@ -161,11 +163,12 @@ function check_product(int $product_id){
 
 // Produtos de um vendedor (usado no seletor do gráfico de faturamento).
 // Relatório financeiro: INCLUI os excluídos logicamente (deleted_at preenchido), para o
-// vendedor continuar vendo o faturamento histórico deles. Não usar em listagens de loja.
+// vendedor continuar vendo o faturamento histórico deles. Os excluídos vêm por último.
+// Não usar em listagens de loja.
 function get_products_by_user(int $user_id){
     $conn = conn();
 
-    $stmt = $conn -> prepare("SELECT id, name, deleted_at FROM products WHERE user_id = ? ORDER BY name");
+    $stmt = $conn -> prepare("SELECT id, name, deleted_at FROM products WHERE user_id = ? ORDER BY (deleted_at IS NOT NULL), name");
     $stmt -> bind_param('i', $user_id);
 
     $stmt -> execute();

@@ -210,18 +210,26 @@ function get_revenue_months($user_id, $max_months = 24)
  *
  * Faturamento = SUM(quantity * price), igual ao "Total" exibido no histórico do Diário.
  *
- * @return array{labels: string[], values: float[], total: float}  labels no formato "YYYY-MM"
+ * @return array{labels: string[], values: float[], total: float, details: array}  labels no formato "YYYY-MM"
  */
 function get_monthly_revenue_series($user_id, $product_id = null, $max_months = 24)
 {
     $period = get_revenue_period($user_id, $max_months);
 
     if (!$period['has_sales']) {
-        return ['labels' => [], 'values' => [], 'total' => 0.0];
+        return ['labels' => [], 'values' => [], 'total' => 0.0, 'details' => []];
     }
 
     $totals = query_revenue_totals(
         "DATE_FORMAT(o.`date`, '%Y-%m')",
+        $user_id,
+        $period['start']->format('Y-m-d'),
+        $period['end']->format('Y-m-d'),
+        $product_id
+    );
+
+    $details = query_revenue_details(
+        'month',
         $user_id,
         $period['start']->format('Y-m-d'),
         $period['end']->format('Y-m-d'),
@@ -242,14 +250,14 @@ function get_monthly_revenue_series($user_id, $product_id = null, $max_months = 
         $sum += $value;
     }
 
-    return ['labels' => $labels, 'values' => $values, 'total' => round($sum, 2)];
+    return ['labels' => $labels, 'values' => $values, 'total' => round($sum, 2), 'details' => $details];
 }
 
 /**
  * Faturamento por dia dentro de um mês ("YYYY-MM", já validado pelo controller),
  * com todos os dias do mês (dias sem venda = 0). Aceita filtro por produto.
  *
- * @return array{labels: string[], values: float[], total: float}  labels no formato "YYYY-MM-DD"
+ * @return array{labels: string[], values: float[], total: float, details: array}  labels no formato "YYYY-MM-DD"
  */
 function get_daily_revenue_series($user_id, $month, $product_id = null)
 {
@@ -264,6 +272,8 @@ function get_daily_revenue_series($user_id, $month, $product_id = null)
         $product_id
     );
 
+    $details = query_revenue_details('day', $user_id, $start->format('Y-m-d'), $end->format('Y-m-d'), $product_id);
+
     $labels = [];
     $values = [];
     $sum = 0.0;
@@ -277,7 +287,7 @@ function get_daily_revenue_series($user_id, $month, $product_id = null)
         $sum += $value;
     }
 
-    return ['labels' => $labels, 'values' => $values, 'total' => round($sum, 2)];
+    return ['labels' => $labels, 'values' => $values, 'total' => round($sum, 2), 'details' => $details];
 }
 
 /**
@@ -322,6 +332,93 @@ function query_revenue_totals($group_expr, $user_id, $from, $to, $product_id = n
     }
 
     return $totals;
+}
+
+/**
+ * Detalhe das vendas que formam cada barra do gráfico (balão ao passar o mouse). Mesmo filtro
+ * de query_revenue_totals: pedidos 'completed' do vendedor em [$from, $to), produto opcional.
+ *
+ * O nome do produto vem de LEFT JOIN SEM filtrar deleted_at: produto excluído logicamente
+ * continua aparecendo com o nome no histórico.
+ *
+ * $granularity = 'day'   -> ['YYYY-MM-DD' => [['hour' => 'HH:MM', 'product' => nome,
+ *                            'quantity' => int, 'total' => float], ...]]   (em ordem de horário)
+ * $granularity = 'month' -> ['YYYY-MM' => [['product' => nome, 'quantity' => int,
+ *                            'total' => float], ...]]   (somado por produto, maior valor primeiro)
+ */
+function query_revenue_details($granularity, $user_id, $from, $to, $product_id = null)
+{
+    $conn = conn();
+
+    $sql = "
+    SELECT
+        DATE_FORMAT(o.`date`, '%Y-%m-%d') AS d,
+        DATE_FORMAT(o.`date`, '%H:%i') AS h,
+        s.product_id,
+        p.name AS product_name,
+        s.quantity,
+        ROUND(s.quantity * CAST(s.price AS DECIMAL(10,2)), 2) AS total
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    LEFT JOIN products p ON p.id = s.product_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    AND o.`date` >= ?
+    AND o.`date` < ?
+    ";
+    $types = 'iss';
+    $params = [$user_id, $from, $to];
+
+    if ($product_id !== null) {
+        $sql .= " AND s.product_id = ?";
+        $types .= 'i';
+        $params[] = $product_id;
+    }
+
+    $sql .= " ORDER BY o.`date`, s.id";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    $details = [];
+
+    foreach ($rows as $row) {
+        $name = $row['product_name'] ?? 'Produto removido';
+
+        if ($granularity === 'day') {
+            $details[$row['d']][] = [
+                'hour' => $row['h'],
+                'product' => $name,
+                'quantity' => (int) $row['quantity'],
+                'total' => (float) $row['total'],
+            ];
+
+            continue;
+        }
+
+        $key = substr($row['d'], 0, 7);
+        $product_key = (int) $row['product_id'];
+
+        if (!isset($details[$key][$product_key])) {
+            $details[$key][$product_key] = ['product' => $name, 'quantity' => 0, 'total' => 0.0];
+        }
+
+        $details[$key][$product_key]['quantity'] += (int) $row['quantity'];
+        $details[$key][$product_key]['total'] = round($details[$key][$product_key]['total'] + (float) $row['total'], 2);
+    }
+
+    if ($granularity !== 'day') {
+        foreach ($details as $key => $products) {
+            $list = array_values($products);
+            usort($list, fn($a, $b) => $b['total'] <=> $a['total']);
+            $details[$key] = $list;
+        }
+    }
+
+    return $details;
 }
 
 /**

@@ -25,6 +25,16 @@ $price = number_format((float) $price, 2, '.', '');
 
 $category = preg_replace('/\D+/', '', $_POST['product_category']);
 
+// Estoque: sem o checkbox = produto sem controle de estoque (NULL); com ele, a quantidade é obrigatória
+$has_stock = !empty($_POST['has_stock']);
+$stock = null;
+
+if ($has_stock) {
+    $stock = filter_var($_POST['product_stock'] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 2147483647]]);
+}
+
+$current_stock = ($product['stock'] ?? null) === null ? null : (int) $product['stock'];
+
 
 if (
     empty($_POST['product_name']) ||
@@ -47,11 +57,16 @@ if (
     $_SESSION['msg'] = "A descrição precisa conter ao menos 10 caracteres";
     header("Location: ../view/update_product.php?id=" . $product['id'] . "#msg");
     exit;
+} elseif ($has_stock && $stock === false) {
+    $_SESSION['msg'] = "Informe a quantidade em estoque (número inteiro, a partir de 0)";
+    header("Location: ../view/update_product.php?id=" . $product['id'] . "#msg");
+    exit;
 } elseif (
     $product['name'] == $_POST['product_name'] &&
     $product['price'] == $price &&
     $product['category_id'] == $category &&
     $product['description'] == $_POST['product_description'] &&
+    $current_stock === $stock &&
     (
         !isset($_FILES['product_photo']) ||
         $_FILES['product_photo']['error'] !== UPLOAD_ERR_OK
@@ -75,7 +90,8 @@ update_product(
     $_POST['product_name'],
     $price,
     $category,
-    $_POST['product_description']
+    $_POST['product_description'],
+    $stock
 );
 
 $_SESSION['msg'] = 'Produto alterado com sucesso';

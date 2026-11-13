@@ -6,6 +6,14 @@ require_once("../config/init.php");
 
 $user = get_user_by_id($_SESSION['id']);
 
+// Estoque: sem o checkbox = produto sem controle de estoque (NULL); com ele, a quantidade é obrigatória
+$has_stock = !empty($_POST['has_stock']);
+$stock = null;
+
+if ($has_stock) {
+    $stock = filter_var($_POST['product_stock'] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 2147483647]]);
+}
+
 if (
     !isset($_FILES['product_photo']) ||
     $_FILES['product_photo']['error'] !== UPLOAD_ERR_OK ||
@@ -25,6 +33,10 @@ if (
      $_SESSION['msg'] = "Selecione uma categoria válida";
     header("Location: ../view/new_product.php#msg");
     exit;
+} elseif ($has_stock && $stock === false){
+    $_SESSION['msg'] = "Informe a quantidade em estoque (número inteiro, a partir de 0)";
+    header("Location: ../view/new_product.php#msg");
+    exit;
 } else {
     $name = uniqid() . ".jpg";
     $path = (BASE_PATH . "uploads/products/");
@@ -36,7 +48,8 @@ if (
         $_POST['product_category'], 
         $_POST['product_description'], 
         $_POST['product_price'], 
-        $db_path
+        $db_path,
+        $stock
         );
      $_SESSION['msg'] = "Produto criado com sucesso";
     header("Location: ../view/new_product.php?products#msg");

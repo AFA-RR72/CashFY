@@ -152,6 +152,29 @@ $categories = get_categories();
                     </div>
 
 
+                    <!-- Estoque -->
+
+                    <div class="field stock-field">
+
+                        <label class="stock-toggle" for="has_stock">
+                            <input type="checkbox" id="has_stock" name="has_stock" value="1">
+                            <span>Este produto tem estoque</span>
+                        </label>
+
+                        <div class="stock-qty" id="stock-qty" hidden>
+
+                            <label for="stock">
+                                Quantidade em estoque<span class="required">*</span>
+                            </label>
+
+                            <input type="number" id="stock" name="product_stock" min="0" step="1"
+                                placeholder="0">
+
+                        </div>
+
+                    </div>
+
+
                     <!-- Mensagem -->
 
                     <?php if (isset($_SESSION['msg'])): ?>
@@ -235,6 +258,17 @@ $categories = get_categories();
         });
     </script>
     <script>
+        // Estoque: o campo de quantidade só aparece (e só vale) com o checkbox marcado
+        (function () {
+            const hasStock = document.getElementById('has_stock');
+            const stockBox = document.getElementById('stock-qty');
+
+            hasStock.addEventListener('change', function () {
+                stockBox.hidden = !hasStock.checked;
+            });
+        })();
+    </script>
+    <script>
         const product = <?= json_encode($product); ?>;
 
         document.getElementById('product_name').value = product.name;
@@ -243,6 +277,12 @@ $categories = get_categories();
 
         const price = Number(product.price);
         document.getElementById('price').value = price.toFixed(2);
+
+        // stock null/ausente = sem controle de estoque
+        const productHasStock = product.stock !== null && product.stock !== undefined;
+        document.getElementById('has_stock').checked = productHasStock;
+        document.getElementById('stock').value = productHasStock ? product.stock : '';
+        document.getElementById('stock-qty').hidden = !productHasStock;
 
         if (product.product_photo) {
             const img = document.createElement('img');

@@ -120,7 +120,8 @@ CREATE TABLE `products` (
   `description` varchar(255) NOT NULL,
   `price` float NOT NULL,
   `product_photo` varchar(255) NOT NULL,
-  `deleted_at` datetime DEFAULT NULL
+  `deleted_at` datetime DEFAULT NULL,
+  `stock` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

@@ -37,6 +37,9 @@
     let controller = null;
     let granularity = 'month'; // 'month' (histórico) ou 'day' (dias de um mês)
     let rawLabels = [];
+    let rawDetails = {}; // vendas de cada barra: dia -> [{hour, product, quantity, total}], mês -> [{product, quantity, total}]
+
+    const MAX_TOOLTIP_LINES = 8;
 
     function showMessage(text, isError) {
         message.textContent = text;
@@ -60,6 +63,29 @@
     function monthLabel(ym) {
         const [year, month] = ym.split('-');
         return MONTHS[Number(month) - 1] + '/' + year.slice(2);
+    }
+
+    function shorten(text, max) {
+        return text.length > max ? text.slice(0, max - 1) + '…' : text;
+    }
+
+    // Linhas extras do balão. Dia: "14:32 — Produto · 2x · R$ 20,00" (uma por venda).
+    // Mês: "Produto · 5x · R$ 100,00" (soma por produto; hora não se aplica a um mês inteiro).
+    function detailLines(key) {
+        const list = rawDetails[key] || [];
+
+        const lines = list.slice(0, MAX_TOOLTIP_LINES).map((item) => {
+            const text = shorten(String(item.product), 28) + ' · ' + item.quantity + 'x · ' + brl.format(item.total);
+            return granularity === 'day' ? item.hour + ' — ' + text : text;
+        });
+
+        if (list.length > MAX_TOOLTIP_LINES) {
+            const rest = list.length - MAX_TOOLTIP_LINES;
+            const noun = granularity === 'day' ? (rest === 1 ? 'venda' : 'vendas') : (rest === 1 ? 'produto' : 'produtos');
+            lines.push('+ ' + rest + ' ' + noun);
+        }
+
+        return lines;
     }
 
     // Cores vêm das variáveis CSS do projeto (acompanham o dark mode)
@@ -96,6 +122,7 @@
         const datasetLabel = data.product ? data.product.name : 'Faturamento';
         granularity = data.granularity;
         rawLabels = data.labels;
+        rawDetails = data.details || {};
         // dia: "05"; mês: "set/26"
         const labels = data.labels.map((key) => granularity === 'day' ? String(Number(key.slice(8))) : monthLabel(key));
 
@@ -129,7 +156,8 @@
                                         ? key.slice(8) + '/' + key.slice(5, 7) + '/' + key.slice(0, 4)
                                         : monthLabel(key);
                                 },
-                                label: (ctx) => ' ' + brl.format(ctx.parsed.y)
+                                label: (ctx) => ' ' + brl.format(ctx.parsed.y),
+                                afterLabel: (ctx) => detailLines(rawLabels[ctx.dataIndex])
                             }
                         }
                     },

@@ -141,6 +141,29 @@ $categories = get_categories();
                     </div>
 
 
+                    <!-- Estoque -->
+
+                    <div class="field stock-field">
+
+                        <label class="stock-toggle" for="has_stock">
+                            <input type="checkbox" id="has_stock" name="has_stock" value="1">
+                            <span>Este produto tem estoque</span>
+                        </label>
+
+                        <div class="stock-qty" id="stock-qty" hidden>
+
+                            <label for="stock">
+                                Quantidade em estoque<span class="required">*</span>
+                            </label>
+
+                            <input type="number" id="stock" name="product_stock" min="0" step="1"
+                                placeholder="0">
+
+                        </div>
+
+                    </div>
+
+
                     <!-- Mensagem -->
 
                     <?php if (isset($_SESSION['msg'])): ?>
@@ -222,6 +245,17 @@ $categories = get_categories();
 
             reader.readAsDataURL(file);
         });
+    </script>
+    <script>
+        // Estoque: o campo de quantidade só aparece (e só vale) com o checkbox marcado
+        (function () {
+            const hasStock = document.getElementById('has_stock');
+            const stockBox = document.getElementById('stock-qty');
+
+            hasStock.addEventListener('change', function () {
+                stockBox.hidden = !hasStock.checked;
+            });
+        })();
     </script>
     <script src="../../assets/js/return.js"></script>
     <script src="../../assets/js/theme.js"></script>

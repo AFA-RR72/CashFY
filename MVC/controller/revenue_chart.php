@@ -109,6 +109,7 @@ try {
         'labels' => $series['labels'],
         'values' => $series['values'],
         'total' => $series['total'],
+        'details' => $series['details'], // vendas de cada barra (balão do gráfico)
     ]);
 } catch (Throwable $e) {
     error_log('revenue_chart: ' . $e->getMessage());
