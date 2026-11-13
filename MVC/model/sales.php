@@ -324,4 +324,49 @@ function query_revenue_totals($group_expr, $user_id, $from, $to, $product_id = n
     return $totals;
 }
 
+/**
+ * Faturamento e itens vendidos de um mês ("YYYY-MM", já validado pelo controller) ou,
+ * com $month = null, de todo o período do gráfico ("Todos os meses").
+ * Mesma regra do restante: só pedidos 'completed'.
+ *
+ * @return array{revenue: float, items: int}
+ */
+function get_month_summary($user_id, $month = null)
+{
+    if ($month === null) {
+        $period = get_revenue_period($user_id);
+
+        if (!$period['has_sales']) {
+            return ['revenue' => 0.0, 'items' => 0];
+        }
+
+        $from = $period['start']->format('Y-m-d');
+        $to = $period['end']->format('Y-m-d');
+    } else {
+        $start = DateTime::createFromFormat('!Y-m-d', $month . '-01');
+        $from = $start->format('Y-m-d');
+        $to = (clone $start)->modify('+1 month')->format('Y-m-d');
+    }
+
+    $conn = conn();
+
+    $stmt = $conn->prepare("
+    SELECT
+        COALESCE(ROUND(SUM(s.quantity * CAST(s.price AS DECIMAL(10,2))), 2), 0) AS revenue,
+        COALESCE(SUM(s.quantity), 0) AS items
+    FROM sales s
+    INNER JOIN orders o ON o.id = s.order_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    AND o.`date` >= ?
+    AND o.`date` < ?
+    ");
+    $stmt->bind_param('iss', $user_id, $from, $to);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    return ['revenue' => (float) $row['revenue'], 'items' => (int) $row['items']];
+}
+
 ?>

@@ -1,5 +1,7 @@
 <?php session_start();
 require_once('init.php');
+require_once(__DIR__ . '/remember.php');
+login_from_remember_cookie();
 require_once(__DIR__ . '/../model/user.php');
 require_once(__DIR__ . '/../model/products.php');
 
@@ -11,9 +13,9 @@ function check_login()
     }
 }
 
-function check_role(){
+function check_role(int $id){
     $user_test = get_user_by_id($_SESSION['id']);
-    if ($user_test['role_id'] != 2){
+    if ($user_test['role_id'] != $id){
         header('Location: '. BASE_URL . 'index.php');
         exit;
     }

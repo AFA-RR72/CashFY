@@ -5,7 +5,7 @@ require_once(__DIR__ . '/../model/orders.php');
 /*
  * Ações do vendedor sobre os pedidos recebidos (POST):
  *   action=accept   pending  -> accepted
- *   action=reject   pending  -> rejected
+ *   action=reject   pending  -> rejected (exige explanation: o motivo, 5 a 255 caracteres)
  *   action=complete accepted -> completed (aceita items[sale_id][quantity|price] para ajustar valores)
  *
  * O vendedor vem SEMPRE da sessão; o pedido precisa ser dele.
@@ -44,8 +44,16 @@ if ($action === 'accept') {
     $ok = change_order_status($order_id, $seller_id, 'pending', 'accepted');
     $_SESSION['msg-form'] = $ok ? 'Pedido aceito' : 'Não foi possível aceitar este pedido';
 } elseif ($action === 'reject') {
-    $ok = change_order_status($order_id, $seller_id, 'pending', 'rejected');
-    $_SESSION['msg-form'] = $ok ? 'Pedido recusado' : 'Não foi possível recusar este pedido';
+    $explanation = trim((string) ($_POST['explanation'] ?? ''));
+    $explanation = preg_replace('/\s+/u', ' ', $explanation);
+    $length = mb_strlen($explanation, 'UTF-8');
+
+    if ($length < 5 || $length > 255) {
+        $_SESSION['msg-form'] = 'Informe o motivo da recusa (de 5 a 255 caracteres)';
+    } else {
+        $ok = reject_order($order_id, $seller_id, $explanation);
+        $_SESSION['msg-form'] = $ok ? 'Pedido recusado' : 'Não foi possível recusar este pedido';
+    }
 } elseif ($action === 'complete') {
     $edits = [];
 

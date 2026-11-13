@@ -9,24 +9,27 @@ require_once(__DIR__ . '/../../config/cart_return.php');
 
 $cart_items = $_SESSION['cart'] ?? [];
 $cart_total = 0;
+$cart_quantity = array_sum(array_map(static fn($item) => (int) ($item['quantity'] ?? 0), $cart_items));
 $cart_return = cart_current_page();
 $cart_action = BASE_URL . 'MVC/controller/cart.php';
 $cart_checkout = BASE_URL . 'MVC/controller/checkout.php';
+$cart_animate = !empty($_SESSION['cart-msg']['ok']);
 ?>
 <!-- Botão do carrinho -->
 
-<?php if (!empty($_SESSION['cart'])): ?>
+<button
+    class="cart-button<?= $cart_animate ? ' is-animated' : ''; ?>"
+    onclick="document.getElementById('cart').showModal()"
+    type="button"
+    aria-label="Abrir carrinho"
+    title="Abrir carrinho">
 
-  <button
-    class="cart-button"
-    onclick="cart.showModal()"
-    type="button">
-
-    <i class="fa-solid fa-cart-shopping"></i>
+    <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+    <?php if ($cart_quantity > 0): ?>
+      <span class="cart-count"><?= $cart_quantity; ?></span>
+    <?php endif; ?>
 
   </button>
-
-<?php endif; ?>
 
 
 <!-- Aviso do carrinho / checkout -->
@@ -87,7 +90,7 @@ $cart_checkout = BASE_URL . 'MVC/controller/checkout.php';
       type="button"
       class="cart-close"
       aria-label="Fechar carrinho"
-      onclick="cart.close()">
+      onclick="document.getElementById('cart').close()">
       <i class="fa-solid fa-xmark"></i>
     </button>
 
@@ -206,7 +209,7 @@ $cart_checkout = BASE_URL . 'MVC/controller/checkout.php';
   <button
     type="button"
     class="btn btn-transparent cart-continue"
-    onclick="cart.close()">
+    onclick="document.getElementById('cart').close()">
     Continuar comprando
   </button>
 
@@ -215,6 +218,6 @@ $cart_checkout = BASE_URL . 'MVC/controller/checkout.php';
 <?php if (!empty($_SESSION['open_cart'])): ?>
   <?php unset($_SESSION['open_cart']); ?>
   <script>
-    document.getElementById('cart').showModal();
+    document.getElementById('cart')?.showModal();
   </script>
 <?php endif; ?>

@@ -13,7 +13,10 @@
  * @param string      $status    pending | accepted | rejected | completed
  * @param string|null $date      'Y-m-d H:i:s'. Se null, o banco usa o horário atual
  *
- * @return int|false id do pedido criado, ou false se algo falhou
+ * Só produtos ativos (products.deleted_at IS NULL) podem entrar num pedido: a checagem é feita
+ * aqui, dentro da transação, valendo para o checkout e para o registro manual do Diário.
+ *
+ * @return int|false id do pedido criado, ou false se algo falhou (ou se algum produto foi excluído)
  */
 function create_order(int $buyer_id, int $seller_id, array $items, string $status = 'pending', ?string $date = null)
 {
@@ -31,6 +34,30 @@ function create_order(int $buyer_id, int $seller_id, array $items, string $statu
 
     try {
         $conn->begin_transaction();
+
+        // Revalida os produtos com o registro travado (LOCK IN SHARE MODE): uma exclusão feita
+        // pelo vendedor neste exato momento espera esta transação terminar (e então só arquiva
+        // o produto, pois a venda passa a existir) ou termina antes (e o pedido é recusado aqui).
+        $stmt = $conn->prepare("
+        SELECT id FROM products WHERE id = ? AND deleted_at IS NULL LOCK IN SHARE MODE
+        ");
+
+        foreach ($items as $item) {
+            $product_id = (int) $item['product_id'];
+
+            $stmt->bind_param('i', $product_id);
+            $stmt->execute();
+
+            $result = $stmt->get_result();
+            $active = $result->num_rows > 0;
+            $result->free();
+
+            if (!$active) {
+                throw new RuntimeException("produto $product_id indisponível (excluído ou inexistente)");
+            }
+        }
+
+        $stmt->close();
 
         if ($date === null) {
             $stmt = $conn->prepare("
@@ -175,8 +202,9 @@ function get_seller_orders(int $seller_id): array
  */
 function change_order_status(int $order_id, int $seller_id, string $from, string $to): bool
 {
+    // 'rejected' tem função própria (reject_order), pois exige o motivo da recusa
     $allowed = [
-        'pending' => ['accepted', 'rejected'],
+        'pending' => ['accepted'],
     ];
 
     if (!in_array($to, $allowed[$from] ?? [], true)) {
@@ -190,6 +218,27 @@ function change_order_status(int $order_id, int $seller_id, string $from, string
     WHERE id = ? AND seller_id = ? AND status = ?
     ");
     $stmt->bind_param('siis', $to, $order_id, $seller_id, $from);
+    $stmt->execute();
+
+    $changed = $stmt->affected_rows > 0;
+    $stmt->close();
+
+    return $changed;
+}
+
+/**
+ * Recusa um pedido pendente do vendedor e grava o motivo em orders.explanation.
+ * O UPDATE só acontece se o pedido ainda estiver pendente (evita ação dupla).
+ */
+function reject_order(int $order_id, int $seller_id, string $explanation): bool
+{
+    $conn = conn();
+
+    $stmt = $conn->prepare("
+    UPDATE orders SET status = 'rejected', explanation = ?
+    WHERE id = ? AND seller_id = ? AND status = 'pending'
+    ");
+    $stmt->bind_param('sii', $explanation, $order_id, $seller_id);
     $stmt->execute();
 
     $changed = $stmt->affected_rows > 0;
@@ -297,6 +346,118 @@ function get_latest_pending_order(int $seller_id): ?array
     }
 
     return ['id' => (int) $row['id'], 'buyer' => $row['buyer'], 'total' => round((float) $row['total'], 2)];
+}
+
+
+function get_client_orders(int $buyer_id): array
+{
+    $conn = conn();
+
+    $stmt = $conn->prepare("
+    SELECT o.id, o.buyer_id, o.total, o.status, o.explanation, o.`date`,
+           u.name AS seller_name, u.phone_number AS seller_phone,
+           u.profile_photo AS seller_photo
+    FROM orders o
+    INNER JOIN users u ON u.id = o.seller_id
+    WHERE o.buyer_id = ?
+    AND o.status IN ('pending', 'accepted', 'completed', 'rejected')
+    ORDER BY o.`date` DESC, o.id DESC
+    ");
+    $stmt->bind_param('i', $buyer_id);
+    $stmt->execute();
+
+    $orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    if (empty($orders)) {
+        return [];
+    }
+
+    $by_id = [];
+    foreach ($orders as $order) {
+        $order['items'] = [];
+        $by_id[(int) $order['id']] = $order;
+    }
+
+    $ids = array_keys($by_id);
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+    $stmt = $conn->prepare("
+    SELECT s.id, s.order_id, s.product_id, s.quantity, s.price, p.name AS product_name,
+           p.product_photo
+    FROM sales s
+    LEFT JOIN products p ON p.id = s.product_id
+    WHERE s.order_id IN ($placeholders)
+    ORDER BY s.id
+    ");
+    $stmt->bind_param(str_repeat('i', count($ids)), ...$ids);
+    $stmt->execute();
+
+    foreach ($stmt->get_result()->fetch_all(MYSQLI_ASSOC) as $item) {
+        $by_id[(int) $item['order_id']]['items'][] = $item;
+    }
+
+    $stmt->close();
+
+    return array_values($by_id);
+}
+
+/**
+ * Histórico do vendedor: pedidos concluídos (do mais novo para o mais antigo), cada um com
+ * o nome do comprador, a flag manual (venda avulsa do Diário: o vendedor é o próprio
+ * comprador) e a lista de itens em $order['items'].
+ */
+function get_seller_history(int $seller_id, int $limit = 30): array
+{
+    $conn = conn();
+
+    $stmt = $conn->prepare("
+    SELECT o.id, o.buyer_id, o.total, o.status, o.`date`,
+           u.name AS buyer_name,
+           (o.buyer_id = o.seller_id) AS is_manual
+    FROM orders o
+    INNER JOIN users u ON u.id = o.buyer_id
+    WHERE o.seller_id = ?
+    AND o.status = 'completed'
+    ORDER BY o.`date` DESC, o.id DESC
+    LIMIT ?
+    ");
+    $stmt->bind_param('ii', $seller_id, $limit);
+    $stmt->execute();
+
+    $orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    if (empty($orders)) {
+        return [];
+    }
+
+    $by_id = [];
+    foreach ($orders as $order) {
+        $order['items'] = [];
+        $by_id[(int) $order['id']] = $order;
+    }
+
+    $ids = array_keys($by_id);
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+    $stmt = $conn->prepare("
+    SELECT s.id, s.order_id, s.product_id, s.quantity, s.price, p.name AS product_name
+    FROM sales s
+    LEFT JOIN products p ON p.id = s.product_id
+    WHERE s.order_id IN ($placeholders)
+    ORDER BY s.id
+    ");
+    $stmt->bind_param(str_repeat('i', count($ids)), ...$ids);
+    $stmt->execute();
+
+    foreach ($stmt->get_result()->fetch_all(MYSQLI_ASSOC) as $item) {
+        $by_id[(int) $item['order_id']]['items'][] = $item;
+    }
+
+    $stmt->close();
+
+    return array_values($by_id);
 }
 
 ?>

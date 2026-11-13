@@ -39,17 +39,17 @@ function cart_notice(string $text, bool $ok = false): void
  * assim o preço gravado no pedido é o preço real do produto.
  */
 $items = [];
+$unavailable = [];
 
 foreach ($cart as $product_id => $cart_item) {
+    // get_product_by_id só devolve produto ativo (deleted_at IS NULL)
     $product = get_product_by_id((int) $product_id);
     $quantity = (int) $cart_item['quantity'];
 
-    // Produto removido depois de entrar no carrinho
+    // Produto excluído (ou removido) depois de entrar no carrinho: não pode ser comprado
     if (!$product || $quantity <= 0) {
-        unset($_SESSION['cart'][$product_id]);
-        cart_notice('Um dos produtos do carrinho não está mais disponível.');
-        header("Location: $back");
-        exit;
+        $unavailable[(int) $product_id] = (string) ($cart_item['product'] ?? '');
+        continue;
     }
 
     if ((int) $product['user_id'] !== $seller_id) {
@@ -63,6 +63,29 @@ foreach ($cart as $product_id => $cart_item) {
         'quantity' => $quantity,
         'price' => (float) $product['price'],
     ];
+}
+
+// Nenhum pedido é criado enquanto houver item indisponível: os itens saem do carrinho
+// e o cliente é avisado para conferir o carrinho e finalizar de novo.
+if (!empty($unavailable)) {
+    foreach (array_keys($unavailable) as $product_id) {
+        unset($_SESSION['cart'][$product_id]);
+    }
+
+    $names = array_map(fn($name) => '"' . $name . '"', array_filter($unavailable, fn($name) => $name !== ''));
+
+    if (empty($names)) {
+        $text = 'Um dos produtos do carrinho não está mais disponível e foi removido. Confira o carrinho e tente novamente.';
+    } elseif (count($names) === 1) {
+        $text = reset($names) . ' não está mais disponível e foi removido do carrinho. Confira o carrinho e tente novamente.';
+    } else {
+        $text = implode(', ', $names) . ' não estão mais disponíveis e foram removidos do carrinho. Confira o carrinho e tente novamente.';
+    }
+
+    cart_notice($text);
+    $_SESSION['open_cart'] = true;
+    header("Location: $back");
+    exit;
 }
 
 $order_id = create_order($buyer_id, $seller_id, $items, 'pending');

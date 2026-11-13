@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 09/11/2026 às 03:39
+-- Tempo de geração: 10/11/2026 às 05:03
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -79,8 +79,9 @@ CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `buyer_id` int(11) NOT NULL,
   `seller_id` int(11) NOT NULL,
-  `total` decimal(10,0) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
   `status` enum('pending','accepted','rejected','completed') DEFAULT 'pending',
+  `explanation` varchar(255) DEFAULT NULL,
   `date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -118,7 +119,8 @@ CREATE TABLE `products` (
   `category_id` int(11) NOT NULL,
   `description` varchar(255) NOT NULL,
   `price` float NOT NULL,
-  `product_photo` varchar(255) NOT NULL
+  `product_photo` varchar(255) NOT NULL,
+  `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -223,7 +225,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `institute_id`, `phone_number`, `description`, `email`, `password`, `profile_photo`, `role_id`, `remember_token`) VALUES
-(53, 'Andrei Freire de Almeida', 1, '(95) 9 8113-8069', 'auraauraauraauraauraaura', 'andreifalmeida08@gmail.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', 'uploads/perfil/6ade57091ae56.jpg', 2, NULL),
+(53, 'Andrei Freire de Almeida', 1, '(95) 9 8113-8069', 'auraauraauraauraauraaura', 'andreifalmeida08@gmail.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', 'uploads/perfil/6ade57091ae56.jpg', 2, '8996d41f7cf18ee3532a5bbf6ed434fa5a2d3ce06ca74801dd906bcbf533dde2'),
 (54, 'Lenalinda', 4, NULL, NULL, 'lena@email.com', '$2y$10$6WwC9p8895wuAHQZj1nSquTrV3fd.Pfp7EzXob7l8qZx5bfqdG93u', NULL, 3, NULL),
 (55, 'Carlos Henrique', 3, '95991535938', 'Carlos Henrique, vendedor de xp do fortnite', 'carlos@email.com', '$2y$10$joXcvHldaNoTljNbFfyVT.Zimx2Ac.Ntl66wLxiUk1Clbz6IMi2Ua', 'uploads/perfil/6a9bc33ea138f.jpg', 2, NULL),
 (56, 'Mateus Costa de Sousa', 1, NULL, NULL, 'mininolocoiala@gmail.com', '$2y$10$J2IzklEz17HNSPG1Obn2fOdUt2VxTz0eK5R7VxOFO9jU.Wb75YGsO', NULL, 3, NULL),
@@ -346,7 +348,7 @@ ALTER TABLE `educational_institute`
 -- AUTO_INCREMENT de tabela `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de tabela `permissions`
@@ -370,7 +372,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de tabela `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT de tabela `users`

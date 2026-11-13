@@ -1,0 +1,694 @@
+/* ============================================
+   CashFY — extras de interface
+   - balão de confirmação (sair da conta, apagar produto, recusar pedido)
+   - botão de ícone dentro de formulário
+   - caixa "Lembrar de mim"
+============================================ */
+
+[hidden] {
+    display: none !important;
+}
+
+/* ---------- Balão de confirmação ---------- */
+
+body.confirm-open {
+    overflow: hidden;
+}
+
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(16, 25, 24, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: confirm-fade .16s ease-out;
+}
+
+.confirm-box {
+    position: relative;
+    width: min(100%, 420px);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 26px 24px 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: var(--shadow-pop);
+    text-align: center;
+    animation: confirm-pop .2s cubic-bezier(.2, .9, .3, 1.2);
+}
+
+.confirm-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: #FBEAE6;
+    color: #C0503D;
+    font-size: 1.35rem;
+}
+
+.confirm-box.is-neutral .confirm-icon {
+    background: var(--cream-deep);
+    color: var(--orange-600);
+}
+
+.confirm-title {
+    margin: 0 0 8px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--ink);
+}
+
+.confirm-message {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.confirm-reason {
+    margin-top: 16px;
+    text-align: left;
+}
+
+.confirm-reason label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.confirm-reason textarea {
+    display: block;
+    width: 100%;
+    min-height: 92px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--cream-light);
+    color: var(--ink);
+    font: inherit;
+    resize: vertical;
+}
+
+.confirm-reason textarea:focus {
+    outline: none;
+    border-color: var(--teal-500);
+}
+
+.confirm-reason.has-error textarea {
+    border-color: #C0503D;
+}
+
+.confirm-reason-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: 0.8rem;
+}
+
+.confirm-error {
+    color: #C0503D;
+    font-weight: 700;
+}
+
+.confirm-count {
+    margin-left: auto;
+    color: var(--ink-soft);
+}
+
+.confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.confirm-actions .btn {
+    flex: 1 1 130px;
+    cursor: pointer;
+}
+
+.confirm-actions .confirm-ok.is-danger {
+    background: #C0503D !important;
+    color: #fff;
+}
+
+.confirm-actions .confirm-ok.is-danger:hover {
+    background: #A6402F !important;
+}
+
+body.dark-mode .confirm-overlay {
+    background: rgba(0, 0, 0, 0.62);
+}
+
+body.dark-mode .confirm-icon {
+    background: #3A2420;
+    color: #F09A86;
+}
+
+body.dark-mode .confirm-box.is-neutral .confirm-icon {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .confirm-error {
+    color: #F09A86;
+}
+
+@keyframes confirm-fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes confirm-pop {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .confirm-overlay,
+    .confirm-box {
+        animation: none;
+    }
+}
+
+/* ---------- Botão de ícone dentro de <form> (apagar produto) ---------- */
+
+.inline-form {
+    display: inline;
+    margin: 0;
+}
+
+.icon-action {
+    display: inline;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.icon-action:focus-visible {
+    outline: 2px solid var(--teal-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* ---------- Lembrar de mim ---------- */
+
+.remember-me,
+.field .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.remember-me input,
+.field .remember-me input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex: 0 0 auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    accent-color: var(--orange-500);
+    cursor: pointer;
+}
+
+/* ---------- Contador de pedidos novos ao lado de "Pedidos" (perfil do vendedor) ---------- */
+
+.menu_details_options a.menu-link-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.menu-link-badge .orders-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0 7px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, var(--orange-500), var(--orange-600));
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(232, 103, 43, 0.35);
+}
+
+/* ---------- Histórico de pedidos do vendedor (aba Diário) ---------- */
+
+.history-content.active {
+    max-height: 6000px;
+}
+
+.hist {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 6px 2px 10px;
+}
+
+.hist-day {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hist-day-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--line);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--teal-900);
+}
+
+.hist-day-title small {
+    color: var(--ink-soft);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.hist-card {
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--leaf-500);
+    border-radius: var(--radius-md);
+    background: var(--card);
+    box-shadow: var(--shadow-card);
+}
+
+.hist-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.hist-card-title {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.hist-card-title strong {
+    color: var(--ink);
+    font-family: var(--font-display);
+}
+
+.hist-card-title span {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+}
+
+.hist-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: #E6F3E2;
+    color: var(--leaf-700);
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.hist-items {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hist-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.hist-item:last-child {
+    border-bottom: 0;
+}
+
+.hist-item-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.hist-item-name small {
+    display: block;
+    color: var(--ink-soft);
+    font-weight: 600;
+}
+
+.hist-item-total {
+    flex: 0 0 auto;
+}
+
+.hist-card-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    color: var(--ink-soft);
+    font-weight: 700;
+}
+
+.hist-card-total strong {
+    color: var(--teal-700);
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+}
+
+.hist-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 30px 16px;
+    border: 2px dashed var(--line);
+    border-radius: var(--radius-md);
+    color: var(--ink-soft);
+    text-align: center;
+}
+
+.hist-empty i {
+    color: var(--teal-300);
+    font-size: 1.8rem;
+}
+
+.hist-empty p {
+    margin: 0;
+}
+
+body.dark-mode .hist-card {
+    border-color: rgba(255, 255, 255, 0.12);
+    border-left-color: #8CCB9D;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+}
+
+body.dark-mode .hist-tag {
+    background: #1E3929;
+    color: #8CCB9D;
+}
+
+body.dark-mode .hist-empty {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+
+/* ============================================
+   RESPONSIVE — UI EXTRAS
+============================================ */
+
+/* ---------- Tablets e dispositivos menores ---------- */
+
+@media (max-width: 768px) {
+
+    /* Confirmation modal */
+
+    .confirm-overlay {
+        padding: 16px;
+        align-items: center;
+    }
+
+    .confirm-box {
+        width: 100%;
+        max-width: 440px;
+        max-height: calc(100vh - 32px);
+        padding: 24px 20px;
+        border-radius: var(--radius-lg);
+    }
+
+    .confirm-actions {
+        gap: 10px;
+    }
+
+    .confirm-actions .btn {
+        min-height: 44px;
+    }
+
+    /* Order history */
+
+    .hist {
+        gap: 18px;
+    }
+
+    .hist-card {
+        padding: 13px;
+    }
+
+    .hist-card-head {
+        align-items: flex-start;
+    }
+
+    .hist-day-title {
+        flex-wrap: wrap;
+    }
+
+    /* Orders badge */
+
+    .menu_details_options a.menu-link-badge {
+        gap: 6px;
+    }
+
+}
+
+
+/* ---------- Smartphones ---------- */
+
+@media (max-width: 480px) {
+
+    /* Confirmation modal */
+
+    .confirm-overlay {
+        padding: 12px;
+        overflow-y: auto;
+        align-items: center;
+    }
+
+    .confirm-box {
+        width: 100%;
+        max-width: none;
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        padding: 22px 16px 18px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .confirm-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 12px;
+        font-size: 1.2rem;
+    }
+
+    .confirm-title {
+        font-size: 1.1rem;
+    }
+
+    .confirm-message {
+        font-size: 0.9rem;
+    }
+
+    .confirm-reason textarea {
+        min-height: 100px;
+        font-size: 16px;
+    }
+
+    /* Confirmation buttons */
+
+    .confirm-actions {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .confirm-actions .btn {
+        flex: 0 1 auto;
+        width: auto;
+        min-width: 100px;
+        min-height: 40px;
+        padding: 10px 18px;
+        font-size: 0.85rem;
+        border-radius: var(--radius-sm);
+    }
+
+    /* Remember me */
+
+    .remember-me,
+    .field .remember-me {
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+    }
+
+    .remember-me input,
+    .field .remember-me input {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Order history */
+
+    .hist {
+        gap: 16px;
+        padding: 4px 0 8px;
+    }
+
+    .hist-day {
+        gap: 10px;
+    }
+
+    .hist-day-title {
+        align-items: flex-start;
+        font-size: 0.95rem;
+    }
+
+    .hist-day-title small {
+        font-size: 0.78rem;
+    }
+
+    .hist-card {
+        padding: 12px;
+        border-radius: var(--radius-sm);
+    }
+
+    .hist-card-head {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .hist-card-title {
+        width: 100%;
+    }
+
+    .hist-card-title span {
+        font-size: 0.8rem;
+    }
+
+    .hist-tag {
+        font-size: 0.7rem;
+    }
+
+    .hist-item {
+        gap: 8px;
+        font-size: 0.85rem;
+    }
+
+    .hist-item-total {
+        font-size: 0.85rem;
+    }
+
+    .hist-card-total {
+        gap: 8px;
+        font-size: 0.85rem;
+    }
+
+    .hist-card-total strong {
+        font-size: 0.95rem;
+    }
+
+    .hist-empty {
+        padding: 24px 12px;
+    }
+
+    /* Orders badge */
+
+    .menu-link-badge .orders-badge {
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        font-size: 0.68rem;
+    }
+
+}
+
+/* ---------- Smartphones pequenos ---------- */
+
+@media (max-width: 360px) {
+
+    .confirm-box {
+        padding: 18px 13px;
+    }
+
+    .confirm-actions .btn {
+        font-size: 0.85rem;
+        padding: 11px;
+    }
+
+    .hist-card {
+        padding: 10px;
+    }
+
+    .hist-item {
+        font-size: 0.8rem;
+    }
+
+    .hist-card-total {
+        flex-wrap: wrap;
+    }
+
+}

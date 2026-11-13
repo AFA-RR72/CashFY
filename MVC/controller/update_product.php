@@ -4,8 +4,19 @@ require_once("../model/category.php");
 require_once("../model/user.php");
 require_once("../config/init.php");
 
+if (empty($_SESSION['id'])) {
+    header("Location: ../view/login.php");
+    exit;
+}
+
 $user = get_user_by_id($_SESSION['id']);
-$product = get_product_by_id($_GET['id']);
+$product = get_product_by_id((int) ($_GET['id'] ?? 0));
+
+// Produto inexistente, excluído (get_product_by_id só devolve ativos) ou de outro vendedor
+if (!$product || $product['user_id'] != $_SESSION['id']) {
+    header("Location: ../view/perfil.php?products");
+    exit;
+}
 
 $photo = $product['product_photo'];
 

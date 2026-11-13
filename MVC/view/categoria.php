@@ -1,19 +1,39 @@
-<?php 
+<?php
 require_once("../config/init.php");
 require_once("../config/auth.php");
+require_once("../config/cart_return.php");
 require_once("../model/category.php");
 require_once("../model/products.php");
 require_once("../model/user.php");
 
-if (!isset($_GET['cat']) || empty($_GET['cat']) || !check_category($_GET['cat'])) {
-  echo '<script>
-        history.back();
-    </script>';
+$category_param = trim((string) ($_GET['cat'] ?? ''));
+
+if ($category_param === '') {
+  header('Location: ../../index.php');
   exit;
 }
 
-$category = get_category_by_id($_GET['cat']);
-$products = get_products_by_category($category['id']);
+if (ctype_digit($category_param)) {
+  $category = get_category_by_id((int) $category_param);
+} else {
+  $category = get_category_by_slug($category_param);
+}
+
+if (!$category) {
+  header('Location: ../../index.php');
+  exit;
+}
+
+$products = get_products_by_category((int) $category['id']);
+$product_modal = null;
+
+if (isset($_GET['product']) && ctype_digit((string) $_GET['product'])) {
+  $requested_product = get_product_by_id((int) $_GET['product']);
+
+  if ($requested_product && (int) $requested_product['category_id'] === (int) $category['id']) {
+    $product_modal = $requested_product;
+  }
+}
 
 if (isset($_SESSION['id'])) {
   $user = get_user_by_id($_SESSION['id']);
@@ -97,15 +117,25 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <span class="bar"></span>
         </button>
         <ul class="nav-links">
-          <li class="home">
+
+          <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
             <a href="../../index.php">Home</a>
           </li>
+
           <li>
             <a href="contact.php">Contato</a>
           </li>
+
           <li>
             <a href="sobre.php">Sobre nós</a>
           </li>
+
+          <?php if (isset($user) && $user['role_id'] == 3): ?>
+            <li>
+              <a href="myOrders.php">Meus pedidos</a>
+            </li>
+          <?php endif; ?>
+
           <li class="mobile-theme">
             <div class="theme-switch-div">
               <label class="theme-switch">
@@ -170,9 +200,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <h1 id="banner-title"><?= $category['name']; ?></h1>
           <p id="banner-count">
             <?= count($products) ?> produto<?php if (count($products) != 1) {
-                 echo 's';
-               }
-               ?>
+                                              echo 's';
+                                            }
+                                            ?>
             nessa categoria
           </p>
         </div>
@@ -185,29 +215,86 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <?php foreach ($products as $product): ?>
             <?php if ($product['category_id'] == $category['id']): ?>
               <?php $seller = get_user_by_id($product['user_id']) ?>
-              <div class="product-card">
+              <article class="product-card">
                 <span class="badge-new">Novo!</span>
-                <div class="product-img"><img src="<?= "../../" . $product['product_photo'] ?>" alt="Image">
+                <div class="product-img">
+                  <img src="<?= htmlspecialchars('../../' . $product['product_photo']); ?>"
+                    alt="<?= htmlspecialchars($product['name']); ?>">
                 </div>
+
                 <p class="product-name">
-                  <?= htmlspecialchars($product['name']) ?? ''; ?>
+                  <?= htmlspecialchars($product['name']); ?>
                 </p>
-                <a href="seller.php?id=<?= $product['user_id']; ?>" class="product-card-seller">
-                  <?= htmlspecialchars($seller['name']) ?? ''; ?>
+
+                <a href="seller.php?id=<?= (int) $product['user_id']; ?>" class="product-card-seller">
+                  <?= htmlspecialchars($seller['name'] ?? 'Vendedor'); ?>
                 </a>
 
                 <p class="product-desc">
-                  <?= htmlspecialchars($product['description']) ?? ''; ?>
+                  <?= htmlspecialchars($product['description']); ?>
                 </p>
+
                 <p class="product-price">
-                  <?= 'R$ ' . htmlspecialchars(number_format(($product['price'] ?? 0), 2, ',', '.')); ?>
+                  <?= 'R$ ' . number_format((float) $product['price'], 2, ',', '.'); ?>
                 </p>
-              </div>
+
+                <a class="btn btn-gradient btn-sm category-add-button"
+                  href="?cat=<?= rawurlencode((string) $category['id']); ?>&amp;product=<?= (int) $product['id']; ?>">
+                  <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                  Adicionar ao carrinho
+                </a>
+              </article>
             <?php endif; ?>
           <?php endforeach; ?>
         </div>
       </div>
     </main>
+
+    <?php if ($product_modal): ?>
+      <dialog id="product-modal" open aria-labelledby="category-product-title">
+        <a class="product-modal-back"
+          href="?cat=<?= rawurlencode((string) $category['id']); ?>"
+          aria-label="Fechar detalhes do produto">
+          <i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i>
+        </a>
+
+        <h2 id="category-product-title"><?= htmlspecialchars($product_modal['name']); ?></h2>
+
+        <div class="cart-form">
+          <div>
+            <img
+              src="<?= htmlspecialchars('../../' . $product_modal['product_photo']); ?>"
+              alt="<?= htmlspecialchars($product_modal['name']); ?>">
+          </div>
+
+          <div>
+            <p class="product-desc"><?= htmlspecialchars($product_modal['description']); ?></p>
+            <p class="product-price">
+              R$ <?= number_format((float) $product_modal['price'], 2, ',', '.'); ?>
+            </p>
+
+            <form action="../controller/cart.php" method="post">
+              <input type="hidden" name="product_id" value="<?= (int) $product_modal['id']; ?>">
+              <input type="hidden" name="return" value="<?= htmlspecialchars(cart_current_page(), ENT_QUOTES); ?>">
+
+              <div class="cart-quantity">
+                <label for="category-cart-quantity">Quantidade</label>
+                <div class="input">
+                  <button type="button" class="quantity-decrease" aria-label="Diminuir quantidade">−</button>
+                  <input type="number" name="quantity" id="category-cart-quantity" value="1" min="1" step="1" required>
+                  <button type="button" class="quantity-increase" aria-label="Aumentar quantidade">+</button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-gradient">
+                <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                Adicionar ao carrinho
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+    <?php endif; ?>
 
     <?php require __DIR__ . '/partials/cart_modal.php'; ?>
 
@@ -218,6 +305,24 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <script src="../../assets/js/return.js"></script>
   <script src="../../assets/js/theme.js"></script>
   <script src="../../assets/js/menu-toggle.js"></script>
+  <script>
+    (() => {
+      const quantityInput = document.getElementById('category-cart-quantity');
+      if (!quantityInput) return;
+
+      document.querySelector('.quantity-decrease')?.addEventListener('click', () => {
+        quantityInput.value = Math.max(1, (Number.parseInt(quantityInput.value, 10) || 1) - 1);
+      });
+
+      document.querySelector('.quantity-increase')?.addEventListener('click', () => {
+        quantityInput.value = (Number.parseInt(quantityInput.value, 10) || 1) + 1;
+      });
+
+      quantityInput.addEventListener('change', () => {
+        quantityInput.value = Math.max(1, Number.parseInt(quantityInput.value, 10) || 1);
+      });
+    })();
+  </script>
   <?php require __DIR__ . '/partials/order_notifier.php'; ?>
 </body>
 

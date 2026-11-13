@@ -1,3 +1,8 @@
+/*
+ * Service Worker do CashFY. Fica na RAIZ do projeto de propósito: o escopo de um Service
+ * Worker é a pasta onde ele está, então aqui ele cobre todas as páginas (antes ficava em
+ * assets/js e a URL registrada nem existia).
+ */
 self.addEventListener('install', () => {
     self.skipWaiting();
 });

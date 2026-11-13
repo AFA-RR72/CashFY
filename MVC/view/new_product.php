@@ -4,7 +4,7 @@ require_once("../model/category.php");
 ob_start();
 
 check_login();
-check_role();
+check_role(2);
 
 $categories = get_categories();
 

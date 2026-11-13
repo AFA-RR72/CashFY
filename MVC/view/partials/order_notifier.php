@@ -13,7 +13,7 @@ if ($notifier_user && (int) $notifier_user['role_id'] === 2):
     $notifier_sig = get_order_signature((int) $notifier_user['id']);
 ?>
     <link rel="stylesheet" href="<?= BASE_URL; ?>assets/css/orders.css">
-    <span id="orders-notify" data-sw-url="/activities/CashFY/service-worker.js" hidden
+    <span id="orders-notify" data-sw-url="<?= BASE_URL; ?>service-worker.js" hidden
         data-endpoint="<?= BASE_URL; ?>MVC/controller/order_stream.php"
         data-orders-url="<?= BASE_URL; ?>MVC/view/perfil.php?orders"
         data-pending="<?= $notifier_sig['pending']; ?>"

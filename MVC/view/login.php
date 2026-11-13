@@ -10,6 +10,7 @@ require_once('../config/auth.php');
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Entrar — Cashfy</title>
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/ui-extras.css">
 </head>
 
 <body>
@@ -52,6 +53,12 @@ require_once('../config/auth.php');
               <img id="eye-icon" src="../../uploads/icones/olhof.png" alt="Mostrar senha">
             </button>
           </div>
+        </div>
+        <div class="field">
+          <label class="remember-me" for="remember">
+            <input type="checkbox" id="remember" name="remember" value="1">
+            Lembrar de mim por 30 dias
+          </label>
         </div>
         <div class="field">
           <?php if (isset($_SESSION['msg'])): ?>

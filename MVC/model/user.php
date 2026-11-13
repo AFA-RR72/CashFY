@@ -148,4 +148,18 @@ function update_user(int $id, string $name, int $institute_id, string $phone_num
     return;
 }
 
+/**
+ * Guarda (ou apaga, com null) o hash do token do "lembrar de mim" do usuário.
+ * Nunca se grava o token puro: só o SHA-256 dele (64 caracteres, cabe em varchar(100)).
+ */
+function set_remember_token(int $user_id, ?string $token_hash): void
+{
+    $conn = conn();
+
+    $stmt = $conn->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+    $stmt->bind_param('si', $token_hash, $user_id);
+    $stmt->execute();
+    $stmt->close();
+}
+
 ?>

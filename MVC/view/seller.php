@@ -1,11 +1,26 @@
 <?php
 require_once('../config/auth.php');
+require_once('../config/cart_return.php');
 require_once('../model/user.php');
 require_once('../model/products.php');
 require_once('../model/orders.php');
 
-$seller = get_user_by_id($_GET['id']);
+$seller = get_user_by_id((int) ($_GET['id'] ?? 0));
 $products = get_products();
+$product_modal = null;
+
+if (isset($_GET['product']) && ctype_digit((string) $_GET['product'])) {
+  $requested_product = get_product_by_id((int) $_GET['product']);
+
+  if ($requested_product && $seller && (int) $requested_product['user_id'] === (int) $seller['id']) {
+    $product_modal = $requested_product;
+  }
+}
+
+if (!$seller) {
+  header('Location: ../../index.php');
+  exit;
+}
 
 if (isset($_SESSION['id'])) {
   $user = get_user_by_id($_SESSION['id']);
@@ -99,7 +114,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
         <ul class="nav-links">
 
-          <li class="home">
+          <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
             <a href="../../index.php">Home</a>
           </li>
 
@@ -110,6 +125,12 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <li>
             <a href="sobre.php">Sobre nós</a>
           </li>
+
+          <?php if (isset($user) && $user['role_id'] == 3): ?>
+            <li>
+              <a href="myOrders.php">Meus pedidos</a>
+            </li>
+          <?php endif; ?>
 
           <li class="mobile-theme">
 
@@ -265,13 +286,13 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
       <!-- Modal do produto -->
 
-      <?php if (isset($_GET['product'])): ?>
+      <?php if ($product_modal): ?>
 
         <?php
 
         $params = $_GET;
 
-        $product = get_product_by_id($_GET['product']);
+        $product = $product_modal;
 
         ?>
 
@@ -310,16 +331,8 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
             <div>
 
-              <?php
-
-              $params['product'] = $_GET['product'];
-
-              $url = http_build_query($params);
-
-              ?>
-
               <form
-                action="../controller/cart.php?<?= htmlspecialchars($url); ?>"
+                action="../controller/cart.php"
                 method="post">
 
                 <div class="cart-quantity">
@@ -374,10 +387,14 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                 <?php endif; ?>
 
                 <input
-                  type="number"
+                  type="hidden"
                   name="product_id"
-                  value="<?= $product['id']; ?>"
-                  hidden>
+                  value="<?= (int) $product['id']; ?>">
+
+                <input
+                  type="hidden"
+                  name="return"
+                  value="<?= htmlspecialchars(cart_current_page(), ENT_QUOTES); ?>">
 
 
                 <button
@@ -426,12 +443,6 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <a href="<?= htmlspecialchars($url); ?>">
 
               <div class="product-card">
-
-                <span class="badge-new">
-                  Novo!
-                </span>
-
-
                 <div class="product-img">
 
                   <img

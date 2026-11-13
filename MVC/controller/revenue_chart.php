@@ -8,6 +8,7 @@ require_once(__DIR__ . '/../model/sales.php');
  *
  * GET revenue_chart.php?mode=month&month=all|YYYY-MM
  * GET revenue_chart.php?mode=product&product_id=<id>&month=all|YYYY-MM
+ * GET revenue_chart.php?mode=summary&month=all|YYYY-MM   -> totais dos cartões (faturamento e itens do mês)
  *
  * month=all     -> histórico mensal (uma barra por mês)
  * month=YYYY-MM -> faturamento por dia daquele mês
@@ -47,7 +48,7 @@ try {
     // Validação do modo (lista permitida)
     $mode = $_GET['mode'] ?? 'month';
 
-    if (!in_array($mode, ['month', 'product'], true)) {
+    if (!in_array($mode, ['month', 'product', 'summary'], true)) {
         json_response(400, ['ok' => false, 'error' => 'Modo de visualização inválido.']);
     }
 
@@ -58,6 +59,19 @@ try {
         if (!is_string($month) || !preg_match('/^(20\d{2})-(0[1-9]|1[0-2])$/', $month)) {
             json_response(400, ['ok' => false, 'error' => 'Mês inválido.']);
         }
+    }
+
+    // Cartões "Vendas do mês" / "Itens vendidos": seguem o mês escolhido no gráfico
+    if ($mode === 'summary') {
+        $summary = get_month_summary($user_id, $month === 'all' ? null : $month);
+
+        json_response(200, [
+            'ok' => true,
+            'mode' => 'summary',
+            'month' => $month,
+            'revenue' => $summary['revenue'],
+            'items' => $summary['items'],
+        ]);
     }
 
     $product = null;

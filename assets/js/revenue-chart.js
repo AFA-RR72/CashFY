@@ -26,6 +26,12 @@
     const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
     const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
+    const statRevenue = document.getElementById('stat-month');
+    const statItems = document.getElementById('stat-items');
+    const statRevenueLabel = document.getElementById('stat-month-label');
+    const statItemsLabel = document.getElementById('stat-items-label');
+
+    let summaryController = null;
     let mode = 'month';
     let chart = null;
     let controller = null;
@@ -215,6 +221,41 @@
         }
     }
 
+    // Cartões de resumo: acompanham o mês escolhido no seletor (ou o período todo)
+    async function loadSummary() {
+        if (!statRevenue && !statItems) return;
+
+        if (summaryController) summaryController.abort();
+        const current = new AbortController();
+        summaryController = current;
+
+        const month = monthSelect ? monthSelect.value : 'all';
+        const optionText = monthSelect ? monthSelect.options[monthSelect.selectedIndex].textContent.trim() : '';
+
+        try {
+            const response = await fetch(endpoint + '?' + new URLSearchParams({ mode: 'summary', month: month }).toString(), {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                signal: current.signal
+            });
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok || !data || !data.ok) return;
+
+            if (statRevenue) statRevenue.textContent = brl.format(data.revenue);
+            if (statItems) statItems.textContent = String(data.items);
+
+            if (statRevenueLabel) {
+                statRevenueLabel.textContent = month === 'all' ? 'Vendas no período' : 'Vendas de ' + optionText;
+            }
+            if (statItemsLabel) {
+                statItemsLabel.textContent = month === 'all' ? 'Itens vendidos no período' : 'Itens vendidos em ' + optionText;
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') console.error('Resumo do mês:', error);
+        }
+    }
+
     function setMode(newMode) {
         mode = newMode;
 
@@ -242,6 +283,7 @@
 
     if (monthSelect) {
         monthSelect.addEventListener('change', load);
+        monthSelect.addEventListener('change', loadSummary);
     }
 
     // Reaplica as cores quando o usuário troca entre tema claro/escuro
@@ -251,4 +293,5 @@
     });
 
     load();
+    loadSummary();
 })();

@@ -107,40 +107,34 @@
         }, 8000);
     }
 
-    function notifyNewOrder() {
-        async function notifyNewOrder(data) {
-            const text = describe(data);
-            const id = data.latest?.id || data.last_id;
+    async function notifyNewOrder(data) {
+        const text = describe(data);
+        const id = (data.latest && data.latest.id) || data.last_id;
 
-            // Mantém o aviso visual dentro do CashFY
-            showToast(text);
+        // Aviso visual dentro do CashFY (sempre aparece, mesmo sem permissão de notificação)
+        showToast(text);
 
-            // Verifica a permissão
-            if (!('Notification' in window) ||
-                Notification.permission !== 'granted') {
+        if (!('Notification' in window) || Notification.permission !== 'granted') {
+            return;
+        }
+
+        try {
+            const registration = await swRegistrationPromise;
+
+            // No celular só funciona via Service Worker (new Notification() é bloqueado)
+            if (!registration) {
                 return;
             }
 
-            try {
-                const registration = await swRegistrationPromise;
-
-                if (!registration) {
-                    return;
-                }
-
-                await registration.showNotification('Novo pedido no CashFY', {
-                    body: text,
-                    tag: 'cashfy-order-' + id,
-                    renotify: false,
-                    vibrate: [200, 100, 200],
-                    data: {
-                        url: ordersUrl
-                    }
-                });
-
-            } catch (error) {
-                console.error('Erro ao exibir notificação:', error);
-            }
+            await registration.showNotification('Novo pedido no CashFY', {
+                body: text,
+                tag: 'cashfy-order-' + id,
+                renotify: false,
+                vibrate: [200, 100, 200],
+                data: { url: new URL(ordersUrl, location.href).href }
+            });
+        } catch (error) {
+            console.error('Erro ao exibir notificação:', error);
         }
     }
 
@@ -153,7 +147,10 @@
             return;
         }
 
-        if (!('Notification' in window)) {
+        if (!window.isSecureContext) {
+            enableButton.hidden = true;
+            statusText.textContent = 'Notificações só funcionam em conexão segura (HTTPS). Neste endereço, você verá apenas o aviso dentro da página.';
+        } else if (!('Notification' in window)) {
             enableButton.hidden = true;
             statusText.textContent = 'Seu navegador não suporta notificações.';
         } else if (Notification.permission === 'granted') {
@@ -168,13 +165,45 @@
         }
     }
 
+    let asking = false;
+
+    function requestPermission() {
+        if (asking || !('Notification' in window) || Notification.permission !== 'default') {
+            return;
+        }
+
+        asking = true;
+
+        const done = function () {
+            asking = false;
+            refreshPermissionUI();
+        };
+
+        try {
+            const result = Notification.requestPermission(done); // Safari antigo usa callback
+            if (result && typeof result.then === 'function') {
+                result.then(done, done);
+            }
+        } catch (error) {
+            done();
+        }
+    }
+
     if (enableButton) {
-        enableButton.addEventListener('click', function () {
-            Notification.requestPermission().then(refreshPermissionUI);
-        });
+        enableButton.addEventListener('click', requestPermission);
     }
 
     refreshPermissionUI();
+
+    // Pede a permissão ao entrar no site. Celulares (e o Safari) só mostram o pedido depois de
+    // um toque do usuário, então, se ainda não foi respondido, o primeiro toque na página também pede.
+    requestPermission();
+
+    if ('Notification' in window && Notification.permission === 'default') {
+        ['pointerdown', 'keydown'].forEach(function (type) {
+            document.addEventListener(type, requestPermission, { once: true });
+        });
+    }
 
     const source = new EventSource(endpoint);
 

@@ -2,7 +2,7 @@
 require_once('../config/auth.php');
 
 if (isset($_SESSION['id'])) {
-  $user = get_user_by_id($_SESSION['id']);
+    $user = get_user_by_id($_SESSION['id']);
 }
 
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
@@ -87,7 +87,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
                 <ul class="nav-links">
 
-                    <li class="home">
+                    <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
                         <a href="../../index.php">Home</a>
                     </li>
 
@@ -98,6 +98,12 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                     <li>
                         <a href="sobre.php">Sobre nós</a>
                     </li>
+
+                    <?php if (isset($user) && $user['role_id'] == 3): ?>
+                        <li>
+                            <a href="myOrders.php">Meus pedidos</a>
+                        </li>
+                    <?php endif; ?>
 
                     <li class="mobile-theme">
                         <div class="theme-switch-div">
@@ -132,7 +138,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                                         alt="Perfil">
                                 </span>
 
-                            <?php else: ?>
+                            <?php elseif (isset($user)): ?>
 
                                 <span class="index-account-mark-child">
                                     <?= pegarIniciais($user['name']); ?>

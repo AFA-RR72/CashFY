@@ -91,15 +91,25 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <span class="bar"></span>
         </button>
         <ul class="nav-links">
-          <li class="home">
+
+          <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
             <a href="index.php" class="active">Home</a>
           </li>
+
           <li>
             <a href="MVC/view/contact.php">Contato</a>
           </li>
+
           <li class="about">
             <a href="MVC/view/sobre.php">Sobre nós</a>
           </li>
+
+          <?php if (isset($user) && $user['role_id'] == 3): ?>
+            <li>
+              <a href="MVC/view/myOrders.php">Meus pedidos</a>
+            </li>
+          <?php endif; ?>
+
           <li class="mobile-theme">
             <div class="theme-switch-div">
               <label class="theme-switch">
@@ -132,7 +142,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   <img src="<?= $user['profile_photo'] ?>" alt="Perfil">
                 </span>
 
-              <?php elseif(isset($user)): ?>
+              <?php elseif (isset($user)): ?>
                 <span class="index-account-mark-child">
                   <?= pegarIniciais($user['name']); ?>
                 </span>
@@ -286,7 +296,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     <button id="cookie-reject">Sair</button>
   </div>
 
-    <?php require __DIR__ . '/MVC/view/partials/cart_modal.php'; ?>
+  <?php require __DIR__ . '/MVC/view/partials/cart_modal.php'; ?>
 
   <script src="assets/js/theme.js"></script>
   <script src="assets/js/menu-toggle.js"></script>

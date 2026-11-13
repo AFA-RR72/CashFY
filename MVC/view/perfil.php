@@ -1,8 +1,5 @@
 <?php
 require_once('../config/auth.php');
-require_once('../config/init.php');
-require_once('../model/user.php');
-require_once('../model/products.php');
 require_once('../model/sales.php');
 require_once('../model/institutes.php');
 
@@ -82,6 +79,7 @@ if (empty($_GET)) {
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/orders.css">
+    <link rel="stylesheet" href="../../assets/css/ui-extras.css">
 </head>
 <!-- Eu meio que dei ctrl+c ctrl+v no dashboard, porque é a mesma merda basicamente. vou só mudar uns nomes e class -->
 
@@ -105,18 +103,48 @@ if (empty($_GET)) {
                     <span class="bar"></span>
                 </button>
                 <ul class="nav-links">
-                    <li class="home">
+
+                    <li class="home <?php if (isset($user) && $user['role_id'] == 3) {
+                                        echo 'client';
+                                    } ?>">
                         <a href="../../index.php">Home</a>
                     </li>
+
                     <li>
                         <a href="../../index.php#contato">Contato</a>
                     </li>
+
                     <li>
                         <a href="sobre.php">Sobre nós</a>
                     </li>
+
+                    <?php if (isset($user) && $user['role_id'] == 3): ?>
+                        <li>
+                            <a href="myOrders.php">Meus pedidos</a>
+                        </li>
+                    <?php endif; ?>
+
+                    <li class="mobile-theme">
+
+                        <div class="theme-switch-div">
+
+                            <label class="theme-switch">
+                                <input type="checkbox" id="theme-toggle-mobile">
+                                <span class="slider"></span>
+                            </label>
+
+                        </div>
+
+                    </li>
+
                 </ul>
                 <div class="header-actions">
-                    <a href="../controller/log-out.php" class="btn btn-gradient btn-sm">Sair</a>
+                    <a href="../controller/log-out.php" class="btn btn-gradient btn-sm"
+                        data-confirm="Você precisará entrar novamente para acessar sua conta neste dispositivo."
+                        data-confirm-title="Sair da conta?"
+                        data-confirm-ok="Sair"
+                        data-confirm-icon="fa-right-from-bracket"
+                        data-confirm-tone="neutral">Sair</a>
                 </div>
             </div>
         </header>
@@ -199,7 +227,7 @@ if (empty($_GET)) {
                             <a href="?diary">Diário</a>
                         </div>
                         <div class="menu_details_options">
-                            <a href="?orders">Pedidos<span id="orders-badge" data-sw-url="/activities/CashFY/service-worker.js" class="orders-badge"
+                            <a href="?orders" class="menu-link-badge"><span class="menu-link-label">Pedidos</span><span id="orders-badge" data-sw-url="<?= BASE_URL; ?>service-worker.js" class="orders-badge"
                                     data-endpoint="../controller/order_stream.php"
                                     data-orders-url="perfil.php?orders"
                                     data-pending="<?= $order_sig['pending']; ?>"
@@ -222,6 +250,7 @@ if (empty($_GET)) {
                         $orders = get_seller_orders((int) $user['id']);
                         $pending_orders = array_filter($orders, fn($o) => $o['status'] === 'pending');
                         $accepted_orders = array_filter($orders, fn($o) => $o['status'] === 'accepted');
+                        $completed_orders = array_filter($orders, fn($o) => $o['status'] === 'completed');
                         $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
                         ?>
 
@@ -230,7 +259,7 @@ if (empty($_GET)) {
                                 <h2 class="section-title" style="margin-top:0;">PEDIDOS RECEBIDOS</h2>
 
                                 <div class="orders-notify">
-                                    <button class="btn btn-transparent btn-sm" type="button" id="orders-notify-enable" data-sw-url="/activities/CashFY/service-worker.js" hidden>
+                                    <button class="btn btn-transparent btn-sm" type="button" id="orders-notify-enable" data-sw-url="<?= BASE_URL; ?>service-worker.js" hidden>
                                         Ativar notificações
                                     </button>
                                     <p class="orders-notify-status" id="orders-notify-status"></p>
@@ -286,7 +315,16 @@ if (empty($_GET)) {
                                         <form class="order-actions" action="../controller/order_status.php" method="post">
                                             <input type="hidden" name="order_id" value="<?= (int) $order['id']; ?>">
                                             <button class="btn btn-orange btn-sm" type="submit" name="action" value="accept">Aceitar</button>
-                                            <button class="btn btn-transparent btn-sm" type="submit" name="action" value="reject">Recusar</button>
+                                            <button class="btn btn-transparent btn-sm" type="submit" name="action" value="reject"
+                                                data-confirm="O cliente vai ver este motivo no pedido dele."
+                                                data-confirm-title="Recusar pedido #<?= (int) $order['id']; ?>?"
+                                                data-confirm-ok="Recusar pedido"
+                                                data-confirm-icon="fa-ban"
+                                                data-reason-field="explanation"
+                                                data-reason-label="Motivo da recusa"
+                                                data-reason-placeholder="Ex.: produto esgotado, não consigo entregar nesse dia..."
+                                                data-reason-min="5"
+                                                data-reason-max="255">Recusar</button>
                                         </form>
                                     </article>
                                 <?php endforeach; ?>
@@ -345,6 +383,14 @@ if (empty($_GET)) {
 
                         <!-- Produtos do vendedor -->
 
+                        <?php if (isset($_SESSION['msg-form'])): ?>
+                            <div class="session-msg <?= $_SESSION['msg-form'] === 'Produto apagado' ? 'success' : ''; ?>"
+                                id="msg">
+                                <?= htmlspecialchars($_SESSION['msg-form']); ?>
+                                <?php unset($_SESSION['msg-form']); ?>
+                            </div>
+                        <?php endif; ?>
+
                         <a href="new_product.php">
                             <div class="pill-tag-perfil">Novo Produto</div>
                         </a>
@@ -372,9 +418,16 @@ if (empty($_GET)) {
                                                     <a href="update_product.php?id=<?= $product['id']; ?>">
                                                         <i class="fa-solid fa-pen-to-square update-product"></i>
                                                     </a>
-                                                    <a href="../controller/delete_product.php?id=<?= $product['id']; ?>">
-                                                        <i class="fa-regular fa-trash-can delete-product"></i>
-                                                    </a>
+                                                    <form class="inline-form" action="../controller/delete_product.php" method="post">
+                                                        <input type="hidden" name="id" value="<?= (int) $product['id']; ?>">
+                                                        <button class="icon-action" type="submit" aria-label="Apagar produto"
+                                                            data-confirm="&quot;<?= htmlspecialchars($product['name'], ENT_QUOTES); ?>&quot; será removido da sua lista de produtos. Essa ação não pode ser desfeita."
+                                                            data-confirm-title="Apagar produto?"
+                                                            data-confirm-ok="Apagar"
+                                                            data-confirm-icon="fa-trash-can">
+                                                            <i class="fa-regular fa-trash-can delete-product"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -391,7 +444,9 @@ if (empty($_GET)) {
                         <section class="tab-panel" id="tab-diario">
 
                             <div class="diary">
-                                 <button onclick="diary()"><h2 class="section-title" style="margin-top:0;">REGISTRAR VENDAS <i class="fa-solid fa-chevron-down diary-btn" id="diary-btn"></i></h2></button>
+                                <button onclick="diary()">
+                                    <h2 class="section-title" style="margin-top:0;">REGISTRAR VENDAS <i class="fa-solid fa-chevron-down diary-btn" id="diary-btn"></i></h2>
+                                </button>
 
 
                                 <div class="diary-content" id="diary">
@@ -442,33 +497,85 @@ if (empty($_GET)) {
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <button onclick="history()"><h2 class="section-title" style="margin-top:0;">HISTÓRICO DE VENDAS <i class="fa-solid fa-chevron-down history-btn" id="history-btn"></i></h2></button>
+                                <button onclick="history()">
+                                    <h2 class="section-title" style="margin-top:0;">HISTÓRICO DE PEDIDOS <i class="fa-solid fa-chevron-down history-btn" id="history-btn"></i></h2>
+                                </button>
                                 <div class="history-content" id="history">
-                                    <div class="history-sale">
-                                        <?php $sales = get_sales($user['id']); ?>
-                                        <?php if (empty($sales)): ?>
-                                            <p>Nenhuma venda registrada ainda.</p>
-                                        <?php endif; ?>
-                                        <?php foreach ($sales as $sale): ?>
-                                            <div class="sale-row">
-                                                <div class="row-duos">
-                                                    <span class="sale-name">
-                                                        <?= htmlspecialchars($sale['product_name'] ?? 'Produto removido'); ?>
-                                                    </span>
-                                                    <span class="sale-date">
-                                                        <?= date('d/m/y', strtotime($sale['date'])); ?>
-                                                    </span>
-                                                </div>
-                                                <div class="row-duos">
-                                                    <span class="sale-qty">
-                                                        <?= 'Quantidade: ' . (int) $sale['quantity']; ?>
-                                                    </span>
-                                                    <span class="sale-total">
-                                                        <?= 'Total: R$' . number_format(($sale['quantity'] * $sale['price']), 2, '.', ','); ?>
-                                                    </span>
-                                                </div>
+                                    <?php
+                                    $history_orders = get_seller_history((int) $user['id']);
+                                    $history_days = [];
+                                    foreach ($history_orders as $history_order) {
+                                        $history_days[date('Y-m-d', strtotime($history_order['date']))][] = $history_order;
+                                    }
+                                    $today_key = date('Y-m-d');
+                                    $yesterday_key = date('Y-m-d', strtotime('-1 day'));
+                                    ?>
+                                    <div class="hist">
+                                        <?php if (empty($history_orders)): ?>
+                                            <div class="hist-empty">
+                                                <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+                                                <p>Nenhum pedido concluído ainda.</p>
                                             </div>
-                                            <br>
+                                        <?php endif; ?>
+
+                                        <?php foreach ($history_days as $day_key => $day_orders): ?>
+                                            <?php
+                                            $day_total = 0;
+                                            foreach ($day_orders as $day_order) {
+                                                foreach ($day_order['items'] as $day_item) {
+                                                    $day_total += $day_item['quantity'] * $day_item['price'];
+                                                }
+                                            }
+                                            $day_label = $day_key === $today_key
+                                                ? 'Hoje'
+                                                : ($day_key === $yesterday_key ? 'Ontem' : date('d/m/Y', strtotime($day_key)));
+                                            ?>
+                                            <div class="hist-day">
+                                                <h3 class="hist-day-title">
+                                                    <span><?= $day_label; ?></span>
+                                                    <small>R$ <?= number_format($day_total, 2, ',', '.'); ?></small>
+                                                </h3>
+
+                                                <?php foreach ($day_orders as $history_order): ?>
+                                                    <?php $history_total = 0; ?>
+                                                    <article class="hist-card">
+                                                        <div class="hist-card-head">
+                                                            <div class="hist-card-title">
+                                                                <strong>Pedido #<?= (int) $history_order['id']; ?></strong>
+                                                                <span>
+                                                                    <?= date('H:i', strtotime($history_order['date'])); ?>
+                                                                    ·
+                                                                    <?php if ((int) $history_order['is_manual'] === 1): ?>
+                                                                        Venda avulsa (Diário)
+                                                                    <?php else: ?>
+                                                                        <?= htmlspecialchars($history_order['buyer_name']); ?>
+                                                                    <?php endif; ?>
+                                                                </span>
+                                                            </div>
+                                                            <span class="hist-tag"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Concluído</span>
+                                                        </div>
+                                                        <ul class="hist-items">
+                                                            <?php foreach ($history_order['items'] as $history_item): ?>
+                                                                <?php
+                                                                $history_subtotal = $history_item['quantity'] * $history_item['price'];
+                                                                $history_total += $history_subtotal;
+                                                                ?>
+                                                                <li class="hist-item">
+                                                                    <span class="hist-item-name">
+                                                                        <?= htmlspecialchars($history_item['product_name'] ?? 'Produto removido'); ?>
+                                                                        <small><?= (int) $history_item['quantity']; ?> × R$ <?= number_format($history_item['price'], 2, ',', '.'); ?></small>
+                                                                    </span>
+                                                                    <span class="hist-item-total">R$ <?= number_format($history_subtotal, 2, ',', '.'); ?></span>
+                                                                </li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                        <div class="hist-card-total">
+                                                            <span>Total do pedido</span>
+                                                            <strong>R$ <?= number_format($history_total, 2, ',', '.'); ?></strong>
+                                                        </div>
+                                                    </article>
+                                                <?php endforeach; ?>
+                                            </div>
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
@@ -481,19 +588,19 @@ if (empty($_GET)) {
                         <section class="tab-panel" id="tab-rendimento">
                             <div class="stat-grid">
                                 <div class="stat-card stat-green">
-                                    <div class="stat-label">Vendas da Semana</div>
+                                    <div class="stat-label">Vendas da Semana (atual)</div>
                                     <div class="stat-value" id="stat-week">R$
                                         <?= htmlspecialchars(get_total_week($user['id'])) ?>
                                     </div>
                                 </div>
                                 <div class="stat-card stat-orange">
-                                    <div class="stat-label">Vendas do Mês</div>
+                                    <div class="stat-label" id="stat-month-label">Vendas do Mês</div>
                                     <div class="stat-value" id="stat-month">R$
                                         <?= htmlspecialchars(get_total_month($user['id'])); ?>
                                     </div>
                                 </div>
                                 <div class="stat-card stat-blue">
-                                    <div class="stat-label">Itens vendidos no Mês</div>
+                                    <div class="stat-label" id="stat-items-label">Itens vendidos no Mês</div>
                                     <div class="stat-value" id="stat-items">
                                         <?= htmlspecialchars(get_saled_items_month($user['id'])) ?>
                                     </div>
@@ -536,7 +643,7 @@ if (empty($_GET)) {
                                             <option value="" disabled selected>Selecione um produto:</option>
                                             <?php foreach ($seller_products as $seller_product): ?>
                                                 <option value="<?= (int) $seller_product['id']; ?>">
-                                                    <?= htmlspecialchars($seller_product['name']); ?>
+                                                    <?= htmlspecialchars($seller_product['name']) . (!empty($seller_product['deleted_at']) ? ' (excluído)' : ''); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -669,6 +776,7 @@ if (empty($_GET)) {
     <script src="../../assets/js/theme.js"></script>
     <script src="../../assets/js/toggle.js"></script>
     <script src="../../assets/js/menu-toggle.js"></script>
+    <script src="../../assets/js/confirm.js"></script>
     <?php if (isset($user['role_id']) && $user['role_id'] == 2): ?>
         <script src="../../assets/js/orders-sse.js"></script>
     <?php endif; ?>

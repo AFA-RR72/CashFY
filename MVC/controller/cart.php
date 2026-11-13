@@ -1,18 +1,55 @@
-<?php session_start();
-require_once(__DIR__ . '/../model/products.php');
+<?php
+session_start();
+
+require_once(__DIR__ . '/../config/init.php');
 require_once(__DIR__ . '/../config/cart_return.php');
+require_once(__DIR__ . '/../model/products.php');
 
-// Ações dentro do modal do carrinho: aumentar, diminuir e remover
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ' . BASE_URL . 'index.php');
+    exit;
+}
+
+function cart_set_notice(string $message, bool $success = false): void
+{
+    $_SESSION['cart-msg'] = [
+        'text' => $message,
+        'ok' => $success,
+    ];
+}
+
+function cart_redirect_back(string $rawReturn, string $fallback): void
+{
+    header('Location: ' . cart_return_url($rawReturn, $fallback));
+    exit;
+}
+
+$cart = $_SESSION['cart'] ?? [];
+$rawReturn = (string) ($_POST['return'] ?? '');
+$fallback = BASE_URL . 'index.php';
+
+/*
+ * Atualizações feitas dentro do modal: aumentar, diminuir ou remover.
+ */
 if (isset($_POST['action'])) {
-    $params = $_GET;
-    unset($params['product']);
-    $url = '?' . http_build_query($params);
+    $action = (string) $_POST['action'];
+    $productId = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
 
-    $action = $_POST['action'];
-    $id = (int) ($_POST['product_id'] ?? 0);
+    if ($productId && isset($cart[$productId])) {
+        // Produto excluído enquanto estava no carrinho: não dá para aumentar a quantidade
+        // (diminuir e remover continuam permitidos). O item sai do carrinho.
+        if ($action === 'increase' && !get_product_by_id($productId)) {
+            $name = (string) ($cart[$productId]['product'] ?? 'Um dos produtos');
 
-    if ($id > 0 && isset($_SESSION['cart'][$id])) {
-        $quantity = (int) $_SESSION['cart'][$id]['quantity'];
+            unset($cart[$productId]);
+            $_SESSION['cart'] = $cart;
+
+            cart_set_notice('"' . $name . '" não está mais disponível e foi removido do carrinho.');
+            $_SESSION['open_cart'] = true;
+            cart_redirect_back($rawReturn, $fallback);
+        }
+
+        $quantity = (int) $cart[$productId]['quantity'];
 
         if ($action === 'increase') {
             $quantity++;
@@ -23,81 +60,67 @@ if (isset($_POST['action'])) {
         }
 
         if ($quantity <= 0) {
-            unset($_SESSION['cart'][$id]);
+            unset($cart[$productId]);
         } else {
-            $_SESSION['cart'][$id]['quantity'] = $quantity;
-            $_SESSION['cart'][$id]['total'] = $quantity * $_SESSION['cart'][$id]['price'];
+            $cart[$productId]['quantity'] = $quantity;
+            $cart[$productId]['total'] = $quantity * (float) $cart[$productId]['price'];
         }
+
+        $_SESSION['cart'] = $cart;
     }
 
     $_SESSION['open_cart'] = true;
-
-    // Volta para a página onde o carrinho foi usado (index, categoria ou seller)
-    $fallback = !empty($_GET['id']) ? "../view/seller.php$url" : BASE_URL . 'index.php';
-
-    header('Location: ' . cart_return_url($_POST['return'] ?? '', $fallback));
-    exit;
+    cart_redirect_back($rawReturn, $fallback);
 }
 
-if (
-    empty($_GET['id']) ||
-    empty($_GET['product']) ||
-    empty($_POST['quantity']) ||
-    $_POST['quantity'] <= 0 ||
-    empty($_POST['product_id'])
-) {
-    header("Location: ../../index.php");
-    exit;
-} 
+/*
+ * Inclusão de produto. O controlador não depende mais de parâmetros GET
+ * específicos do perfil do vendedor: funciona também na página de categoria.
+ */
+$productId = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
+$quantity = filter_input(INPUT_POST, 'quantity', FILTER_VALIDATE_INT);
 
-$params = $_GET;
-$url = '?' . http_build_query($params);
+if (!$productId || !$quantity || $quantity < 1) {
+    cart_set_notice('Selecione um produto e uma quantidade válida.');
+    cart_redirect_back($rawReturn, $fallback);
+}
 
-if (check_product($_POST['product_id'])) {
-    $product = get_product_by_id($_POST['product_id']);
+$product = get_product_by_id($productId);
+
+if (!$product) {
+    cart_set_notice('Este produto não está mais disponível.');
+    cart_redirect_back($rawReturn, $fallback);
+}
+
+$sellerId = (int) $product['user_id'];
+
+/*
+ * O carrinho aceita produtos de apenas um vendedor por vez.
+ */
+if (!empty($cart)) {
+    $currentSellerId = (int) (reset($cart)['seller'] ?? 0);
+
+    if ($currentSellerId !== $sellerId) {
+        cart_set_notice('Só é possível comprar em uma loja por vez.');
+        cart_redirect_back($rawReturn, $fallback);
+    }
+}
+
+if (isset($cart[$productId])) {
+    $cart[$productId]['quantity'] += $quantity;
+    $cart[$productId]['price'] = (float) $product['price'];
+    $cart[$productId]['product'] = $product['name'];
+    $cart[$productId]['total'] = $cart[$productId]['quantity'] * (float) $product['price'];
 } else {
-    $params['product'] = null;
-    header("Location: ../view/seller.php$url");
-    exit;
-}
-
-if (isset($_SESSION['cart'])){
-    $firstItem = (int) reset($_SESSION['cart'])['seller'];
-}
-
-if (
-    isset($firstItem) &&
-    $firstItem !== $product['user_id'] &&
-    !empty($_SESSION['cart'])
-){
-    $_SESSION['msg'] = 'Só é possível comprar em uma loja por vez';
-    header("Location: ../view/seller.php$url");
-    exit;
-}
-
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
-
-$id = $product['id'];
-$quantity = (int) $_POST['quantity'];
-
-if (isset($_SESSION['cart'][$id])) {
-    $_SESSION['cart'][$id]['quantity'] += $quantity;
-    $_SESSION['cart'][$id]['total'] =
-        $_SESSION['cart'][$id]['quantity'] * $product['price'];
-} else {
-    $_SESSION['cart'][$id] = [
-        'seller' => $product['user_id'],
+    $cart[$productId] = [
+        'seller' => $sellerId,
         'product' => $product['name'],
-        'price' => $product['price'],
+        'price' => (float) $product['price'],
         'quantity' => $quantity,
-        'total' => $quantity * $product['price']
+        'total' => $quantity * (float) $product['price'],
     ];
 }
 
-unset($params['product']);
-$url = '?' . http_build_query($params);
-
-header("Location: ../view/seller.php$url");
-exit;
+$_SESSION['cart'] = $cart;
+cart_set_notice('Produto adicionado ao carrinho.', true);
+cart_redirect_back($rawReturn, $fallback);

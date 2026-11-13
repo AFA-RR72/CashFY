@@ -2,7 +2,7 @@
 require_once('../config/auth.php');
 
 if (isset($_SESSION['id'])) {
-  $user = get_user_by_id($_SESSION['id']);
+    $user = get_user_by_id($_SESSION['id']);
 }
 
 function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
@@ -90,17 +90,23 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
                 <ul class="nav-links">
 
-                    <li class="home">
+                    <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
                         <a href="../../index.php">Home</a>
                     </li>
 
                     <li>
-                        <a href="contact.php">Contato</a>
+                        <a href="" class="active">Contato</a>
                     </li>
 
                     <li>
                         <a href="sobre.php">Sobre nós</a>
                     </li>
+
+                    <?php if (isset($user) && $user['role_id'] == 3): ?>
+                        <li>
+                            <a href="myOrders.php">Meus pedidos</a>
+                        </li>
+                    <?php endif; ?>
 
                     <li class="mobile-theme">
 

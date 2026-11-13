@@ -5,7 +5,7 @@ require_once('../model/products.php');
 ob_start();
 
 check_login();
-check_role();
+check_role(2);
 
 check_get_id();
 
