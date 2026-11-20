@@ -11,49 +11,15 @@ require_once(__DIR__ . "/orders.php");
  * pedidos com status 'completed'.
  */
 
-/**
- * Últimas vendas (itens de pedidos concluídos) de um vendedor.
- * Cada linha traz também: user_id (vendedor), date (do pedido) e product_name.
- */
-function get_sales(int $user_id, int $limit = 10)
-{
-    $conn = conn();
-
-    $stmt = $conn->prepare("
-    SELECT
-        s.id,
-        s.order_id,
-        s.product_id,
-        s.quantity,
-        s.price,
-        o.seller_id AS user_id,
-        o.`date` AS `date`,
-        p.name AS product_name
-    FROM sales s
-    INNER JOIN orders o ON o.id = s.order_id
-    LEFT JOIN products p ON p.id = s.product_id
-    WHERE o.seller_id = ?
-    AND o.status = 'completed'
-    ORDER BY o.`date` DESC, s.id DESC
-    LIMIT ?
-    ");
-    $stmt->bind_param('ii', $user_id, $limit);
-    $stmt->execute();
-
-    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-
-    return $result;
-}
 
 /**
- * Registro manual do Diário: cria um pedido já 'completed' com um item.
+ * Registro manual do Diário: cria um pedido já 'completed' com um item e abate estoque.
  * Como orders.buyer_id é obrigatório, o próprio vendedor entra como comprador
  * (venda presencial/avulsa, sem cliente cadastrado).
  *
  * @return int|false id do pedido criado
  */
-function register_sale(int $user_id, int $product_id, int $quantity, float $price, string $date)
+function register_sale(int $user_id, int $product_id, int $quantity, float $price, string $date, ?string &$error_msg = null)
 {
     // A data vem do <input type="date">; o horário usado é o do momento do registro
     $datetime = date('Y-m-d', strtotime($date)) . ' ' . date('H:i:s');
@@ -63,7 +29,8 @@ function register_sale(int $user_id, int $product_id, int $quantity, float $pric
         $user_id,
         [['product_id' => $product_id, 'quantity' => $quantity, 'price' => $price]],
         'completed',
-        $datetime
+        $datetime,
+        $error_msg
     );
 }
 
@@ -465,5 +432,4 @@ function get_month_summary($user_id, $month = null)
 
     return ['revenue' => (float) $row['revenue'], 'items' => (int) $row['items']];
 }
-
 ?>

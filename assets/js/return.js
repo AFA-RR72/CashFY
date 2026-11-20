@@ -1,21 +1,52 @@
-// Captura dinamicamente a origem (protocolo + IP/host + porta se houver)
+
 const BASE_URL = `${window.location.origin}/activities/CashFY/`;
 
 function voltarPagina(event) {
-    if (event) {
-        event.preventDefault();
+    event.preventDefault();
+
+    const referrer = document.referrer;
+
+    if (referrer) {
+        const previousPage = new URL(referrer);
+
+        const isCashFY =
+            previousPage.origin === window.location.origin &&
+            previousPage.pathname.startsWith('/activities/CashFY/') &&
+            previousPage.pathname !== window.location.pathname;
+
+        if (isCashFY) {
+            history.back();
+            return;
+        }
     }
 
-    // Se a página anterior não pertence ao mesmo site/pasta, vai para a página inicial
-    if (!document.referrer.startsWith(BASE_URL)) {
-        window.location.href = BASE_URL + "index.php";
+    window.location.href = BASE_URL + 'index.php';
+}
+
+// Navegação por âncoras sem modificar o histórico ou a URL
+document.addEventListener('click', function (event) {
+    const link = event.target.closest('a[href^="#"]');
+
+    if (!link) return;
+
+    event.preventDefault();
+
+    const targetId = link.getAttribute('href').substring(1);
+
+    if (!targetId) {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
         return;
     }
 
-    // Trata o histórico caso haja alteração por hash (#)
-    if (window.location.hash) {
-        history.go(-2);
-    } else {
-        history.back();
+    const target = document.getElementById(targetId);
+
+    if (target) {
+        target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
     }
-}
+});

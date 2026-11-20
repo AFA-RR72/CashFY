@@ -1,6 +1,6 @@
 <?php
 /*
- * Botão + modal do carrinho, compartilhado por index.php, categoria.php e seller.php.
+ * Botão + modal do carrinho + barra de navegação inferior mobile (bottom_nav.php).
  * Todos os endereços usam BASE_URL, então funcionam de qualquer página, e o campo
  * "return" leva o usuário de volta para a página em que ele estava.
  */
@@ -15,7 +15,7 @@ $cart_action = BASE_URL . 'MVC/controller/cart.php';
 $cart_checkout = BASE_URL . 'MVC/controller/checkout.php';
 $cart_animate = !empty($_SESSION['cart-msg']['ok']);
 ?>
-<!-- Botão do carrinho -->
+<!-- Botão flutuante do carrinho (exibido no desktop; no mobile o carrinho fica na Bottom Nav) -->
 
 <button
     class="cart-button<?= $cart_animate ? ' is-animated' : ''; ?>"
@@ -29,7 +29,7 @@ $cart_animate = !empty($_SESSION['cart-msg']['ok']);
       <span class="cart-count"><?= $cart_quantity; ?></span>
     <?php endif; ?>
 
-  </button>
+</button>
 
 
 <!-- Aviso do carrinho / checkout -->
@@ -58,6 +58,12 @@ $cart_animate = !empty($_SESSION['cart-msg']['ok']);
       background: #E6F3E2;
       border-color: #CDE9C6;
       color: #2C6E45;
+    }
+
+    @media (max-width: 880px) {
+      .cart-toast {
+        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+      }
     }
   </style>
 
@@ -221,3 +227,5 @@ $cart_animate = !empty($_SESSION['cart-msg']['ok']);
     document.getElementById('cart')?.showModal();
   </script>
 <?php endif; ?>
+
+<?php require_once(__DIR__ . '/bottom_nav.php'); ?>

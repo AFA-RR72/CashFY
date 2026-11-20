@@ -5,48 +5,6 @@ if (isset($_SESSION['id'])) {
   $user = get_user_by_id($_SESSION['id']);
 }
 
-function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
-{
-  $palavras = preg_split('/\s+/', trim($frase));
-  $palavrasValidas = [];
-
-  foreach ($palavras as $palavra) {
-    $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
-
-    if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
-      continue;
-    }
-
-    $palavrasValidas[] = $palavra;
-  }
-
-  $quantidade = count($palavrasValidas);
-
-  if ($quantidade === 0) {
-    return '';
-  }
-
-  if ($quantidade === 1) {
-    return mb_strtoupper(
-      mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
-      'UTF-8'
-    );
-  }
-
-  if ($quantidade === 2) {
-    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-    $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-
-    return mb_strtoupper($primeira . $ultima, 'UTF-8');
-  }
-
-  $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-  $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-  $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
-
-  return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -56,8 +14,15 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Sobre nós — Cashfy</title>
+  <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
   <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1F7A70">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="CashFY">
+  <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
 
 <body>
@@ -89,7 +54,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
         <ul class="nav-links">
 
-          <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
+          <li class="home <?php if (isset($user)) {
+                            echo 'client';
+                          } ?>">
             <a href="../../index.php">Home</a>
           </li>
 
@@ -101,7 +68,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <a href="" class="active">Sobre nós</a>
           </li>
 
-          <?php if (isset($user) && $user['role_id'] == 3): ?>
+          <?php if (isset($user)): ?>
             <li>
               <a href="myOrders.php">Meus pedidos</a>
             </li>
@@ -222,10 +189,37 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     </main>
 
     <footer class="site-footer">
-      Cashfy — feito por estudantes, para estudantes. &nbsp;·&nbsp; <span id="contato">contato@cashfy.com</span>
+      Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;
+      <span id="contato">cashfy@gmail.com</span> &nbsp;·&nbsp;
+      <a href="tos.php">Termos de uso</a> &nbsp;·&nbsp;
+      <a href="pp.php">Políticas de privacidade</a>
     </footer>
+
+    <div id="cookie-banner">
+      <h3>Usamos cookies</h3>
+
+      <p>
+        O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+        preferências e garantir o funcionamento correto do site.
+      </p>
+
+      <p>
+        Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+        determinadas configurações enquanto navega pelo CashFY.
+      </p>
+
+      <p>
+        Ao continuar navegando, você concorda com o uso desses cookies.
+      </p>
+
+      <button id="cookie-accept">Aceitar</button>
+      <button id="cookie-reject">Sair</button>
+    </div>
   </div>
+  <?php require __DIR__ . '/partials/cart_modal.php'; ?>
+  <?php require __DIR__ . '/partials/order_notifier.php'; ?>
   <script src="../../assets/js/theme.js"></script>
+  <script src="../../assets/js/cookies.js"></script>
   <script src="../../assets/js/menu-toggle.js"></script>
 </body>
 

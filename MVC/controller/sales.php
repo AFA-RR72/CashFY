@@ -35,13 +35,27 @@ if ($quantity <= 0 || $price <= 0) {
     exit;
 }
 
-if (register_sale((int) $_SESSION['id'], (int) $product['id'], $quantity, $price, $_POST['date'])) {
+if ($product['stock'] !== null) {
+    $available = (int) $product['stock'];
+    if ($available <= 0) {
+        $_SESSION['msg-form'] = 'O produto "' . $product['name'] . '" está sem estoque.';
+        header('Location: ../view/perfil.php?diary#msg');
+        exit;
+    }
+    if ($quantity > $available) {
+        $_SESSION['msg-form'] = 'Estoque insuficiente para "' . $product['name'] . '" (disponível: ' . $available . ').';
+        header('Location: ../view/perfil.php?diary#msg');
+        exit;
+    }
+}
+
+$error_msg = null;
+if (register_sale((int) $_SESSION['id'], (int) $product['id'], $quantity, $price, $_POST['date'], $error_msg)) {
     $_SESSION['msg-form'] = 'Venda registrada';
 } else {
-    $_SESSION['msg-form'] = 'Não foi possível registrar a venda';
+    $_SESSION['msg-form'] = $error_msg ?: 'Não foi possível registrar a venda';
 }
 
 header('Location: ../view/perfil.php?diary#msg');
 exit;
-
 ?>

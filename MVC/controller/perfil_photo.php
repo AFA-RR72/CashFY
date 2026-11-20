@@ -1,4 +1,4 @@
-    <?php session_start();
+<?php session_start();
     require_once("../config/init.php");
     require_once('../model/user.php');
 

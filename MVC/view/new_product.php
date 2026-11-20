@@ -17,9 +17,15 @@ $categories = get_categories();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Novo Produto - Cashfy</title>
-
+    <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#1F7A70">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CashFY">
+    <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
 
 <body>
@@ -208,6 +214,26 @@ $categories = get_categories();
 
     </div>
 
+    <div id="cookie-banner">
+        <h3>Usamos cookies</h3>
+
+        <p>
+            O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+            preferências e garantir o funcionamento correto do site.
+        </p>
+
+        <p>
+            Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+            determinadas configurações enquanto navega pelo CashFY.
+        </p>
+
+        <p>
+            Ao continuar navegando, você concorda com o uso desses cookies.
+        </p>
+
+        <button id="cookie-accept">Aceitar</button>
+        <button id="cookie-reject">Sair</button>
+    </div>
 
     <!-- Preview da imagem -->
 
@@ -216,7 +242,7 @@ $categories = get_categories();
         const photoPreview = document.getElementById('photoPreview');
         const dropLabel = photoPreview.querySelector('.drop-label');
 
-        input.addEventListener('change', function () {
+        input.addEventListener('change', function() {
 
             const file = this.files[0];
 
@@ -224,7 +250,7 @@ $categories = get_categories();
 
             const reader = new FileReader();
 
-            reader.onload = function (e) {
+            reader.onload = function(e) {
 
                 let img = photoPreview.querySelector('img');
 
@@ -248,17 +274,18 @@ $categories = get_categories();
     </script>
     <script>
         // Estoque: o campo de quantidade só aparece (e só vale) com o checkbox marcado
-        (function () {
+        (function() {
             const hasStock = document.getElementById('has_stock');
             const stockBox = document.getElementById('stock-qty');
 
-            hasStock.addEventListener('change', function () {
+            hasStock.addEventListener('change', function() {
                 stockBox.hidden = !hasStock.checked;
             });
         })();
     </script>
-    <script src="../../assets/js/return.js"></script>
     <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/cookies.js"></script>
+    <script src="../../assets/js/return.js"></script>
 </body>
 
 </html>

@@ -88,7 +88,8 @@ html {
 }
 
 html::-webkit-scrollbar {
-    display: none; /* Chrome, Edge e Safari */
+    display: none;
+    /* Chrome, Edge e Safari */
 }
 
 body {
@@ -491,13 +492,6 @@ img {
     color: var(--teal-900);
 }
 
-.crumb-tag {
-    text-align: center;
-    color: var(--orange-500);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 0.9rem;
-}
 
 .breadcrumb {
     color: var(--muted);
@@ -1105,19 +1099,6 @@ body.dark-mode .product-img {
     object-fit: cover;
 }
 
-.badge-new {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: var(--orange-500);
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.72rem;
-    padding: 4px 12px;
-    border-radius: var(--radius-pill);
-    z-index: 2;
-}
-
 .product-name {
     font-weight: 800;
     color: var(--ink);
@@ -1345,16 +1326,18 @@ body.dark-mode .field textarea:focus {
 /* Estoque no formulário de produto */
 .field .stock-toggle {
     display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
     align-items: center;
     gap: 10px;
     margin-bottom: 0;
-    cursor: pointer;
 }
 
 .field .stock-toggle input {
+    display: inline-block;
+    flex-shrink: 0;
     width: auto;
-    padding: 0;
-    accent-color: var(--teal-700);
+    margin: 0;
 }
 
 .stock-qty {
@@ -1538,12 +1521,14 @@ body.dark-mode .field.invalid select {
     background: transparent;
 }
 
-.password-toggle img {
-    width: 30px;
-    height: 30px;
+.password-toggle i {
+    font-size: medium;
     object-fit: cover;
-    display: block;
-    border-radius: 3px;
+    color: var(--teal-500);
+}
+
+.password-toggle i.open-eye::before {
+    content: "\f06e";
 }
 
 /* ============================================
@@ -1691,12 +1676,6 @@ body.dark-mode .form-msg.success {
     margin-bottom: 8px;
 }
 
-.sim-tag {
-    color: var(--orange-500);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 0.85rem;
-}
 
 .form-card {
     width: 100%;
@@ -1814,7 +1793,7 @@ body.dark-mode .img-drop:hover {
     font-size: medium;
     background: none;
     border: none;
-    color: var( --teal-900);
+    color: var(--teal-900);
     rotate: -90deg;
     transition: rotate 0.2s ease;
 }
@@ -1896,7 +1875,7 @@ body.dark-mode .diary-card {
     font-size: medium;
     background: none;
     border: none;
-    color: var( --teal-900);
+    color: var(--teal-900);
     rotate: -90deg;
     transition: rotate 0.2s ease;
 }
@@ -3152,7 +3131,6 @@ body.dark-mode #cookie-reject:hover {
         margin-right: 8px;
     }
 
-
     /* =========================================
        BOTÃO HAMBÚRGUER
     ========================================= */
@@ -3378,7 +3356,7 @@ body.dark-mode #cookie-reject:hover {
         position: relative;
         display: flex;
         flex-direction: row;
-        align-items: flex-start;
+        align-items: center;
         min-width: 0;
         width: 100%;
     }
@@ -3412,7 +3390,7 @@ body.dark-mode #cookie-reject:hover {
         margin-right: auto;
     }
 
-    .btn-orange {
+    .seller-button-card {
         opacity: 0;
         position: absolute;
         inset: 0;
@@ -3449,14 +3427,6 @@ body.dark-mode ::selection {
     color: #fff;
 }
 
-.be-seller-form {
-    justify-self: center;
-}
-
-.titulo-form-vendedor {
-    color: gray;
-    margin-bottom: 10px;
-}
 
 .cashfy {
     color: var(--leaf-500);
@@ -4107,224 +4077,6 @@ body.dark-mode .diary-card h3 {
     text-decoration: underline;
 }
 
-/* ============================================
-   8. BANNER DE COOKIES (somente front-end)
-============================================ */
-
-.cookie-banner {
-    position: fixed;
-    left: 50%;
-    bottom: 22px;
-    transform: translateX(-50%) translateY(150%);
-
-    width: min(960px, calc(100% - 32px));
-
-    background: var(--card);
-    border: 2px solid var(--teal-300);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-pop);
-    padding: 22px 26px;
-
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-
-    opacity: 0;
-    pointer-events: none;
-    z-index: 300;
-
-    transition:
-        transform .35s cubic-bezier(.2, .8, .3, 1),
-        opacity .35s ease;
-}
-
-.cookie-banner.show {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.cookie-text {
-    flex: 1;
-    min-width: 240px;
-}
-
-.cookie-text h3 {
-    font-family: var(--font-display);
-    font-size: 1.02rem;
-    color: var(--teal-900);
-    margin: 0 0 6px;
-}
-
-.cookie-text p {
-    margin: 0;
-    font-size: .89rem;
-    line-height: 1.55;
-    color: var(--ink-soft);
-}
-
-.cookie-text a {
-    color: var(--teal-700);
-    font-weight: 800;
-}
-
-.cookie-text a:hover {
-    color: var(--orange-600);
-    text-decoration: underline;
-}
-
-.cookie-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-}
-
-.cookie-prefs {
-    width: 100%;
-    display: none;
-    padding-top: 4px;
-}
-
-.cookie-banner.prefs-open .cookie-prefs {
-    display: block;
-}
-
-.cookie-opt {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    border-top: 1px solid var(--line);
-    padding-top: 14px;
-    margin-top: 14px;
-}
-
-.cookie-opt .opt-text {
-    flex: 1;
-}
-
-.cookie-opt h4 {
-    font-family: var(--font-display);
-    font-size: .92rem;
-    color: var(--teal-900);
-    margin: 0 0 3px;
-}
-
-.cookie-opt p {
-    margin: 0;
-    font-size: .84rem;
-    line-height: 1.5;
-    color: var(--ink-soft);
-}
-
-/* Switch do banner (mesma linguagem visual do theme-switch) */
-.cookie-switch {
-    position: relative;
-    display: inline-block;
-    width: 46px;
-    height: 26px;
-    flex-shrink: 0;
-}
-
-.cookie-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.cookie-switch .slider {
-    position: absolute;
-    inset: 0;
-    background: #D8CDBB;
-    border-radius: var(--radius-pill);
-    cursor: pointer;
-    transition: background .2s ease;
-}
-
-.cookie-switch .slider::before {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    left: 3px;
-    top: 3px;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
-    transition: transform .2s ease;
-}
-
-.cookie-switch input:checked+.slider {
-    background: var(--teal-500);
-}
-
-.cookie-switch input:checked+.slider::before {
-    transform: translateX(20px);
-}
-
-.cookie-switch input:disabled+.slider {
-    background: var(--teal-300);
-    cursor: not-allowed;
-    opacity: .75;
-}
-
-.cookie-switch input:focus-visible+.slider {
-    outline: 3px solid var(--sky-400);
-    outline-offset: 2px;
-}
-
-body.dark-mode .cookie-switch .slider {
-    background: #3A4B47;
-}
-
-/* ============================================
-   9. BOTÃO FLUTUANTE "VOLTAR AO TOPO"
-============================================ */
-
-.to-top {
-    position: fixed;
-    right: 22px;
-    bottom: 22px;
-
-    width: 48px;
-    height: 48px;
-    border: none;
-    border-radius: 50%;
-
-    background: var(--teal-700);
-    color: #fff;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    box-shadow: var(--shadow-pop);
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(14px);
-    z-index: 250;
-
-    transition:
-        opacity .25s ease,
-        transform .25s ease,
-        background .2s ease;
-}
-
-.to-top.show {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-.to-top:hover {
-    background: var(--orange-500);
-    transform: translateY(-3px);
-}
-
-body.cookie-open .to-top {
-    bottom: 160px;
-}
 
 /* ============================================
    10. RESPONSIVIDADE
@@ -4495,14 +4247,7 @@ body.cookie-open .to-top {
     .product-price {
         font-size: .95rem;
     }
-
-    .badge-new {
-        top: 16px;
-        left: 16px;
-        font-size: .66rem;
-        padding: 3px 9px;
-    }
-
+    
     .seller-products {
         padding: 0;
     }
@@ -4834,6 +4579,7 @@ body.dark-mode .chart-mode-btn.active {
         flex-basis: 100%;
     }
 }
+
 /* ============================================================
    RESPONSIVIDADE — celulares e tablets (ajustes finais)
    Fica no fim do arquivo para prevalecer sobre as regras
@@ -5227,5 +4973,239 @@ svg {
 
     .site-header {
         position: static;
+    }
+}
+
+/* ============================================================
+   FLOATING BOTTOM NAVIGATION (MOBILE) & BADGES DE ESTOQUE
+============================================================ */
+
+.floating-bottom-nav {
+    display: none;
+}
+
+/* Badges de controle de estoque nos cards e modais */
+.stock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.stock-badge.card-stock-badge {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.stock-badge.is-ok {
+    background: #E6F3E2;
+    color: var(--leaf-700);
+    border: 1px solid #CDE9C6;
+}
+
+.stock-badge.is-low {
+    background: #FFF1E3;
+    color: var(--orange-600);
+    border: 1px solid #F7DCB9;
+}
+
+.stock-badge.is-out {
+    background: #FBEAE6;
+    color: #C0503D;
+    border: 1px solid #F2C7BE;
+}
+
+body.dark-mode .stock-badge.is-ok {
+    background: #1E3929;
+    color: #8CCB9D;
+    border-color: #315D40;
+}
+
+body.dark-mode .stock-badge.is-low {
+    background: #38281C;
+    color: #F2A15F;
+    border-color: #68472D;
+}
+
+body.dark-mode .stock-badge.is-out {
+    background: #3A2420;
+    color: #F09A86;
+    border-color: #694039;
+}
+
+.product-card.is-out-of-stock .product-img img {
+    filter: grayscale(0.45);
+    opacity: 0.75;
+}
+
+/* Navegação Mobile Flutuante em formato de cápsula (substitui o hambúrguer em <= 880px) */
+@media (max-width: 880px) {
+    /* Oculta o botão hambúrguer, o menu suspenso antigo e o botão flutuante isolado do carrinho */
+    .menu-btn,
+    #menuToggle,
+    .nav-links,
+    .cart-button {
+        display: none !important;
+    }
+
+    /* Mantém o seletor de tema visível e alinhado no cabeçalho mobile */
+    .desktop-theme {
+        display: flex !important;
+        order: 2;
+        margin-left: auto;
+        margin-right: 10px;
+    }
+
+    .header-actions,
+    .account {
+        order: 3;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Espaço inferior na página para que a Bottom Nav nunca cubra conteúdos ou rodapé */
+    body {
+        padding-bottom: calc(82px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .floating-bottom-nav {
+        position: fixed;
+        left: 50%;
+        bottom: max(12px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+        transform: translateX(-50%);
+        z-index: 1050;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        gap: 4px;
+
+        width: min(92vw, 390px);
+        height: 58px;
+        padding: 5px 8px;
+
+        background: rgba(255, 254, 253, 0.94);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-pill);
+        box-shadow: 0 10px 28px rgba(22, 74, 70, 0.16);
+    }
+
+    body.dark-mode .floating-bottom-nav {
+        background: rgba(27, 41, 39, 0.94);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .fbn-item {
+        flex: 1 1 0;
+        min-width: 0;
+        height: 46px;
+        padding: 4px 6px;
+        border: none;
+        border-radius: var(--radius-pill);
+        background: transparent;
+        color: var(--ink-soft);
+        font-family: var(--font-body);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-decoration: none;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+
+        cursor: pointer;
+        transition:
+            background-color .2s ease,
+            color .2s ease,
+            transform .15s ease;
+    }
+
+    .fbn-item:active {
+        transform: scale(0.95);
+    }
+
+    .fbn-icon {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.08rem;
+        line-height: 1;
+        transition: transform .2s ease;
+    }
+
+    .fbn-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        line-height: 1.1;
+    }
+
+    .fbn-item.is-active {
+        background: linear-gradient(100deg, rgba(31, 122, 112, 0.15), rgba(62, 156, 142, 0.22));
+        color: var(--teal-700);
+        font-weight: 800;
+    }
+
+    body.dark-mode .fbn-item.is-active {
+        background: rgba(79, 179, 164, 0.2);
+        color: var(--teal-900);
+    }
+
+    .fbn-item.is-active .fbn-icon {
+        transform: translateY(-1px);
+    }
+
+    .fbn-badge {
+        position: absolute;
+        top: -6px;
+        right: -11px;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        border-radius: var(--radius-pill);
+        background: var(--orange-600);
+        color: #fff;
+        border: 1.5px solid var(--card);
+        font-size: 0.64rem;
+        font-weight: 800;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .fbn-badge.is-cart {
+        background: var(--orange-500);
+    }
+
+    .fbn-cart-btn.is-animated .fbn-icon {
+        animation: cart-jump .5s ease-in-out;
+    }
+}
+
+@media (max-width: 360px) {
+    .floating-bottom-nav {
+        width: calc(100vw - 16px);
+        height: 54px;
+        padding: 4px 6px;
+    }
+
+    .fbn-item {
+        font-size: 0.68rem;
+        height: 44px;
     }
 }

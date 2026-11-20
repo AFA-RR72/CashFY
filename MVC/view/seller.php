@@ -26,47 +26,6 @@ if (isset($_SESSION['id'])) {
   $user = get_user_by_id($_SESSION['id']);
 }
 
-function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
-{
-  $palavras = preg_split('/\s+/', trim($frase));
-  $palavrasValidas = [];
-
-  foreach ($palavras as $palavra) {
-    $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
-
-    if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
-      continue;
-    }
-
-    $palavrasValidas[] = $palavra;
-  }
-
-  $quantidade = count($palavrasValidas);
-
-  if ($quantidade === 0) {
-    return '';
-  }
-
-  if ($quantidade === 1) {
-    return mb_strtoupper(
-      mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
-      'UTF-8'
-    );
-  }
-
-  if ($quantidade === 2) {
-    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-    $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-
-    return mb_strtoupper($primeira . $ultima, 'UTF-8');
-  }
-
-  $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-  $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-  $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
-
-  return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
-}
 ?>
 
 <!DOCTYPE html>
@@ -77,9 +36,15 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <title>Vendedor — Cashfy</title>
-
+  <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
   <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1F7A70">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="CashFY">
+  <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
 
 <body>
@@ -114,7 +79,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
         <ul class="nav-links">
 
-          <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
+          <li class="home <?php if (isset($user)) {
+                            echo 'client';
+                          } ?>">
             <a href="../../index.php">Home</a>
           </li>
 
@@ -126,7 +93,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <a href="sobre.php">Sobre nós</a>
           </li>
 
-          <?php if (isset($user) && $user['role_id'] == 3): ?>
+          <?php if (isset($user)): ?>
             <li>
               <a href="myOrders.php">Meus pedidos</a>
             </li>
@@ -231,27 +198,11 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         <div class="profile-body">
 
           <div class="avatar" id="pf-avatar">
-
             <?php if (!empty($seller['profile_photo'])): ?>
-
-              <div class="avatar" id="pf-avatar">
-
-                <img
-                  src="../../<?= $seller['profile_photo']; ?>"
-                  alt="Perfil">
-
-              </div>
-
+              <img src="../../<?= htmlspecialchars($seller['profile_photo']); ?>" alt="Perfil">
             <?php else: ?>
-
-              <div class="avatar" id="pf-avatar">
-
-                <?= pegarIniciais($seller['name']); ?>
-
-              </div>
-
+              <?= pegarIniciais($seller['name']); ?>
             <?php endif; ?>
-
           </div>
 
 
@@ -265,9 +216,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
               <?= htmlspecialchars($seller['description']); ?>
             </p>
 
-            <span class="stars" id="pf-stars">
+            <!-- <span class="stars" id="pf-stars">
               ★★★★<span class="off">★</span>
-            </span>
+            </span> -->
 
           </div>
 
@@ -289,11 +240,12 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
       <?php if ($product_modal): ?>
 
         <?php
-
         $params = $_GET;
-
         $product = $product_modal;
-
+        $modal_has_stock = $product['stock'] !== null;
+        $modal_stock = $modal_has_stock ? (int) $product['stock'] : null;
+        $modal_out_of_stock = $modal_has_stock && $modal_stock <= 0;
+        $is_own_store = isset($user) && (int) $user['id'] === (int) $product['user_id'];
         ?>
 
         <dialog id="product-modal" open>
@@ -302,79 +254,84 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <?= htmlspecialchars($product['name']); ?>
           </h2>
 
-
           <?php
-
           unset($params['product']);
-
           $url = http_build_query($params);
-
           ?>
 
           <a href="seller.php?<?= htmlspecialchars($url); ?>">
-
             <i class="fa-solid fa-arrow-left-long"></i>
-
           </a>
-
 
           <div class="cart-form">
 
             <div>
-
               <img
                 src="../../<?= $product['product_photo'] ?>"
                 alt="<?= htmlspecialchars($product['name']); ?>">
-
             </div>
 
-
             <div>
+              <p class="product-desc"><?= htmlspecialchars($product['description']); ?></p>
+              <p class="product-price" style="margin-bottom:8px;">
+                R$ <?= number_format((float) $product['price'], 2, ',', '.'); ?>
+              </p>
+
+              <?php if ($modal_has_stock): ?>
+                <div style="margin-bottom:12px;">
+                  <?php if ($modal_out_of_stock): ?>
+                    <span class="stock-badge is-out"><i class="fa-solid fa-circle-xmark"></i> Esgotado</span>
+                  <?php elseif ($modal_stock <= 5): ?>
+                    <span class="stock-badge is-low"><i class="fa-solid fa-bolt"></i> Restam <?= $modal_stock; ?> un.</span>
+                  <?php else: ?>
+                    <span class="stock-badge is-ok"><i class="fa-solid fa-boxes-stacked"></i> <?= $modal_stock; ?> em estoque</span>
+                  <?php endif; ?>
+                </div>
+              <?php endif; ?>
 
               <form
                 action="../controller/cart.php"
                 method="post">
 
-                <div class="cart-quantity">
+                <?php if (!$modal_out_of_stock && !$is_own_store): ?>
+                  <div class="cart-quantity">
 
-                  <label for="quantity">
-                    Quantidade
-                  </label>
+                    <label for="cart-quantity">
+                      Quantidade
+                    </label>
 
+                    <div class="input">
 
-                  <div class="input">
+                      <button
+                        type="button"
+                        onclick="less()">
+                        -
+                      </button>
 
-                    <button
-                      type="button"
-                      onclick="less()">
-                      -
-                    </button>
+                      <input
+                        type="number"
+                        name="quantity"
+                        id="cart-quantity"
+                        value="1"
+                        min="1"
+                        <?= $modal_has_stock ? 'max="' . $modal_stock . '"' : ''; ?>>
 
+                      <button
+                        type="button"
+                        onclick="more()">
+                        +
+                      </button>
 
-                    <input
-                      type="number"
-                      name="quantity"
-                      id="cart-quantity"
-                      value="1"
-                      min="1">
-
-
-                    <button
-                      type="button"
-                      onclick="more()">
-                      +
-                    </button>
+                    </div>
 
                   </div>
-
-                </div>
+                <?php endif; ?>
 
                 <?php if (isset($_SESSION['msg'])): ?>
 
                   <div class="session-msg-product <?= $_SESSION['msg'] === 'Produto adicionado com sucesso.' ? 'success' : '' ?>" id="msg">
                     <?= htmlspecialchars($_SESSION['msg']) ?>
                   </div>
-
 
                   <?php if ($_SESSION['msg'] === 'Log-in realizado com sucesso.') {
                     unset($_SESSION['msg']);
@@ -396,11 +353,17 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   name="return"
                   value="<?= htmlspecialchars(cart_current_page(), ENT_QUOTES); ?>">
 
-
                 <button
                   type="submit"
-                  class="btn btn-gradient">
-                  Adicionar
+                  class="btn btn-gradient"
+                  <?= ($modal_out_of_stock || $is_own_store) ? 'disabled' : ''; ?>>
+                  <?php if ($is_own_store): ?>
+                    Seu próprio produto
+                  <?php elseif ($modal_out_of_stock): ?>
+                    Produto esgotado
+                  <?php else: ?>
+                    Adicionar
+                  <?php endif; ?>
                 </button>
 
               </form>
@@ -430,47 +393,44 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
           <?php if ($product['user_id'] == $seller['id']): ?>
 
             <?php
-
             $params = $_GET;
-
             $params['product'] = $product['id'];
-
             $url = '?' . http_build_query($params);
 
+            $has_stock = $product['stock'] !== null;
+            $stock_val = $has_stock ? (int) $product['stock'] : null;
+            $is_out = $has_stock && $stock_val <= 0;
             ?>
-
 
             <a href="<?= htmlspecialchars($url); ?>">
 
-              <div class="product-card">
-                <div class="product-img">
+              <div class="product-card<?= $is_out ? ' is-out-of-stock' : ''; ?>">
+                <?php if ($has_stock): ?>
+                  <?php if ($is_out): ?>
+                    <span class="stock-badge is-out card-stock-badge">Esgotado</span>
+                  <?php elseif ($stock_val <= 5): ?>
+                    <span class="stock-badge is-low card-stock-badge">Últimas <?= $stock_val; ?> un.</span>
+                  <?php else: ?>
+                    <span class="stock-badge is-ok card-stock-badge"><?= $stock_val; ?> em estoque</span>
+                  <?php endif; ?>
+                <?php endif; ?>
 
+                <div class="product-img">
                   <img
                     src="../../<?= $product['product_photo']; ?>"
                     alt="Preview">
-
                 </div>
 
-
                 <p class="product-name">
-
                   <?= htmlspecialchars($product['name']); ?>
-
                 </p>
-
 
                 <p class="product-desc">
-
                   <?= htmlspecialchars($product['description']); ?>
-
                 </p>
 
-
                 <p class="product-price">
-
-                  R$
-                  <?= number_format($product['price'], 2, ',', '.'); ?>
-
+                  R$ <?= number_format($product['price'], 2, ',', '.'); ?>
                 </p>
 
               </div>
@@ -492,43 +452,64 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     <!-- Rodapé -->
 
     <footer class="site-footer">
-
-      Cashfy — feito por estudantes, para estudantes.
-
+      Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;
+      <span id="contato">cashfy@gmail.com</span> &nbsp;·&nbsp;
+      <a href="tos.php">Termos de uso</a> &nbsp;·&nbsp;
+      <a href="pp.php">Políticas de privacidade</a>
     </footer>
+
+    <div id="cookie-banner">
+      <h3>Usamos cookies</h3>
+
+      <p>
+        O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+        preferências e garantir o funcionamento correto do site.
+      </p>
+
+      <p>
+        Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+        determinadas configurações enquanto navega pelo CashFY.
+      </p>
+
+      <p>
+        Ao continuar navegando, você concorda com o uso desses cookies.
+      </p>
+
+      <button id="cookie-accept">Aceitar</button>
+      <button id="cookie-reject">Sair</button>
+    </div>
 
   </div>
 
 
   <!-- Scripts -->
 
-  <script src="../../assets/js/return.js"></script>
-
   <script src="../../assets/js/theme.js"></script>
-
   <script src="../../assets/js/menu-toggle.js"></script>
-
+  <script src="../../assets/js/cookies.js"></script>
+  <script src="../../assets/js/return.js"></script>
 
   <script>
     function more() {
-
       const inputQuantity = document.getElementById('cart-quantity');
+      if (!inputQuantity) return;
 
-      inputQuantity.value = Number(inputQuantity.value) + 1;
+      const current = Number(inputQuantity.value) || 1;
+      const maxAttr = inputQuantity.getAttribute('max');
+      const max = maxAttr ? Number(maxAttr) : Infinity;
 
+      if (current < max) {
+        inputQuantity.value = current + 1;
+      }
     }
 
-
     function less() {
-
       const inputQuantity = document.getElementById('cart-quantity');
+      if (!inputQuantity) return;
 
       if (Number(inputQuantity.value) > 1) {
-
         inputQuantity.value = Number(inputQuantity.value) - 1;
-
       }
-
     }
   </script>
 

@@ -5,12 +5,12 @@ function toggle() {
 
     if (password.type === "password") {
         password.type = "text";
-        olho.src = "../../uploads/icones/olhoa.png";
+        olho.classList.add('open-eye')
         olho.alt = "Ocultar senha";
         passConfirm.type = "text";
     } else {
         password.type = "password";
-        olho.src = "../../uploads/icones/olhof.png";
+        olho.classList.remove('open-eye')
         olho.alt = "Mostrar senha";
         passConfirm.type = "password";
     }

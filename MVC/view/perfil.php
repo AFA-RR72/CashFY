@@ -9,60 +9,6 @@ $user = get_user_by_id($_SESSION['id']);
 $products = get_products();
 $show_revenue_chart = false;
 
-function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
-{
-    $palavras = preg_split('/\s+/', trim($frase));
-    $palavrasValidas = [];
-
-    foreach ($palavras as $palavra) {
-        $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
-
-        if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
-            continue;
-        }
-
-        $palavrasValidas[] = $palavra;
-    }
-
-    $quantidade = count($palavrasValidas);
-
-    if ($quantidade === 0) {
-        return '';
-    }
-
-    if ($quantidade === 1) {
-        return mb_strtoupper(
-            mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
-            'UTF-8'
-        );
-    }
-
-    if ($quantidade === 2) {
-        $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-        $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-
-        return mb_strtoupper($primeira . $ultima, 'UTF-8');
-    }
-
-    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-    $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-    $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
-
-    return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
-}
-
-function format_phone_number($phone_number)
-{
-    $number = preg_replace('/\D/', '', $phone_number);
-    if (strlen($number) === 11) {
-        return '(' . substr($number, 0, 2) . ') ' . substr($number, 2, 5) . '-' . substr($number, 7, 4);
-    }
-    if (strlen($number) === 10) {
-        return '(' . substr($number, 0, 2) . ') ' . substr($number, 2, 4) . '-' . substr($number, 6, 4);
-    }
-    return $number;
-}
-
 if (empty($_GET)) {
     $_GET['profile'] = true;
 }
@@ -76,12 +22,18 @@ if (empty($_GET)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Meu perfil — Cashfy</title>
+    <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/orders.css">
     <link rel="stylesheet" href="../../assets/css/ui-extras.css">
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#1F7A70">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CashFY">
+    <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
-<!-- Eu meio que dei ctrl+c ctrl+v no dashboard, porque é a mesma merda basicamente. vou só mudar uns nomes e class -->
 
 <body>
     <div class="page">
@@ -111,14 +63,14 @@ if (empty($_GET)) {
                     </li>
 
                     <li>
-                        <a href="../../index.php#contato">Contato</a>
+                        <a href="contact.php">Contato</a>
                     </li>
 
                     <li>
                         <a href="sobre.php">Sobre nós</a>
                     </li>
 
-                    <?php if (isset($user) && $user['role_id'] == 3): ?>
+                    <?php if (isset($user)): ?>
                         <li>
                             <a href="myOrders.php">Meus pedidos</a>
                         </li>
@@ -148,8 +100,6 @@ if (empty($_GET)) {
                 </div>
             </div>
         </header>
-
-        <!-- radios escondidos que controlam as abas -->
 
         <main class="container" style="flex:1;">
 
@@ -414,7 +364,6 @@ if (empty($_GET)) {
                                 <?php foreach ($products as $product): ?>
                                     <?php if ($product['user_id'] == $user['id']): ?>
                                         <div class="product-card perfil-card">
-                                            <span class="badge-new">Novo!</span>
                                             <div class="product-img">
                                                 <img src="<?= "../../" . $product['product_photo'] ?>" alt="Image">
                                             </div>
@@ -473,9 +422,16 @@ if (empty($_GET)) {
                                                         <option value="" disabled selected>Selecione um produto:</option>
                                                         <?php foreach ($products as $product): ?>
                                                             <?php if ($product['user_id'] == $user['id']): ?>
+                                                                <?php
+                                                                $p_has_stock = $product['stock'] !== null;
+                                                                $p_stock = $p_has_stock ? (int) $product['stock'] : null;
+                                                                $p_out = $p_has_stock && $p_stock <= 0;
+                                                                ?>
                                                                 <option value="<?= $product['id']; ?>"
-                                                                    data-price="<?= $product['price']; ?>">
-                                                                    <?= htmlspecialchars($product['name']); ?>
+                                                                    data-price="<?= $product['price']; ?>"
+                                                                    data-stock="<?= $p_has_stock ? $p_stock : ''; ?>"
+                                                                    <?= $p_out ? 'disabled' : ''; ?>>
+                                                                    <?= htmlspecialchars($product['name']) . ($p_has_stock ? ($p_out ? ' (Esgotado)' : ' (' . $p_stock . ' em estoque)') : ''); ?>
                                                                 </option>
                                                             <?php endif; ?>
                                                         <?php endforeach; ?>
@@ -483,7 +439,7 @@ if (empty($_GET)) {
                                                 </div>
                                                 <div class="field">
                                                     <label for="quantity">Quantidade</label>
-                                                    <input type="number" name="quantity" id="quantity">
+                                                    <input type="number" name="quantity" id="quantity" min="1" step="1">
                                                 </div>
                                                 <div class="field">
                                                     <label for="price">Valor</label>
@@ -715,9 +671,15 @@ if (empty($_GET)) {
                                         <textarea name="description" id="p-description" class="description"
                                             placeholder="min. 20 letras." required></textarea>
                                     </div>
-                                    <div class="field">
-                                        <label for="p-pass">Senha</label>
-                                        <input type="password" id="p-pass" name="password" placeholder="••••••••">
+                                    <div class="field" id="f-pass">
+                                        <label for="pass">Senha</label>
+                                        <div class="password-wrapper">
+                                            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"
+                                                required minlength="8">
+                                            <button type="button" id="toggle_pass" class="password-toggle" onclick="toggle()" title="Mostrar senha">
+                                                <i class="fa-solid fa-eye-slash" id="eye-icon"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                     <?php if (isset($_SESSION['msg-form'])): ?>
                                         <div class="session-msg <?= $_SESSION['msg-form'] === 'Perfil alterado com sucesso' ? 'success' : ''; ?>"
@@ -741,6 +703,12 @@ if (empty($_GET)) {
                 <?php $institutes = get_institutes(); ?>
 
                 <section class="tab-panel" id="tab-perfil">
+                    <div class="orders-notify" style="margin: 18px 0;">
+                        <button class="btn btn-transparent btn-sm" type="button" id="orders-notify-enable" data-sw-url="<?= BASE_URL; ?>service-worker.js" hidden>
+                            Ativar notificações
+                        </button>
+                        <p class="orders-notify-status" id="orders-notify-status"></p>
+                    </div>
                     <div class="form-card seller-profile">
                         <h1>Editar seus dados</h1>
                         <form id="profile-form" action="../controller/update_user.php" method="post" novalidate>
@@ -784,30 +752,56 @@ if (empty($_GET)) {
             <?php endif; ?>
         </main>
 
-        <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
+        <footer class="site-footer">
+            Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;
+            <span id="contato">cashfy@gmail.com</span> &nbsp;·&nbsp;
+            <a href="tos.php">Termos de uso</a> &nbsp;·&nbsp;
+            <a href="pp.php">Políticas de privacidade</a>
+        </footer>
     </div>
-    <script src="../../assets/js/PhoneFormat.js"></script>
+    <div id="cookie-banner">
+        <h3>Usamos cookies</h3>
+
+        <p>
+            O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+            preferências e garantir o funcionamento correto do site.
+        </p>
+
+        <p>
+            Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+            determinadas configurações enquanto navega pelo CashFY.
+        </p>
+
+        <p>
+            Ao continuar navegando, você concorda com o uso desses cookies.
+        </p>
+
+        <button id="cookie-accept">Aceitar</button>
+        <button id="cookie-reject">Sair</button>
+    </div>
     <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/cookies.js"></script>
     <script src="../../assets/js/toggle.js"></script>
+    <script src="../../assets/js/PhoneFormat.js"></script>
     <script src="../../assets/js/menu-toggle.js"></script>
     <script src="../../assets/js/confirm.js"></script>
-    <?php if (isset($user['role_id']) && $user['role_id'] == 2): ?>
-        <script src="../../assets/js/orders-sse.js"></script>
-    <?php endif; ?>
     <?php if ($show_revenue_chart): ?>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
         <script src="../../assets/js/revenue-chart.js"></script>
     <?php endif; ?>
     <script>
         // Pedidos aceitos: total do item (qtd × unitário) e total do pedido acompanham a edição
-        (function () {
-            const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+        (function() {
+            const brl = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
 
-            document.querySelectorAll('form[data-order-edit]').forEach(function (form) {
+            document.querySelectorAll('form[data-order-edit]').forEach(function(form) {
                 function update() {
                     let total = 0;
 
-                    form.querySelectorAll('.order-item').forEach(function (item) {
+                    form.querySelectorAll('.order-item').forEach(function(item) {
                         const quantity = parseFloat(item.querySelector('input[name$="[quantity]"]').value) || 0;
                         const price = parseFloat(item.querySelector('input[name$="[price]"]').value) || 0;
 
@@ -828,18 +822,22 @@ if (empty($_GET)) {
         const dateInput = document.getElementById('date');
         const quantity = document.getElementById('quantity');
 
-        productSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
+        if (productSelect && priceInput) {
+            productSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                priceInput.value = Number(selectedOption.dataset.price).toFixed(2);
+            });
+        }
 
-            priceInput.value = Number(selectedOption.dataset.price).toFixed(2);
-        });
-
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.value = today;
-        quantity.value = 1;
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+        if (quantity) {
+            quantity.value = 1;
+        }
     </script>
     <script>
-        const user = <?= json_encode($user); ?>
+        const user = <?= json_encode($user); ?>;
 
         const name = document.getElementById('p-name');
         const inst = document.getElementById('p-inst');
@@ -847,17 +845,18 @@ if (empty($_GET)) {
         const email = document.getElementById('p-email');
         const description = document.getElementById('p-description');
 
-        name.value = user.name;
-        inst.value = user.institute_id;
-        email.value = user.email;
-        description.value = user.description;
+        if (name) name.value = user.name || '';
+        if (inst) inst.value = user.institute_id || '';
+        if (email) email.value = user.email || '';
+        if (description) description.value = user.description || '';
 
-        phone.value = user.phone_number.replace(/\D/g, '');
-
-        if (phone.value.length === 11) {
-            phone.value = `(${phone.value.slice(0, 2)}) ${phone.value.slice(2, 7)}-${phone.value.slice(7)}`;
-        } else if (phone.value.length === 10) {
-            phone.value = `(${phone.value.slice(0, 2)}) ${phone.value.slice(2, 6)}-${phone.value.slice(6)}`;
+        if (phone && user.phone_number) {
+            phone.value = user.phone_number.replace(/\D/g, '');
+            if (phone.value.length === 11) {
+                phone.value = `(${phone.value.slice(0, 2)}) ${phone.value.slice(2, 7)}-${phone.value.slice(7)}`;
+            } else if (phone.value.length === 10) {
+                phone.value = `(${phone.value.slice(0, 2)}) ${phone.value.slice(2, 6)}-${phone.value.slice(6)}`;
+            }
         }
     </script>
     <script>
@@ -886,6 +885,8 @@ if (empty($_GET)) {
         }
     </script>
     <script src="../../assets/js/ScrollToMsg.js"></script>
+    <?php require __DIR__ . '/partials/order_notifier.php'; ?>
+    <?php require __DIR__ . '/partials/bottom_nav.php'; ?>
 </body>
 
 </html>

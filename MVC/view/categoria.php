@@ -40,48 +40,6 @@ if (isset($_SESSION['id'])) {
 }
 
 
-function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
-{
-  $palavras = preg_split('/\s+/', trim($frase));
-  $palavrasValidas = [];
-
-  foreach ($palavras as $palavra) {
-    $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
-
-    if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
-      continue;
-    }
-
-    $palavrasValidas[] = $palavra;
-  }
-
-  $quantidade = count($palavrasValidas);
-
-  if ($quantidade === 0) {
-    return '';
-  }
-
-  if ($quantidade === 1) {
-    return mb_strtoupper(
-      mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'),
-      'UTF-8'
-    );
-  }
-
-  if ($quantidade === 2) {
-    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-    $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-
-    return mb_strtoupper($primeira . $ultima, 'UTF-8');
-  }
-
-  $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-  $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-  $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
-
-  return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -91,8 +49,15 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Categoria — Cashfy</title>
+  <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
   <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1F7A70">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="CashFY">
+  <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
 
 <body>
@@ -118,7 +83,9 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         </button>
         <ul class="nav-links">
 
-          <li class="home <?php if(isset($user) && $user['role_id'] == 3){ echo 'client'; }?>">
+          <li class="home <?php if (isset($user)) {
+                            echo 'client';
+                          } ?>">
             <a href="../../index.php">Home</a>
           </li>
 
@@ -130,7 +97,7 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
             <a href="sobre.php">Sobre nós</a>
           </li>
 
-          <?php if (isset($user) && $user['role_id'] == 3): ?>
+          <?php if (isset($user)): ?>
             <li>
               <a href="myOrders.php">Meus pedidos</a>
             </li>
@@ -214,9 +181,23 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
         <div class="product-grid" id="pf-products">
           <?php foreach ($products as $product): ?>
             <?php if ($product['category_id'] == $category['id']): ?>
-              <?php $seller = get_user_by_id($product['user_id']) ?>
-              <article class="product-card">
-                <span class="badge-new">Novo!</span>
+              <?php
+              $seller = get_user_by_id($product['user_id']);
+              $has_stock = $product['stock'] !== null;
+              $stock_val = $has_stock ? (int) $product['stock'] : null;
+              $is_out = $has_stock && $stock_val <= 0;
+              ?>
+              <article class="product-card<?= $is_out ? ' is-out-of-stock' : ''; ?>">
+                <?php if ($has_stock): ?>
+                  <?php if ($is_out): ?>
+                    <span class="stock-badge is-out card-stock-badge">Esgotado</span>
+                  <?php elseif ($stock_val <= 5): ?>
+                    <span class="stock-badge is-low card-stock-badge">Últimas <?= $stock_val; ?> un.</span>
+                  <?php else: ?>
+                    <span class="stock-badge is-ok card-stock-badge"><?= $stock_val; ?> em estoque</span>
+                  <?php endif; ?>
+                <?php endif; ?>
+
                 <div class="product-img">
                   <img src="<?= htmlspecialchars('../../' . $product['product_photo']); ?>"
                     alt="<?= htmlspecialchars($product['name']); ?>">
@@ -238,10 +219,15 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
                   <?= 'R$ ' . number_format((float) $product['price'], 2, ',', '.'); ?>
                 </p>
 
-                <a class="btn btn-gradient btn-sm category-add-button"
+                <a class="btn <?= $is_out ? 'btn-ghost' : 'btn-gradient'; ?> btn-sm category-add-button"
                   href="?cat=<?= rawurlencode((string) $category['id']); ?>&amp;product=<?= (int) $product['id']; ?>">
-                  <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
-                  Adicionar ao carrinho
+                  <?php if ($is_out): ?>
+                    <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                    Esgotado
+                  <?php else: ?>
+                    <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                    Adicionar ao carrinho
+                  <?php endif; ?>
                 </a>
               </article>
             <?php endif; ?>
@@ -251,6 +237,12 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
     </main>
 
     <?php if ($product_modal): ?>
+      <?php
+      $modal_has_stock = $product_modal['stock'] !== null;
+      $modal_stock = $modal_has_stock ? (int) $product_modal['stock'] : null;
+      $modal_out_of_stock = $modal_has_stock && $modal_stock <= 0;
+      $is_own_store = isset($user) && (int) $user['id'] === (int) $product_modal['user_id'];
+      ?>
       <dialog id="product-modal" open aria-labelledby="category-product-title">
         <a class="product-modal-back"
           href="?cat=<?= rawurlencode((string) $category['id']); ?>"
@@ -269,26 +261,47 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
           <div>
             <p class="product-desc"><?= htmlspecialchars($product_modal['description']); ?></p>
-            <p class="product-price">
+            <p class="product-price" style="margin-bottom:8px;">
               R$ <?= number_format((float) $product_modal['price'], 2, ',', '.'); ?>
             </p>
+
+            <?php if ($modal_has_stock): ?>
+              <div style="margin-bottom:12px;">
+                <?php if ($modal_out_of_stock): ?>
+                  <span class="stock-badge is-out"><i class="fa-solid fa-circle-xmark"></i> Esgotado</span>
+                <?php elseif ($modal_stock <= 5): ?>
+                  <span class="stock-badge is-low"><i class="fa-solid fa-bolt"></i> Restam <?= $modal_stock; ?> un.</span>
+                <?php else: ?>
+                  <span class="stock-badge is-ok"><i class="fa-solid fa-boxes-stacked"></i> <?= $modal_stock; ?> em estoque</span>
+                <?php endif; ?>
+              </div>
+            <?php endif; ?>
 
             <form action="../controller/cart.php" method="post">
               <input type="hidden" name="product_id" value="<?= (int) $product_modal['id']; ?>">
               <input type="hidden" name="return" value="<?= htmlspecialchars(cart_current_page(), ENT_QUOTES); ?>">
 
-              <div class="cart-quantity">
-                <label for="category-cart-quantity">Quantidade</label>
-                <div class="input">
-                  <button type="button" class="quantity-decrease" aria-label="Diminuir quantidade">−</button>
-                  <input type="number" name="quantity" id="category-cart-quantity" value="1" min="1" step="1" required>
-                  <button type="button" class="quantity-increase" aria-label="Aumentar quantidade">+</button>
+              <?php if (!$modal_out_of_stock && !$is_own_store): ?>
+                <div class="cart-quantity">
+                  <label for="category-cart-quantity">Quantidade</label>
+                  <div class="input">
+                    <button type="button" class="quantity-decrease" aria-label="Diminuir quantidade">−</button>
+                    <input type="number" name="quantity" id="category-cart-quantity" value="1" min="1" step="1"
+                      <?= $modal_has_stock ? 'max="' . $modal_stock . '"' : ''; ?> required>
+                    <button type="button" class="quantity-increase" aria-label="Aumentar quantidade">+</button>
+                  </div>
                 </div>
-              </div>
+              <?php endif; ?>
 
-              <button type="submit" class="btn btn-gradient">
-                <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
-                Adicionar ao carrinho
+              <button type="submit" class="btn btn-gradient" <?= ($modal_out_of_stock || $is_own_store) ? 'disabled' : ''; ?>>
+                <?php if ($is_own_store): ?>
+                  Seu próprio produto
+                <?php elseif ($modal_out_of_stock): ?>
+                  Produto esgotado
+                <?php else: ?>
+                  <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                  Adicionar ao carrinho
+                <?php endif; ?>
               </button>
             </form>
           </div>
@@ -300,26 +313,59 @@ function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', '
 
     <!-- Rodapé -->
 
-    <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
+    <footer class="site-footer">
+      Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;
+      <span id="contato">cashfy@gmail.com</span> &nbsp;·&nbsp;
+      <a href="tos.php">Termos de uso</a> &nbsp;·&nbsp;
+      <a href="pp.php">Políticas de privacidade</a>
+    </footer>
   </div>
-  <script src="../../assets/js/return.js"></script>
+  <div id="cookie-banner">
+    <h3>Usamos cookies</h3>
+
+    <p>
+      O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+      preferências e garantir o funcionamento correto do site.
+    </p>
+
+    <p>
+      Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+      determinadas configurações enquanto navega pelo CashFY.
+    </p>
+
+    <p>
+      Ao continuar navegando, você concorda com o uso desses cookies.
+    </p>
+
+    <button id="cookie-accept">Aceitar</button>
+    <button id="cookie-reject">Sair</button>
+  </div>
   <script src="../../assets/js/theme.js"></script>
+  <script src="../../assets/js/cookies.js"></script>
   <script src="../../assets/js/menu-toggle.js"></script>
+  <script src="../../assets/js/return.js"></script>
   <script>
     (() => {
       const quantityInput = document.getElementById('category-cart-quantity');
       if (!quantityInput) return;
+
+      const getMax = () => {
+        const m = quantityInput.getAttribute('max');
+        return m ? Number.parseInt(m, 10) : Infinity;
+      };
 
       document.querySelector('.quantity-decrease')?.addEventListener('click', () => {
         quantityInput.value = Math.max(1, (Number.parseInt(quantityInput.value, 10) || 1) - 1);
       });
 
       document.querySelector('.quantity-increase')?.addEventListener('click', () => {
-        quantityInput.value = (Number.parseInt(quantityInput.value, 10) || 1) + 1;
+        const next = (Number.parseInt(quantityInput.value, 10) || 1) + 1;
+        quantityInput.value = Math.min(getMax(), next);
       });
 
       quantityInput.addEventListener('change', () => {
-        quantityInput.value = Math.max(1, Number.parseInt(quantityInput.value, 10) || 1);
+        const val = Math.max(1, Number.parseInt(quantityInput.value, 10) || 1);
+        quantityInput.value = Math.min(getMax(), val);
       });
     })();
   </script>

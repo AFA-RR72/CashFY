@@ -242,3 +242,32 @@ body.dark-mode .orders-notify-status {
 .order-toast strong {
     color: var(--orange-300);
 }
+
+/* Variantes do toast em tempo real (aceito, recusado com motivo) */
+.order-toast.is-accepted {
+    background: var(--leaf-700, #2C6E45);
+    border-left: 5px solid #8CCB9D;
+}
+
+.order-toast.is-accepted strong {
+    color: #E6F3E2;
+}
+
+.order-toast.is-rejected {
+    background: #8F3A2B;
+    border-left: 5px solid #F7B36C;
+}
+
+.order-toast.is-rejected strong {
+    color: #FFD6CC;
+}
+
+.order-toast-reason {
+    display: block;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 0.84rem;
+    color: var(--teal-500);
+    overflow-wrap: anywhere;
+}

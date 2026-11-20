@@ -117,7 +117,7 @@ function get_users(){
     return $users;
 }
 
-function update_photo(int $id, string $profile_photo){
+function update_photo(int $id, ?string $profile_photo){
     $conn = conn();
 
     $stmt = $conn -> prepare("UPDATE users SET profile_photo = ? WHERE id = ?");
@@ -127,15 +127,6 @@ function update_photo(int $id, string $profile_photo){
     $stmt -> close();
 }
 
-function update_to_seller(int $id, string $contact, string $description){
-    $conn = conn();
-
-    $stmt  = $conn -> prepare("UPDATE users SET description = ?, phone_number = ?, role_id = 2 WHERE id = ?");
-    $stmt -> bind_param("ssi", $description, $contact, $id);
-
-    $stmt -> execute();
-    $stmt -> close();
-}
 
 function update_user(int $id, string $name, int $institute_id, string $phone_number, string $description, string $email){
     $conn = conn();
@@ -162,4 +153,65 @@ function set_remember_token(int $user_id, ?string $token_hash): void
     $stmt->close();
 }
 
+if (!function_exists('pegarIniciais')) {
+    function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em']): string
+    {
+        $palavras = preg_split('/\s+/', trim($frase));
+        $palavrasValidas = [];
+
+        foreach ($palavras as $palavra) {
+            $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
+            if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar, true)) {
+                continue;
+            }
+            $palavrasValidas[] = $palavra;
+        }
+
+        $quantidade = count($palavrasValidas);
+        if ($quantidade === 0) {
+            return '';
+        }
+        if ($quantidade === 1) {
+            return mb_strtoupper(mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'), 'UTF-8');
+        }
+        if ($quantidade === 2) {
+            return mb_strtoupper(
+                mb_substr($palavrasValidas[0], 0, 1, 'UTF-8') . mb_substr($palavrasValidas[1], 0, 1, 'UTF-8'),
+                'UTF-8'
+            );
+        }
+
+        return mb_strtoupper(
+            mb_substr($palavrasValidas[0], 0, 1, 'UTF-8')
+            . mb_substr($palavrasValidas[1], 0, 1, 'UTF-8')
+            . mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8'),
+            'UTF-8'
+        );
+    }
+}
+
+if (!function_exists('format_phone_number')) {
+    function format_phone_number($phone_number): string
+    {
+        $number = preg_replace('/\D/', '', (string) $phone_number);
+        if (strlen($number) === 11) {
+            return '(' . substr($number, 0, 2) . ') ' . substr($number, 2, 5) . '-' . substr($number, 7, 4);
+        }
+        if (strlen($number) === 10) {
+            return '(' . substr($number, 0, 2) . ') ' . substr($number, 2, 4) . '-' . substr($number, 6, 4);
+        }
+        return $number;
+    }
+}
+
+if (!function_exists('whatsapp_url')) {
+    function whatsapp_url(string $phone_number): string
+    {
+        $number = preg_replace('/\D/', '', $phone_number);
+        if (strlen($number) === 10 || strlen($number) === 11) {
+            $number = '55' . $number;
+        }
+        return 'https://wa.me/' . $number;
+    }
+}
 ?>

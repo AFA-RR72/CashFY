@@ -1,0 +1,31 @@
+{
+  "name": "CashFY — Compra e venda entre estudantes",
+  "short_name": "CashFY",
+  "description": "Plataforma de compra e venda entre estudantes com notificações de pedidos em tempo real.",
+  "lang": "pt-BR",
+  "start_url": "./index.php",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FBF2E4",
+  "theme_color": "#1F7A70",
+  "icons": [
+    {
+      "src": "assets/img/favicon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/img/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/img/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

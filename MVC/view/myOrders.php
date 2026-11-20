@@ -3,71 +3,15 @@ require_once('../config/auth.php');
 require_once('../model/orders.php');
 
 check_login();
-check_role(3);
 
 $user = get_user_by_id((int) $_SESSION['id']);
+$is_seller = ((int) ($user['role_id'] ?? 0) === 2);
 
-function pegarIniciais(string $frase, array $ignorar = ['de', 'e', 'do', 'da', 'dos', 'das', 'o', 'a', 'com', 'em'])
-{
-    $palavras = preg_split('/\s+/', trim($frase));
-    $palavrasValidas = [];
-
-    foreach ($palavras as $palavra) {
-        $palavraMinuscula = mb_strtolower($palavra, 'UTF-8');
-
-        if (empty($palavraMinuscula) || in_array($palavraMinuscula, $ignorar)) {
-            continue;
-        }
-
-        $palavrasValidas[] = $palavra;
-    }
-
-    $quantidade = count($palavrasValidas);
-
-    if ($quantidade === 0) {
-        return '';
-    }
-
-    if ($quantidade === 1) {
-        return mb_strtoupper(mb_substr($palavrasValidas[0], 0, 1, 'UTF-8'), 'UTF-8');
-    }
-
-    if ($quantidade === 2) {
-        $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-        $ultima = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-
-        return mb_strtoupper($primeira . $ultima, 'UTF-8');
-    }
-
-    $primeira = mb_substr($palavrasValidas[0], 0, 1, 'UTF-8');
-    $segunda = mb_substr($palavrasValidas[1], 0, 1, 'UTF-8');
-    $ultima = mb_substr($palavrasValidas[$quantidade - 1], 0, 1, 'UTF-8');
-
-    return mb_strtoupper($primeira . $segunda . $ultima, 'UTF-8');
-}
-
-function format_phone_number(string $phone_number)
-{
-    $number = preg_replace('/\D/', '', $phone_number);
-    if (strlen($number) === 11) {
-        return '(' . substr($number, 0, 2) . ') ' . substr($number, 2, 5) . '-' . substr($number, 7, 4);
-    }
-    if (strlen($number) === 10) {
-        return '(' . substr($number, 0, 2) . ') ' . substr($number, 2, 4) . '-' . substr($number, 6, 4);
-    }
-    return $number;
-}
-
-/* Link do WhatsApp: telefones com DDD (10 ou 11 dígitos) ganham o código do Brasil (55) */
-function whatsapp_url(string $phone_number): string
-{
-    $number = preg_replace('/\D/', '', $phone_number);
-
-    if (strlen($number) === 10 || strlen($number) === 11) {
-        $number = '55' . $number;
-    }
-
-    return 'https://wa.me/' . $number;
+// Para vendedor: permite alternar entre "Recebidos" (received) e "Feitos por mim" (mine)
+$scope = 'mine';
+if ($is_seller) {
+    $requested_scope = (string) ($_GET['scope'] ?? 'received');
+    $scope = in_array($requested_scope, ['received', 'mine'], true) ? $requested_scope : 'received';
 }
 
 function order_status_meta(string $status): array
@@ -90,7 +34,7 @@ function render_order_card(array $order): void
     $order_total = 0;
     $steps = [1 => 'Pedido enviado', 2 => 'Aceito pelo vendedor', 3 => 'Concluído'];
 ?>
-    <article class="mo-card" data-status="<?= htmlspecialchars($status); ?>" data-group="<?= $meta['group']; ?>">
+    <article class="mo-card" data-order-id="<?= (int) $order['id']; ?>" data-status="<?= htmlspecialchars($status); ?>" data-group="<?= $meta['group']; ?>">
         <div class="mo-card-head">
             <div class="mo-card-title">
                 <strong>Pedido #<?= (int) $order['id']; ?></strong>
@@ -176,7 +120,7 @@ function render_order_card(array $order): void
         <?php if ($status === 'pending'): ?>
             <p class="mo-note">
                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                <span>Seu pedido foi enviado e está aguardando o vendedor aceitar. Atualize a página para ver novidades.</span>
+                <span>Seu pedido foi enviado e está aguardando o vendedor aceitar. Você receberá uma notificação assim que houver resposta.</span>
             </p>
         <?php elseif ($status === 'accepted'): ?>
             <p class="mo-note">
@@ -202,10 +146,13 @@ function render_order_card(array $order): void
 <?php
 }
 
-$orders = get_client_orders((int) $user['id']); // do mais novo para o mais antigo
+$client_orders = get_client_orders((int) $user['id']);
+$seller_orders = $is_seller ? get_seller_orders((int) $user['id']) : [];
+$pending_received = array_filter($seller_orders, fn($o) => $o['status'] === 'pending');
+$accepted_received = array_filter($seller_orders, fn($o) => $o['status'] === 'accepted');
 
-$totals = ['all' => count($orders), 'progress' => 0, 'completed' => 0, 'rejected' => 0];
-foreach ($orders as $order) {
+$totals = ['all' => count($client_orders), 'progress' => 0, 'completed' => 0, 'rejected' => 0];
+foreach ($client_orders as $order) {
     $totals[order_status_meta((string) $order['status'])['group']]++;
 }
 
@@ -225,11 +172,19 @@ $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>CashFY - Meus Pedidos</title>
+    <title>CashFY - Pedidos</title>
+  <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/orders.css">
     <link rel="stylesheet" href="../../assets/css/my-orders.css">
     <link rel="stylesheet" href="../../assets/css/ui-extras.css">
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#1F7A70">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CashFY">
+    <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
 
 <body>
@@ -294,14 +249,49 @@ $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
 
         <main class="container mo-page" style="flex:1;">
 
+            <?php if ($is_seller): ?>
+                <div class="mo-scope-tabs" role="tablist" aria-label="Alternar visualização de pedidos">
+                    <a href="myOrders.php?scope=received"
+                        class="mo-scope-tab <?= $scope === 'received' ? 'is-active' : ''; ?>"
+                        <?= $scope === 'received' ? 'aria-current="page"' : ''; ?>>
+                        <i class="fa-solid fa-inbox" aria-hidden="true"></i>
+                        <span>Recebidos</span>
+                        <?php if (count($pending_received) > 0): ?>
+                            <span class="mo-scope-badge"><?= count($pending_received); ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <a href="myOrders.php?scope=mine"
+                        class="mo-scope-tab <?= $scope === 'mine' ? 'is-active' : ''; ?>"
+                        <?= $scope === 'mine' ? 'aria-current="page"' : ''; ?>>
+                        <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+                        <span>Feitos por mim</span>
+                        <?php if ($totals['all'] > 0): ?>
+                            <span class="mo-scope-count"><?= $totals['all']; ?></span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+            <?php endif; ?>
+
             <div class="mo-hero">
                 <div>
-                    <h1>Meus pedidos</h1>
-                    <p>Acompanhe o andamento de tudo o que você pediu.</p>
+                    <?php if ($is_seller && $scope === 'received'): ?>
+                        <h1>Pedidos recebidos</h1>
+                        <p>Gerencie os pedidos enviados pelos clientes para a sua loja.</p>
+                    <?php else: ?>
+                        <h1><?= $is_seller ? 'Pedidos feitos por mim' : 'Meus pedidos'; ?></h1>
+                        <p>Acompanhe em tempo real o andamento de tudo o que você pediu.</p>
+                    <?php endif; ?>
                 </div>
-                <a class="btn btn-transparent btn-sm mo-refresh" href="myOrders.php">
+                <a class="btn btn-transparent btn-sm mo-refresh" href="myOrders.php<?= $is_seller ? '?scope=' . rawurlencode($scope) : ''; ?>">
                     <i class="fa-solid fa-rotate" aria-hidden="true"></i> Atualizar
                 </a>
+            </div>
+
+            <div class="orders-notify">
+                <button class="btn btn-transparent btn-sm" type="button" id="orders-notify-enable" data-sw-url="<?= BASE_URL; ?>service-worker.js" hidden>
+                    Ativar notificações
+                </button>
+                <p class="orders-notify-status" id="orders-notify-status"></p>
             </div>
 
             <?php if (isset($_SESSION['msg-form'])): ?>
@@ -312,73 +302,257 @@ $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
                 </div>
             <?php endif; ?>
 
-            <?php if (empty($orders)): ?>
+            <?php if ($is_seller && $scope === 'received'): ?>
 
-                <div class="mo-empty">
-                    <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
-                    <h2>Você ainda não fez nenhum pedido</h2>
-                    <p>Quando você finalizar uma compra, ela aparece aqui.</p>
-                    <a class="btn btn-gradient btn-sm" href="../../index.php">Explorar produtos</a>
+                <div class="orders-panel">
+                    <div class="orders-update" id="orders-update" hidden>
+                        Há novidades nos seus pedidos recebidos.
+                        <a href="myOrders.php?scope=received">Atualizar</a>
+                    </div>
+
+                    <h3 class="orders-group-title">Pendentes (<?= count($pending_received); ?>)</h3>
+
+                    <?php if (empty($pending_received)): ?>
+                        <p class="orders-empty">Nenhum pedido pendente no momento.</p>
+                    <?php endif; ?>
+
+                    <?php foreach ($pending_received as $order): ?>
+                        <?php $order_total = 0; ?>
+                        <article class="order-card">
+                            <div class="order-head">
+                                <strong>Pedido #<?= (int) $order['id']; ?></strong>
+                                <span class="order-date"><?= date('d/m/y H:i', strtotime($order['date'])); ?></span>
+                            </div>
+                            <p class="order-buyer">
+                                Cliente: <?= htmlspecialchars($order['buyer_name']); ?>
+                                <?php if (!empty($order['buyer_phone'])): ?>
+                                    — <a href="<?= htmlspecialchars(whatsapp_url($order['buyer_phone'])); ?>" target="_blank" rel="noopener noreferrer"><?= format_phone_number($order['buyer_phone']); ?></a>
+                                <?php endif; ?>
+                            </p>
+                            <ul class="order-items">
+                                <?php foreach ($order['items'] as $item): ?>
+                                    <?php $order_total += $item['quantity'] * $item['price']; ?>
+                                    <li class="order-item">
+                                        <span class="order-item-name">
+                                            <?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?>
+                                            <small><?= (int) $item['quantity']; ?> × R$<?= number_format($item['price'], 2, ',', '.'); ?></small>
+                                        </span>
+                                        <span>R$ <?= number_format($item['quantity'] * $item['price'], 2, ',', '.'); ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <div class="order-total">
+                                <span>Total</span>
+                                <span>R$<?= number_format($order_total, 2, ',', '.'); ?></span>
+                            </div>
+                            <form class="order-actions" action="../controller/order_status.php" method="post">
+                                <input type="hidden" name="order_id" value="<?= (int) $order['id']; ?>">
+                                <input type="hidden" name="return_to" value="myOrders.php?scope=received">
+                                <button class="btn btn-orange btn-sm" type="submit" name="action" value="accept">Aceitar</button>
+                                <button class="btn btn-transparent btn-sm" type="submit" name="action" value="reject"
+                                    data-confirm="O cliente vai ver este motivo no pedido dele e o estoque será reposto automaticamente."
+                                    data-confirm-title="Recusar pedido #<?= (int) $order['id']; ?>?"
+                                    data-confirm-ok="Recusar pedido"
+                                    data-confirm-icon="fa-ban"
+                                    data-reason-field="explanation"
+                                    data-reason-label="Motivo da recusa"
+                                    data-reason-placeholder="Ex.: produto esgotado, não consigo entregar nesse horário..."
+                                    data-reason-min="5"
+                                    data-reason-max="255">Recusar</button>
+                            </form>
+                        </article>
+                    <?php endforeach; ?>
+
+                    <h3 class="orders-group-title">Aceitos (<?= count($accepted_received); ?>)</h3>
+
+                    <?php if (empty($accepted_received)): ?>
+                        <p class="orders-empty">Nenhum pedido aceito aguardando entrega.</p>
+                    <?php endif; ?>
+
+                    <?php foreach ($accepted_received as $order): ?>
+                        <article class="order-card">
+                            <div class="order-head">
+                                <strong>Pedido #<?= (int) $order['id']; ?></strong>
+                                <span class="order-date"><?= date('d/m/y H:i', strtotime($order['date'])); ?></span>
+                            </div>
+                            <p class="order-buyer">
+                                Cliente: <?= htmlspecialchars($order['buyer_name']); ?>
+                                <?php if (!empty($order['buyer_phone'])): ?>
+                                    — <a href="<?= htmlspecialchars(whatsapp_url($order['buyer_phone'])); ?>" target="_blank" rel="noopener noreferrer"><?= format_phone_number($order['buyer_phone']); ?></a>
+                                <?php endif; ?>
+                            </p>
+                            <?php
+                            $accepted_total = 0;
+                            foreach ($order['items'] as $item) {
+                                $accepted_total += $item['quantity'] * $item['price'];
+                            }
+                            ?>
+                            <form action="../controller/order_status.php" method="post" data-order-edit>
+                                <input type="hidden" name="order_id" value="<?= (int) $order['id']; ?>">
+                                <input type="hidden" name="return_to" value="myOrders.php?scope=received">
+                                <ul class="order-items">
+                                    <?php foreach ($order['items'] as $item): ?>
+                                        <li class="order-item">
+                                            <span class="order-item-name"><?= htmlspecialchars($item['product_name'] ?? 'Produto removido'); ?></span>
+                                            <span class="order-item-fields">
+                                                <input type="number" min="1" step="1"
+                                                    name="items[<?= (int) $item['id']; ?>][quantity]"
+                                                    value="<?= (int) $item['quantity']; ?>"
+                                                    aria-label="Quantidade">
+                                                <span>× R$</span>
+                                                <input type="number" min="0.01" step="0.01"
+                                                    name="items[<?= (int) $item['id']; ?>][price]"
+                                                    value="<?= number_format($item['price'], 2, '.', ''); ?>"
+                                                    aria-label="Valor unitário">
+                                                <span class="order-item-sum" data-item-sum>— R$ <?= number_format($item['quantity'] * $item['price'], 2, ',', '.'); ?></span>
+                                            </span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <div class="order-total">
+                                    <span>Total</span>
+                                    <span data-order-sum>R$<?= number_format($accepted_total, 2, ',', '.'); ?></span>
+                                </div>
+                                <p class="order-hint">Confira ou ajuste os valores antes de concluir. Pedidos concluídos saem desta lista e entram no seu rendimento.</p>
+                                <div class="order-actions">
+                                    <button class="btn btn-orange btn-sm" type="submit" name="action" value="complete">Concluir pedido</button>
+                                </div>
+                            </form>
+                        </article>
+                    <?php endforeach; ?>
                 </div>
 
             <?php else: ?>
 
-                <div class="mo-summary">
-                    <div class="mo-stat is-progress">
-                        <span class="mo-stat-icon"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></span>
-                        <div>
-                            <strong><?= $totals['progress']; ?></strong>
-                            <span class="mo-stat-label">Em andamento</span>
-                        </div>
-                    </div>
-                    <div class="mo-stat is-done">
-                        <span class="mo-stat-icon"><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i></span>
-                        <div>
-                            <strong><?= $totals['completed']; ?></strong>
-                            <span class="mo-stat-label">Concluídos</span>
-                        </div>
-                    </div>
-                    <div class="mo-stat is-refused">
-                        <span class="mo-stat-icon"><i class="fa-solid fa-ban" aria-hidden="true"></i></span>
-                        <div>
-                            <strong><?= $totals['rejected']; ?></strong>
-                            <span class="mo-stat-label">Recusados</span>
-                        </div>
-                    </div>
+                <div class="orders-update" id="buyer-orders-update" hidden>
+                    O status de um dos seus pedidos foi atualizado.
+                    <a href="myOrders.php<?= $is_seller ? '?scope=mine' : ''; ?>">Atualizar lista</a>
                 </div>
 
-                <div class="mo-filters" role="group" aria-label="Filtrar pedidos por status">
-                    <?php foreach ($filters as $key => $label): ?>
-                        <button type="button" class="mo-filter <?= $key === 'all' ? 'is-active' : ''; ?>"
-                            data-filter="<?= $key; ?>" aria-pressed="<?= $key === 'all' ? 'true' : 'false'; ?>">
-                            <?= $label; ?>
-                            <span class="mo-filter-count"><?= $totals[$key]; ?></span>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
+                <?php if (empty($client_orders)): ?>
 
-                <section class="mo-list" id="mo-list" aria-live="polite">
-                    <?php foreach ($orders as $order): ?>
-                        <?php render_order_card($order); ?>
-                    <?php endforeach; ?>
-
-                    <div class="mo-empty" id="mo-filter-empty" hidden>
-                        <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
-                        <h2>Nenhum pedido neste filtro</h2>
-                        <p>Escolha outro filtro para ver seus pedidos.</p>
+                    <div class="mo-empty">
+                        <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+                        <h2>Você ainda não fez nenhum pedido</h2>
+                        <p>Quando você finalizar uma compra em qualquer loja, ela aparece aqui.</p>
+                        <a class="btn btn-gradient btn-sm" href="../../index.php">Explorar produtos</a>
                     </div>
-                </section>
+
+                <?php else: ?>
+
+                    <div class="mo-summary">
+                        <div class="mo-stat is-progress">
+                            <span class="mo-stat-icon"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></span>
+                            <div>
+                                <strong><?= $totals['progress']; ?></strong>
+                                <span class="mo-stat-label">Em andamento</span>
+                            </div>
+                        </div>
+                        <div class="mo-stat is-done">
+                            <span class="mo-stat-icon"><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i></span>
+                            <div>
+                                <strong><?= $totals['completed']; ?></strong>
+                                <span class="mo-stat-label">Concluídos</span>
+                            </div>
+                        </div>
+                        <div class="mo-stat is-refused">
+                            <span class="mo-stat-icon"><i class="fa-solid fa-ban" aria-hidden="true"></i></span>
+                            <div>
+                                <strong><?= $totals['rejected']; ?></strong>
+                                <span class="mo-stat-label">Recusados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mo-filters" role="group" aria-label="Filtrar pedidos por status">
+                        <?php foreach ($filters as $key => $label): ?>
+                            <button type="button" class="mo-filter <?= $key === 'all' ? 'is-active' : ''; ?>"
+                                data-filter="<?= $key; ?>" aria-pressed="<?= $key === 'all' ? 'true' : 'false'; ?>">
+                                <?= $label; ?>
+                                <span class="mo-filter-count"><?= $totals[$key]; ?></span>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <section class="mo-list" id="mo-list" aria-live="polite">
+                        <?php foreach ($client_orders as $order): ?>
+                            <?php render_order_card($order); ?>
+                        <?php endforeach; ?>
+
+                        <div class="mo-empty" id="mo-filter-empty" hidden>
+                            <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+                            <h2>Nenhum pedido neste filtro</h2>
+                            <p>Escolha outro filtro para ver seus pedidos.</p>
+                        </div>
+                    </section>
+
+                <?php endif; ?>
 
             <?php endif; ?>
         </main>
 
-        <footer class="site-footer">Cashfy — feito por estudantes, para estudantes.</footer>
+        <footer class="site-footer">
+            Cashfy — feito por estudantes, para estudantes &nbsp;·&nbsp;
+            <span id="contato">cashfy@gmail.com</span> &nbsp;·&nbsp;
+            <a href="tos.php">Termos de uso</a> &nbsp;·&nbsp;
+            <a href="pp.php">Políticas de privacidade</a>
+        </footer>
+    </div>
+    <div id="cookie-banner">
+        <h3>Usamos cookies</h3>
+
+        <p>
+            O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+            preferências e garantir o funcionamento correto do site.
+        </p>
+
+        <p>
+            Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+            determinadas configurações enquanto navega pelo CashFY.
+        </p>
+
+        <p>
+            Ao continuar navegando, você concorda com o uso desses cookies.
+        </p>
+
+        <button id="cookie-accept">Aceitar</button>
+        <button id="cookie-reject">Sair</button>
     </div>
 
+    <?php require __DIR__ . '/partials/cart_modal.php'; ?>
     <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/cookies.js"></script>
     <script src="../../assets/js/menu-toggle.js"></script>
+    <script src="../../assets/js/confirm.js"></script>
     <script src="../../assets/js/my-orders.js"></script>
     <script src="../../assets/js/ScrollToMsg.js"></script>
+    <script>
+        (function() {
+            const brl = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+
+            document.querySelectorAll('form[data-order-edit]').forEach(function(form) {
+                function update() {
+                    let total = 0;
+
+                    form.querySelectorAll('.order-item').forEach(function(item) {
+                        const quantity = parseFloat(item.querySelector('input[name$="[quantity]"]').value) || 0;
+                        const price = parseFloat(item.querySelector('input[name$="[price]"]').value) || 0;
+
+                        total += quantity * price;
+                        item.querySelector('[data-item-sum]').textContent = '— ' + brl.format(quantity * price);
+                    });
+
+                    form.querySelector('[data-order-sum]').textContent = brl.format(total);
+                }
+
+                form.addEventListener('input', update);
+            });
+        })();
+    </script>
+    <?php require __DIR__ . '/partials/order_notifier.php'; ?>
 </body>
 
 </html>

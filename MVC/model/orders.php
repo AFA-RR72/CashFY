@@ -2,71 +2,111 @@
 
 /**
  * Estrutura atual:
- *   orders (id, buyer_id, seller_id, total, status, date)
+ *   orders (id, buyer_id, seller_id, total, status, explanation, date)
  *   sales  (id, order_id, product_id, quantity, price)   <- itens do pedido
  *
- * Cria um pedido e todos os seus itens numa única transação: ou grava tudo, ou nada.
+ * Cria um pedido, valida/abate o estoque dos produtos controlados e grava todos os itens
+ * numa única transação: ou grava tudo, ou nada.
  *
- * @param int         $buyer_id  quem comprou
- * @param int         $seller_id dono da loja
- * @param array       $items     lista de ['product_id' => int, 'quantity' => int, 'price' => float]
- * @param string      $status    pending | accepted | rejected | completed
- * @param string|null $date      'Y-m-d H:i:s'. Se null, o banco usa o horário atual
+ * @param int         $buyer_id    quem comprou
+ * @param int         $seller_id   dono da loja
+ * @param array       $items       lista de ['product_id' => int, 'quantity' => int, 'price' => float]
+ * @param string      $status      pending | accepted | rejected | completed
+ * @param string|null $date        'Y-m-d H:i:s'. Se null, o banco usa o horário atual
+ * @param string|null &$error_msg  mensagem detalhada em caso de falha de validação/estoque
  *
- * Só produtos ativos (products.deleted_at IS NULL) podem entrar num pedido: a checagem é feita
- * aqui, dentro da transação, valendo para o checkout e para o registro manual do Diário.
- *
- * @return int|false id do pedido criado, ou false se algo falhou (ou se algum produto foi excluído)
+ * @return int|false id do pedido criado, ou false se algo falhou
  */
-function create_order(int $buyer_id, int $seller_id, array $items, string $status = 'pending', ?string $date = null)
+function create_order(int $buyer_id, int $seller_id, array $items, string $status = 'pending', ?string $date = null, ?string &$error_msg = null)
 {
     if (empty($items)) {
+        $error_msg = 'O pedido não possui itens.';
         return false;
     }
 
     $conn = conn();
 
+    // Agrupa quantidades por product_id caso o mesmo produto apareça mais de uma vez
+    $grouped_qty = [];
     $total = 0.0;
     foreach ($items as $item) {
-        $total += $item['quantity'] * $item['price'];
+        $pid = (int) $item['product_id'];
+        $qty = (int) $item['quantity'];
+        $price = (float) $item['price'];
+
+        if ($qty <= 0 || $price < 0) {
+            $error_msg = 'Quantidade ou preço inválido no pedido.';
+            return false;
+        }
+
+        $grouped_qty[$pid] = ($grouped_qty[$pid] ?? 0) + $qty;
+        $total += $qty * $price;
     }
     $total = round($total, 2);
 
     try {
         $conn->begin_transaction();
 
-        // Revalida os produtos com o registro travado (LOCK IN SHARE MODE): uma exclusão feita
-        // pelo vendedor neste exato momento espera esta transação terminar (e então só arquiva
-        // o produto, pois a venda passa a existir) ou termina antes (e o pedido é recusado aqui).
-        $stmt = $conn->prepare("
-        SELECT id FROM products WHERE id = ? AND deleted_at IS NULL LOCK IN SHARE MODE
+        // Trava os registros dos produtos com FOR UPDATE para evitar condição de corrida
+        // no controle de estoque e impedir exclusão simultânea
+        $stmt_check = $conn->prepare("
+            SELECT id, name, stock
+            FROM products
+            WHERE id = ? AND user_id = ? AND deleted_at IS NULL
+            FOR UPDATE
         ");
 
-        foreach ($items as $item) {
-            $product_id = (int) $item['product_id'];
+        $stmt_deduct = $conn->prepare("
+            UPDATE products
+            SET stock = stock - ?
+            WHERE id = ? AND stock IS NOT NULL AND stock >= ?
+        ");
 
-            $stmt->bind_param('i', $product_id);
-            $stmt->execute();
+        foreach ($grouped_qty as $product_id => $needed_qty) {
+            $stmt_check->bind_param('ii', $product_id, $seller_id);
+            $stmt_check->execute();
 
-            $result = $stmt->get_result();
-            $active = $result->num_rows > 0;
-            $result->free();
+            $res = $stmt_check->get_result();
+            $prod = $res->fetch_assoc();
+            $res->free();
 
-            if (!$active) {
-                throw new RuntimeException("produto $product_id indisponível (excluído ou inexistente)");
+            if (!$prod) {
+                $error_msg = 'Um dos produtos não está mais disponível.';
+                throw new RuntimeException("Produto $product_id indisponível (excluído ou inexistente).");
+            }
+
+            if ($prod['stock'] !== null) {
+                $available = (int) $prod['stock'];
+                if ($available <= 0) {
+                    $error_msg = 'O produto "' . $prod['name'] . '" está esgotado.';
+                    throw new RuntimeException("Produto $product_id esgotado.");
+                }
+                if ($needed_qty > $available) {
+                    $error_msg = 'Estoque insuficiente para "' . $prod['name'] . '" (disponível: ' . $available . ').';
+                    throw new RuntimeException("Estoque insuficiente para produto $product_id.");
+                }
+
+                $stmt_deduct->bind_param('iii', $needed_qty, $product_id, $needed_qty);
+                $stmt_deduct->execute();
+
+                if ($stmt_deduct->affected_rows < 1) {
+                    $error_msg = 'Estoque insuficiente para "' . $prod['name'] . '".';
+                    throw new RuntimeException("Falha ao abater estoque do produto $product_id.");
+                }
             }
         }
 
-        $stmt->close();
+        $stmt_check->close();
+        $stmt_deduct->close();
 
         if ($date === null) {
             $stmt = $conn->prepare("
-            INSERT INTO orders (buyer_id, seller_id, total, status) VALUES (?, ?, ?, ?)
+                INSERT INTO orders (buyer_id, seller_id, total, status) VALUES (?, ?, ?, ?)
             ");
             $stmt->bind_param('iids', $buyer_id, $seller_id, $total, $status);
         } else {
             $stmt = $conn->prepare("
-            INSERT INTO orders (buyer_id, seller_id, total, status, `date`) VALUES (?, ?, ?, ?, ?)
+                INSERT INTO orders (buyer_id, seller_id, total, status, `date`) VALUES (?, ?, ?, ?, ?)
             ");
             $stmt->bind_param('iidss', $buyer_id, $seller_id, $total, $status, $date);
         }
@@ -76,7 +116,7 @@ function create_order(int $buyer_id, int $seller_id, array $items, string $statu
         $stmt->close();
 
         $stmt = $conn->prepare("
-        INSERT INTO sales (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)
+            INSERT INTO sales (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)
         ");
 
         foreach ($items as $item) {
@@ -100,11 +140,21 @@ function create_order(int $buyer_id, int $seller_id, array $items, string $statu
     }
 }
 
-function get_order_by_id(int $order_id)
+function get_order_by_id(int $order_id): ?array
 {
     $conn = conn();
 
-    $stmt = $conn->prepare("SELECT * FROM orders WHERE id = ?");
+    $stmt = $conn->prepare("
+        SELECT o.*,
+               b.name AS buyer_name,
+               b.role_id AS buyer_role_id,
+               s.name AS seller_name
+        FROM orders o
+        INNER JOIN users b ON b.id = o.buyer_id
+        INNER JOIN users s ON s.id = o.seller_id
+        WHERE o.id = ?
+        LIMIT 1
+    ");
     $stmt->bind_param('i', $order_id);
     $stmt->execute();
 
@@ -137,6 +187,56 @@ function get_order_signature(int $seller_id): array
     $stmt->close();
 
     return ['pending' => (int) $row['pending'], 'last_id' => (int) $row['last_id']];
+}
+
+/**
+ * Estado atual dos pedidos realizados por um comprador (excluindo vendas manuais do Diário,
+ * onde buyer_id = seller_id). Usado pelo SSE para detectar em tempo real quando um pedido
+ * do comprador passa para 'accepted', 'rejected' ou 'completed'.
+ *
+ * @return array{hash: string, map: array<int, array{id: int, status: string, explanation: ?string, seller_name: string, total: float}>}
+ */
+function get_buyer_orders_state(int $buyer_id): array
+{
+    $conn = conn();
+
+    $stmt = $conn->prepare("
+    SELECT o.id, o.status, o.explanation, o.total, u.name AS seller_name
+    FROM orders o
+    INNER JOIN users u ON u.id = o.seller_id
+    WHERE o.buyer_id = ?
+    AND o.buyer_id <> o.seller_id
+    ORDER BY o.id DESC
+    LIMIT 50
+    ");
+    $stmt->bind_param('i', $buyer_id);
+    $stmt->execute();
+
+    $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    $map = [];
+    $parts = [];
+
+    foreach ($rows as $r) {
+        $id = (int) $r['id'];
+        $status = (string) $r['status'];
+        $explanation = $r['explanation'] !== null ? (string) $r['explanation'] : '';
+
+        $map[$id] = [
+            'id' => $id,
+            'status' => $status,
+            'explanation' => $explanation,
+            'seller_name' => (string) $r['seller_name'],
+            'total' => round((float) $r['total'], 2),
+        ];
+        $parts[] = $id . ':' . $status . ':' . md5($explanation);
+    }
+
+    return [
+        'hash' => md5(implode('|', $parts)),
+        'map' => $map,
+    ];
 }
 
 /**
@@ -196,13 +296,13 @@ function get_seller_orders(int $seller_id): array
 }
 
 /**
- * Muda o status de um pedido do vendedor: pending -> accepted | rejected.
+ * Muda o status de um pedido do vendedor: pending -> accepted.
  * O UPDATE só acontece se o pedido ainda estiver no status de origem, então dois
  * cliques (ou duas abas) não aplicam a mesma ação duas vezes.
  */
 function change_order_status(int $order_id, int $seller_id, string $from, string $to): bool
 {
-    // 'rejected' tem função própria (reject_order), pois exige o motivo da recusa
+    // 'rejected' tem função própria (reject_order), pois exige o motivo da recusa e repõe estoque
     $allowed = [
         'pending' => ['accepted'],
     ];
@@ -227,34 +327,94 @@ function change_order_status(int $order_id, int $seller_id, string $from, string
 }
 
 /**
- * Recusa um pedido pendente do vendedor e grava o motivo em orders.explanation.
- * O UPDATE só acontece se o pedido ainda estiver pendente (evita ação dupla).
+ * Recusa um pedido pendente do vendedor, grava o motivo em orders.explanation
+ * e repõe automaticamente o estoque dos produtos que possuem controle de estoque.
+ * Tudo numa única transação com bloqueio FOR UPDATE para evitar reposição duplicada.
  */
 function reject_order(int $order_id, int $seller_id, string $explanation): bool
 {
     $conn = conn();
 
-    $stmt = $conn->prepare("
-    UPDATE orders SET status = 'rejected', explanation = ?
-    WHERE id = ? AND seller_id = ? AND status = 'pending'
-    ");
-    $stmt->bind_param('sii', $explanation, $order_id, $seller_id);
-    $stmt->execute();
+    try {
+        $conn->begin_transaction();
 
-    $changed = $stmt->affected_rows > 0;
-    $stmt->close();
+        // Trava o pedido e garante que ainda está 'pending'
+        $stmt = $conn->prepare("
+            SELECT id FROM orders
+            WHERE id = ? AND seller_id = ? AND status = 'pending'
+            FOR UPDATE
+        ");
+        $stmt->bind_param('ii', $order_id, $seller_id);
+        $stmt->execute();
+        $found = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
 
-    return $changed;
+        if (!$found) {
+            $conn->rollback();
+            return false;
+        }
+
+        // Atualiza status e motivo da recusa
+        $stmt = $conn->prepare("
+            UPDATE orders SET status = 'rejected', explanation = ?
+            WHERE id = ? AND seller_id = ? AND status = 'pending'
+        ");
+        $stmt->bind_param('sii', $explanation, $order_id, $seller_id);
+        $stmt->execute();
+        $changed = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        if (!$changed) {
+            $conn->rollback();
+            return false;
+        }
+
+        // Busca os itens do pedido para devolver ao estoque (apenas produtos com stock IS NOT NULL)
+        $stmt = $conn->prepare("
+            SELECT product_id, quantity FROM sales WHERE order_id = ?
+        ");
+        $stmt->bind_param('i', $order_id);
+        $stmt->execute();
+        $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        if (!empty($items)) {
+            $stmt_restore = $conn->prepare("
+                UPDATE products
+                SET stock = stock + ?
+                WHERE id = ? AND stock IS NOT NULL
+            ");
+
+            foreach ($items as $item) {
+                $qty = (int) $item['quantity'];
+                $pid = (int) $item['product_id'];
+                if ($qty > 0) {
+                    $stmt_restore->bind_param('ii', $qty, $pid);
+                    $stmt_restore->execute();
+                }
+            }
+
+            $stmt_restore->close();
+        }
+
+        $conn->commit();
+        return true;
+    } catch (Throwable $e) {
+        $conn->rollback();
+        error_log('reject_order: ' . $e->getMessage());
+        return false;
+    }
 }
 
 /**
  * Conclui um pedido aceito (accepted -> completed). Antes de concluir o vendedor pode
- * ajustar quantidade e valor de cada item; o total do pedido é recalculado.
+ * ajustar quantidade e valor de cada item; o total do pedido é recalculado e a diferença
+ * de quantidade ajusta o estoque automaticamente.
  *
- * @param array $edits [sale_id => ['quantity' => int, 'price' => float]]
- *                     itens que não pertencem ao pedido são ignorados
+ * @param array       $edits      [sale_id => ['quantity' => int, 'price' => float]]
+ * @param string|null &$error_msg mensagem de erro se faltar estoque ao aumentar a quantidade
  */
-function complete_order(int $order_id, int $seller_id, array $edits = []): bool
+function complete_order(int $order_id, int $seller_id, array $edits = [], ?string &$error_msg = null): bool
 {
     $conn = conn();
 
@@ -277,23 +437,66 @@ function complete_order(int $order_id, int $seller_id, array $edits = []): bool
             return false;
         }
 
-        $stmt = $conn->prepare("UPDATE sales SET quantity = ?, price = ? WHERE id = ? AND order_id = ?");
+        // Carrega os itens atuais do pedido para calcular diferenças de quantidade no estoque
+        $stmt = $conn->prepare("
+            SELECT id, product_id, quantity FROM sales WHERE order_id = ? FOR UPDATE
+        ");
+        $stmt->bind_param('i', $order_id);
+        $stmt->execute();
+        $current_sales = [];
+        foreach ($stmt->get_result()->fetch_all(MYSQLI_ASSOC) as $row) {
+            $current_sales[(int) $row['id']] = [
+                'product_id' => (int) $row['product_id'],
+                'quantity' => (int) $row['quantity'],
+            ];
+        }
+        $stmt->close();
+
+        $stmt_update_sale = $conn->prepare("UPDATE sales SET quantity = ?, price = ? WHERE id = ? AND order_id = ?");
+        $stmt_prod_lock = $conn->prepare("SELECT name, stock FROM products WHERE id = ? FOR UPDATE");
+        $stmt_prod_stock = $conn->prepare("UPDATE products SET stock = stock - ? WHERE id = ? AND stock IS NOT NULL");
 
         foreach ($edits as $sale_id => $edit) {
+            $sale_id = (int) $sale_id;
+            if (!isset($current_sales[$sale_id])) {
+                continue;
+            }
+
             $quantity = (int) $edit['quantity'];
             $price = (float) $edit['price'];
-            $sale_id = (int) $sale_id;
 
             if ($quantity <= 0 || $price <= 0) {
                 $conn->rollback();
                 return false;
             }
 
-            $stmt->bind_param('idii', $quantity, $price, $sale_id, $order_id);
-            $stmt->execute();
+            $old_qty = $current_sales[$sale_id]['quantity'];
+            $product_id = $current_sales[$sale_id]['product_id'];
+            $diff = $quantity - $old_qty; // positivo = precisa abater mais; negativo = devolve ao estoque
+
+            if ($diff !== 0) {
+                $stmt_prod_lock->bind_param('i', $product_id);
+                $stmt_prod_lock->execute();
+                $prod = $stmt_prod_lock->get_result()->fetch_assoc();
+
+                if ($prod && $prod['stock'] !== null) {
+                    $avail = (int) $prod['stock'];
+                    if ($diff > 0 && $avail < $diff) {
+                        $error_msg = 'Estoque insuficiente para "' . $prod['name'] . '" ao aumentar a quantidade (disponível: ' . $avail . ').';
+                        throw new RuntimeException($error_msg);
+                    }
+                    $stmt_prod_stock->bind_param('ii', $diff, $product_id);
+                    $stmt_prod_stock->execute();
+                }
+            }
+
+            $stmt_update_sale->bind_param('idii', $quantity, $price, $sale_id, $order_id);
+            $stmt_update_sale->execute();
         }
 
-        $stmt->close();
+        $stmt_update_sale->close();
+        $stmt_prod_lock->close();
+        $stmt_prod_stock->close();
 
         $stmt = $conn->prepare("
         UPDATE orders
@@ -354,14 +557,24 @@ function get_client_orders(int $buyer_id): array
     $conn = conn();
 
     $stmt = $conn->prepare("
-    SELECT o.id, o.buyer_id, o.total, o.status, o.explanation, o.`date`,
+    SELECT o.id, o.buyer_id, o.seller_id, o.total, o.status, o.explanation, o.`date`,
            u.name AS seller_name, u.phone_number AS seller_phone,
            u.profile_photo AS seller_photo
     FROM orders o
     INNER JOIN users u ON u.id = o.seller_id
     WHERE o.buyer_id = ?
+    AND o.buyer_id <> o.seller_id
     AND o.status IN ('pending', 'accepted', 'completed', 'rejected')
-    ORDER BY o.`date` DESC, o.id DESC
+    ORDER BY
+    CASE o.status
+        WHEN 'pending' THEN 1
+        WHEN 'accepted' THEN 2
+        WHEN 'rejected' THEN 3
+        WHEN 'completed' THEN 4
+        ELSE 5
+    END,
+    o.`date` DESC,
+    o.id DESC
     ");
     $stmt->bind_param('i', $buyer_id);
     $stmt->execute();
@@ -459,5 +672,4 @@ function get_seller_history(int $seller_id, int $limit = 30): array
 
     return array_values($by_id);
 }
-
 ?>

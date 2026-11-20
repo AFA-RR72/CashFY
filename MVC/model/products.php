@@ -143,23 +143,6 @@ function delete_product(int $id, int $user_id){
     }
 }
 
-function check_product(int $product_id){
-    $conn = conn();
-
-    $stmt = $conn -> prepare("SELECT * FROM products WHERE id = ? AND deleted_at IS NULL");
-    $stmt -> bind_param("i", $product_id);
-
-    $stmt -> execute();
-
-    $result = $stmt -> get_result();
-    if($result -> num_rows > 0){
-        $stmt -> close();
-        return true;
-    }else{
-        $stmt -> close();
-        return false;
-    }
-}
 
 // Produtos de um vendedor (usado no seletor do gráfico de faturamento).
 // Relatório financeiro: INCLUI os excluídos logicamente (deleted_at preenchido), para o

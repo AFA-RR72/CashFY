@@ -36,9 +36,10 @@ if (isset($_POST['action'])) {
     $productId = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
 
     if ($productId && isset($cart[$productId])) {
+        $product = get_product_by_id($productId);
+
         // Produto excluído enquanto estava no carrinho: não dá para aumentar a quantidade
-        // (diminuir e remover continuam permitidos). O item sai do carrinho.
-        if ($action === 'increase' && !get_product_by_id($productId)) {
+        if ($action === 'increase' && !$product) {
             $name = (string) ($cart[$productId]['product'] ?? 'Um dos produtos');
 
             unset($cart[$productId]);
@@ -52,6 +53,25 @@ if (isset($_POST['action'])) {
         $quantity = (int) $cart[$productId]['quantity'];
 
         if ($action === 'increase') {
+            if ($product && $product['stock'] !== null) {
+                $maxStock = (int) $product['stock'];
+                if ($maxStock <= 0) {
+                    unset($cart[$productId]);
+                    $_SESSION['cart'] = $cart;
+                    cart_set_notice('"' . $product['name'] . '" esgotou e foi removido do carrinho.');
+                    $_SESSION['open_cart'] = true;
+                    cart_redirect_back($rawReturn, $fallback);
+                }
+                if ($quantity + 1 > $maxStock) {
+                    $cart[$productId]['quantity'] = $maxStock;
+                    $cart[$productId]['price'] = (float) $product['price'];
+                    $cart[$productId]['total'] = $maxStock * (float) $product['price'];
+                    $_SESSION['cart'] = $cart;
+                    cart_set_notice('Limite de estoque atingido para "' . $product['name'] . '" (' . $maxStock . ' disponível' . ($maxStock > 1 ? 'is' : '') . ').');
+                    $_SESSION['open_cart'] = true;
+                    cart_redirect_back($rawReturn, $fallback);
+                }
+            }
             $quantity++;
         } elseif ($action === 'decrease') {
             $quantity--;
@@ -62,8 +82,10 @@ if (isset($_POST['action'])) {
         if ($quantity <= 0) {
             unset($cart[$productId]);
         } else {
+            $price = $product ? (float) $product['price'] : (float) $cart[$productId]['price'];
+            $cart[$productId]['price'] = $price;
             $cart[$productId]['quantity'] = $quantity;
-            $cart[$productId]['total'] = $quantity * (float) $cart[$productId]['price'];
+            $cart[$productId]['total'] = $quantity * $price;
         }
 
         $_SESSION['cart'] = $cart;
@@ -74,8 +96,7 @@ if (isset($_POST['action'])) {
 }
 
 /*
- * Inclusão de produto. O controlador não depende mais de parâmetros GET
- * específicos do perfil do vendedor: funciona também na página de categoria.
+ * Inclusão de produto a partir de seller.php ou categoria.php.
  */
 $productId = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
 $quantity = filter_input(INPUT_POST, 'quantity', FILTER_VALIDATE_INT);
@@ -94,6 +115,12 @@ if (!$product) {
 
 $sellerId = (int) $product['user_id'];
 
+// Impede que o vendedor compre produtos da própria loja
+if (isset($_SESSION['id']) && (int) $_SESSION['id'] === $sellerId) {
+    cart_set_notice('Você não pode comprar produtos da sua própria loja.');
+    cart_redirect_back($rawReturn, $fallback);
+}
+
 /*
  * O carrinho aceita produtos de apenas um vendedor por vez.
  */
@@ -106,11 +133,34 @@ if (!empty($cart)) {
     }
 }
 
+$currentInCart = isset($cart[$productId]) ? (int) $cart[$productId]['quantity'] : 0;
+$newQuantity = $currentInCart + $quantity;
+
+// Validação de estoque (quando stock !== null)
+if ($product['stock'] !== null) {
+    $availableStock = (int) $product['stock'];
+
+    if ($availableStock <= 0) {
+        cart_set_notice('Este produto está esgotado no momento.');
+        cart_redirect_back($rawReturn, $fallback);
+    }
+
+    if ($newQuantity > $availableStock) {
+        $remaining = max(0, $availableStock - $currentInCart);
+        if ($remaining === 0) {
+            cart_set_notice('Você já adicionou todo o estoque disponível (' . $availableStock . ') deste produto no carrinho.');
+        } else {
+            cart_set_notice('Estoque insuficiente: restam apenas ' . $availableStock . ' unidade(s) de "' . $product['name'] . '".');
+        }
+        cart_redirect_back($rawReturn, $fallback);
+    }
+}
+
 if (isset($cart[$productId])) {
-    $cart[$productId]['quantity'] += $quantity;
+    $cart[$productId]['quantity'] = $newQuantity;
     $cart[$productId]['price'] = (float) $product['price'];
     $cart[$productId]['product'] = $product['name'];
-    $cart[$productId]['total'] = $cart[$productId]['quantity'] * (float) $product['price'];
+    $cart[$productId]['total'] = $newQuantity * (float) $product['price'];
 } else {
     $cart[$productId] = [
         'seller' => $sellerId,
@@ -124,3 +174,4 @@ if (isset($cart[$productId])) {
 $_SESSION['cart'] = $cart;
 cart_set_notice('Produto adicionado ao carrinho.', true);
 cart_redirect_back($rawReturn, $fallback);
+?>

@@ -16,9 +16,7 @@ function toggleDarkMode(isDark) {
 }
 
 const savedTheme = localStorage.getItem('theme');
-const isDark = savedTheme === 'dark';
-
-toggleDarkMode(isDark);
+toggleDarkMode(savedTheme === 'dark');
 
 if (themeDesktop) {
     themeDesktop.addEventListener('change', () => {
@@ -31,5 +29,3 @@ if (themeMobile) {
         toggleDarkMode(themeMobile.checked);
     });
 }
-console.log(document.getElementById("theme-toggle-desktop"));
-console.log(document.getElementById("theme-toggle-mobile"));

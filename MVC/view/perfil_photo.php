@@ -20,8 +20,16 @@ $user = get_user_by_id($_SESSION['id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Meu perfil - CashFY</title>
+    <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
+    <link rel="icon" href="assets/img/favicon.png" type="image/png">
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#1F7A70">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CashFY">
+    <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
 
 <body>
@@ -93,11 +101,33 @@ $user = get_user_by_id($_SESSION['id']);
 
     </div>
 
+    <div id="cookie-banner">
+        <h3>Usamos cookies</h3>
+
+        <p>
+            O CashFY utiliza cookies para manter sua sessão, lembrar algumas de suas
+            preferências e garantir o funcionamento correto do site.
+        </p>
+
+        <p>
+            Os cookies ajudam, por exemplo, a manter você conectado e a preservar
+            determinadas configurações enquanto navega pelo CashFY.
+        </p>
+
+        <p>
+            Ao continuar navegando, você concorda com o uso desses cookies.
+        </p>
+
+        <button id="cookie-accept">Aceitar</button>
+        <button id="cookie-reject">Sair</button>
+    </div>
+
+    <script src="../../assets/js/theme.js"></script>
     <script>
         const input = document.getElementById('profile_photo');
         const preview = document.getElementById('photoPreview');
 
-        input.addEventListener('change', function () {
+        input.addEventListener('change', function() {
 
             const file = this.files[0];
 
@@ -105,7 +135,7 @@ $user = get_user_by_id($_SESSION['id']);
 
             const reader = new FileReader();
 
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 preview.innerHTML = `
                     <img src="${e.target.result}" alt="Prévia da foto">
                 `;
@@ -115,9 +145,8 @@ $user = get_user_by_id($_SESSION['id']);
             reader.readAsDataURL(file);
         });
     </script>
+    <script src="../../assets/js/cookies.js"></script>
     <script src="../../assets/js/return.js"></script>
-    <script src="../../assets/js/theme.js"></script>
 </body>
 
 </html>
-```

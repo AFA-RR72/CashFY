@@ -1,28 +1,10 @@
 <?php require_once(__DIR__ . "/../config/cashfy.php");
 
-function check_institute(int $institute_id)
-{
-    $conn = conn();
-
-    $stmt = $conn->prepare("SELECT * FROM educational_institute WHERE id = ?");
-    $stmt->bind_param('i', $institute_id);
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $stmt->close();
-        return false;
-    }
-    $stmt ->close();
-    return true;
-}
-
 function get_institutes()
 {
     $conn = conn();
 
     $stmt = $conn->prepare("SELECT * FROM educational_institute");
-
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -31,5 +13,4 @@ function get_institutes()
     $stmt->close();
     return $institutes;
 }
-
 ?>

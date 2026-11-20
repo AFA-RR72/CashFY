@@ -1,10 +1,10 @@
 <?php require_once(__DIR__ . '/init.php');
 
 /*
- * Voltar para a página de onde o carrinho foi usado (index, categoria ou seller).
+ * Voltar para a página de onde o carrinho foi usado.
  *
  * O formulário do carrinho envia a URL da página atual em "return". Aqui ela é
- * validada: só as 3 páginas que têm carrinho são aceitas, e o redirecionamento é
+ * validada contra a lista de páginas válidas do sistema, e o redirecionamento é
  * sempre montado em cima de BASE_URL (nunca vai para um endereço vindo do usuário).
  */
 
@@ -19,6 +19,12 @@ function cart_return_url(string $raw, string $fallback): string
         'index.php' => 'index.php',
         'categoria.php' => 'MVC/view/categoria.php',
         'seller.php' => 'MVC/view/seller.php',
+        'myOrders.php' => 'MVC/view/myOrders.php',
+        'perfil.php' => 'MVC/view/perfil.php',
+        'contact.php' => 'MVC/view/contact.php',
+        'sobre.php' => 'MVC/view/sobre.php',
+        'tos.php' => 'MVC/view/tos.php',
+        'pp.php' => 'MVC/view/pp.php',
     ];
 
     $path = (string) parse_url($raw, PHP_URL_PATH);
@@ -41,5 +47,4 @@ function cart_return_url(string $raw, string $fallback): string
 
     return $url;
 }
-
 ?>

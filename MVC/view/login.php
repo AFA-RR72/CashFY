@@ -9,8 +9,15 @@ require_once('../config/auth.php');
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Entrar — Cashfy</title>
+  <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="stylesheet" href="../../assets/css/ui-extras.css">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1F7A70">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="CashFY">
+  <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
 </head>
 
 <body>
@@ -50,14 +57,14 @@ require_once('../config/auth.php');
             <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"
               required minlength="8">
             <button type="button" id="toggle_pass" class="password-toggle" onclick="toggle()" title="Mostrar senha">
-              <img id="eye-icon" src="../../uploads/icones/olhof.png" alt="Mostrar senha">
+              <i class="fa-solid fa-eye-slash" id="eye-icon"></i>
             </button>
           </div>
         </div>
         <div class="field">
           <label class="remember-me" for="remember">
             <input type="checkbox" id="remember" name="remember" value="1">
-            Lembrar de mim por 30 dias
+            Lembrar de mim
           </label>
         </div>
         <div class="field">
@@ -106,10 +113,10 @@ require_once('../config/auth.php');
     <button id="cookie-accept">Aceitar</button>
     <button id="cookie-reject">Sair</button>
   </div>
+  <script src="../../assets/js/theme.js"></script>
   <script src="../../assets/js/return.js"></script>
   <script src="../../assets/js/toggle.js"></script>
-  <script src="../../assets/js/theme.js"></script>
-  <script src="assets/js/cookies.js"></script>
+  <script src="../../assets/js/cookies.js"></script>
 </body>
 
 </html>

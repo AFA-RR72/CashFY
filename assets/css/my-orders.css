@@ -687,3 +687,85 @@ body.dark-mode .mo-empty {
         margin-left: 64px;
     }
 }
+
+/* Abas do vendedor em Pedidos: "Recebidos" vs "Feitos por mim" */
+.mo-scope-tabs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 5px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--card);
+    box-shadow: var(--shadow-card);
+    align-self: flex-start;
+}
+
+.mo-scope-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-soft);
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background .18s ease, color .18s ease;
+}
+
+.mo-scope-tab:hover {
+    color: var(--ink);
+}
+
+.mo-scope-tab.is-active {
+    background: linear-gradient(100deg, var(--teal-700), var(--teal-500));
+    color: #fff;
+}
+
+.mo-scope-badge,
+.mo-scope-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-pill);
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+.mo-scope-badge {
+    background: var(--orange-500);
+    color: #fff;
+}
+
+.mo-scope-count {
+    background: var(--cream-deep);
+    color: var(--ink);
+}
+
+.mo-scope-tab.is-active .mo-scope-count {
+    background: rgba(255, 255, 255, 0.24);
+    color: #fff;
+}
+
+body.dark-mode .mo-scope-tabs {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
+}
+
+@media (max-width: 520px) {
+    .mo-scope-tabs {
+        width: 100%;
+    }
+
+    .mo-scope-tab {
+        flex: 1 1 calc(50% - 4px);
+        justify-content: center;
+        padding: 9px 10px;
+        font-size: 0.84rem;
+    }
+}
