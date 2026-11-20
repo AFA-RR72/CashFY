@@ -1,7 +1,7 @@
 <?php
 
 function conn() {
-    $config = require __DIR__ . '/../../../../cashfy-private/database.php';
+    $config = require dirname(__DIR__, 3) . '/cashfy-private/database.php';
 
     return mysqli_connect(
         $config['host'],
