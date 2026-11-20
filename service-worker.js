@@ -34,8 +34,8 @@ self.addEventListener('push', event => {
     }
 
     const targetUrl = new URL(payload.url || './MVC/view/myOrders.php', self.registration.scope).href;
-    const iconUrl = new URL(payload.icon || './assets/img/favicon.png', self.registration.scope).href;
-    const badgeUrl = new URL(payload.badge || './assets/img/favicon.png', self.registration.scope).href;
+    const iconUrl = new URL(payload.icon || './assets/img/favicon-v2.png', self.registration.scope).href;
+    const badgeUrl = new URL(payload.badge || './assets/img/favicon-v2.png', self.registration.scope).href;
 
     const options = {
         body: payload.body,

@@ -399,8 +399,8 @@ function send_push_notification_to_user(int $user_id, array $payload): int
             'title' => 'CashFY',
             'body' => 'Você tem uma nova atualização.',
             'url' => BASE_URL . 'MVC/view/myOrders.php',
-            'icon' => BASE_URL . 'assets/img/favicon.png',
-            'badge' => BASE_URL . 'assets/img/favicon.png',
+            'icon' => BASE_URL . 'assets/img/favicon-v2.png',
+            'badge' => BASE_URL . 'assets/img/favicon-v2.png',
             'tag' => 'cashfy-notification-' . time(),
             'timestamp' => time() * 1000,
         ];

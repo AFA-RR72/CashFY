@@ -173,7 +173,7 @@ $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CashFY - Pedidos</title>
-  <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
+  <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png">
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/orders.css">
@@ -184,7 +184,7 @@ $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="CashFY">
-    <link rel="apple-touch-icon" href="../../assets/img/favicon.png">
+    <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png">
 </head>
 
 <body>
