@@ -11,6 +11,11 @@ if (!isset($_SESSION['id']) || empty($_SESSION['id'])) {
 
 $user = get_user_by_id($_SESSION['id']);
 
+// Aviso do envio/exclusão da foto (definido em controller/perfil_photo.php)
+$photo_notice = $_SESSION['photo_notice'] ?? null;
+unset($_SESSION['photo_notice']);
+$has_photo = !empty($user['profile_photo']);
+
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +29,7 @@ $user = get_user_by_id($_SESSION['id']);
     <link rel="icon" href="assets/img/favicon.png" type="image/png">
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/photo.css">
     <link rel="manifest" href="../../manifest.json">
     <meta name="theme-color" content="#1F7A70">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -52,39 +58,51 @@ $user = get_user_by_id($_SESSION['id']);
                 <h1 class="photo-title">Foto de perfil</h1>
 
                 <p class="photo-subtitle">
-                    Escolha uma foto para usar no seu perfil.
+                    <?= $has_photo ? 'Quer trocar sua foto? É só escolher outra imagem.' : 'Escolha uma foto para usar no seu perfil.' ?>
                 </p>
 
-                <label class="photo-upload" for="profile_photo">
-                    <div class="photo-preview" id="photoPreview">
-                        <?php if (empty($user['profile_photo'])): ?>
-                            <span class="photo-icon">
-                                <i class="fa-solid fa-user"></i>
-                            </span>
-                        <?php else: ?>
-                            <img src="../../<?= $user['profile_photo'] ?>" alt="preview">
-                        <?php endif; ?>
+                <?php if (!empty($photo_notice['text'])): ?>
+                    <?php $notice_ok = ($photo_notice['type'] ?? '') === 'success'; ?>
+                    <div class="photo-notice photo-notice--inline <?= $notice_ok ? 'is-success' : 'is-error' ?>"
+                        role="status" aria-live="polite" data-photo-toast>
+                        <i class="fa-solid <?= $notice_ok ? 'fa-circle-check' : 'fa-circle-exclamation' ?>"></i>
+                        <span><?= htmlspecialchars($photo_notice['text']) ?></span>
+                    </div>
+                <?php endif; ?>
+
+                <label class="photo-upload" for="profile_photo"
+                    title="<?= $has_photo ? 'Clique para alterar a foto' : 'Clique para escolher uma foto' ?>">
+                    <div class="photo-frame">
+                        <div class="photo-preview" id="photoPreview">
+                            <?php if (!$has_photo): ?>
+                                <span class="photo-icon">
+                                    <i class="fa-solid fa-user"></i>
+                                </span>
+                            <?php else: ?>
+                                <img src="../../<?= htmlspecialchars($user['profile_photo']) ?>" alt="Foto atual">
+                            <?php endif; ?>
+                        </div>
+                        <span class="photo-edit-hint" aria-hidden="true">
+                            <i class="fa-solid fa-camera"></i>
+                            <?= $has_photo ? 'Alterar foto' : 'Escolher foto' ?>
+                        </span>
+                        <span class="photo-edit-badge" aria-hidden="true">
+                            <i class="fa-solid fa-camera"></i>
+                        </span>
                     </div>
                     <div class="photo-text">
-                        <strong>Escolher foto</strong>
-                        <span>Clique para selecionar uma imagem</span>
-                        <strong>
-                            <?php if (isset($_SESSION['msg'])): ?>
-                                <div id="msg-profile">
-                                    <?php echo ($_SESSION['msg']);
-                                    unset($_SESSION['msg']);
-                                    ?>
-                                </div>
-                                <script>
-                                    setTimeout(() => {
-                                        document.getElementById("msg-profile").style.display = "none";
-                                    }, 3000);
-                                </script>
-                            <?php endif; ?>
-                        </strong>
+                        <strong><?= $has_photo ? 'Alterar foto' : 'Escolher foto' ?></strong>
+                        <span><?= $has_photo ? 'Clique na foto ou aqui para escolher outra imagem' : 'Clique para selecionar uma imagem' ?></span>
                     </div>
-                    <input type="file" name="profile_photo" id="profile_photo" accept="image/*" hidden>
+                    <input type="file" name="profile_photo" id="profile_photo" accept="image/*" hidden
+                        data-photo-input data-photo-hint="#photoHint"
+                        data-hint-selected="Nova foto selecionada. Clique em “Enviar foto” para salvar.">
                 </label>
+
+                <p class="photo-hint" id="photoHint" aria-live="polite">
+                    <i class="fa-regular fa-hand-pointer"></i>
+                    <span>Depois de escolher a imagem, clique em “Enviar foto” para salvar.</span>
+                </p>
 
                 <div class="profile-photo-form-button-mother">
                     <button class="btn btn-gradient btn-block" type="submit">
@@ -123,6 +141,7 @@ $user = get_user_by_id($_SESSION['id']);
     </div>
 
     <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/photo.js"></script>
     <script>
         const input = document.getElementById('profile_photo');
         const preview = document.getElementById('photoPreview');

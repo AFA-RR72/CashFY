@@ -74,6 +74,19 @@ function update_product(int $id, string $name, float $price, int $category_id, s
     return;
 }
 
+// Troca só a foto do produto. $product_photo = caminho relativo (ex.: uploads/products/ab12cd34.jpg)
+function update_product_photo(int $id, string $product_photo){
+    $conn = conn();
+
+    $stmt = $conn -> prepare("UPDATE products SET product_photo = ? WHERE id = ? AND deleted_at IS NULL");
+    $stmt -> bind_param('si', $product_photo, $id);
+
+    $stmt -> execute();
+    $stmt -> close();
+
+    return;
+}
+
 /*
  * Exclusão de produto pelo vendedor (só o dono, só produto ativo).
  *   - nunca vendido  -> DELETE definitivo                   (retorna 'deleted')

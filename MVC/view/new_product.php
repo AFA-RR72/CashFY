@@ -20,6 +20,7 @@ $categories = get_categories();
     <link rel="icon" href="../../assets/img/favicon.png" type="image/png">
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/photo.css">
     <link rel="manifest" href="../../manifest.json">
     <meta name="theme-color" content="#1F7A70">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -60,16 +61,23 @@ $categories = get_categories();
                         Imagem do produto<span class="required">*</span>
                     </label>
 
-                    <label class="img-drop" for="product_photo" id="photoPreview" style="cursor:pointer;">
+                    <label class="img-drop" for="product_photo" id="photoPreview" style="cursor:pointer;"
+                        title="Clique para escolher a imagem">
 
                         <span class="drop-label">
                             <i class="fa-solid fa-plus"></i>
                         </span>
 
                         <input type="file" name="product_photo" accept="image/*" id="product_photo"
-                            style="display:none;">
+                            style="display:none;" data-photo-input data-photo-hint="#photoHint"
+                            data-hint-selected="Imagem selecionada. Preencha os dados e clique em Salvar.">
 
                     </label>
+
+                    <p class="photo-hint" id="photoHint" aria-live="polite">
+                        <i class="fa-regular fa-hand-pointer"></i>
+                        <span>Clique no círculo para escolher a imagem do produto.</span>
+                    </p>
 
 
                     <!-- Nome -->
@@ -236,6 +244,8 @@ $categories = get_categories();
     </div>
 
     <!-- Preview da imagem -->
+
+    <script src="../../assets/js/photo.js"></script>
 
     <script>
         const input = document.getElementById('product_photo');

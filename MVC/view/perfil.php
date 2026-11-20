@@ -27,6 +27,7 @@ if (empty($_GET)) {
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/orders.css">
     <link rel="stylesheet" href="../../assets/css/ui-extras.css">
+    <link rel="stylesheet" href="../../assets/css/photo.css">
     <link rel="manifest" href="../../manifest.json">
     <meta name="theme-color" content="#1F7A70">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -109,40 +110,43 @@ if (empty($_GET)) {
 
                     <!-- Foto de perfil -->
 
-                    <?php if (!empty($user['profile_photo'])): ?>
-                        <a href="perfil_photo.php" title="Atualizar foto">
-                            <div class="avatar" id="pf-avatar">
-                                <img src="../../<?= $user['profile_photo']; ?>" alt="Perfil">
-                            </div>
-                            <?php if (isset($_SESSION['msg'])): ?>
-                                <div id="msg">
-                                    <?php echo ($_SESSION['msg']);
-                                    unset($_SESSION['msg']);
-                                    ?>
-                                </div>
-                                <script>
-                                    setTimeout(() => {
-                                        document.getElementById("msg").style.display = "none";
-                                    }, 3000);
-                                </script>
-                            <?php endif; ?>
-                        </a>
-                    <?php else: ?>
-                        <div class="avatar" id="pf-avatar"><a href="perfil_photo.php" title="Adicionar foto">
-                                <?= pegarIniciais($user['name']) ?></a>
+                    <?php
+                    // Aviso do envio/exclusão da foto (definido em controller/perfil_photo.php)
+                    $photo_notice = $_SESSION['photo_notice'] ?? null;
+                    unset($_SESSION['photo_notice']);
+                    ?>
+
+                    <?php if (!empty($photo_notice['text'])): ?>
+                        <?php $notice_ok = ($photo_notice['type'] ?? '') === 'success'; ?>
+                        <div class="photo-notice photo-notice--toast <?= $notice_ok ? 'is-success' : 'is-error' ?>"
+                            role="status" aria-live="polite" data-photo-toast>
+                            <i class="fa-solid <?= $notice_ok ? 'fa-circle-check' : 'fa-circle-exclamation' ?>"></i>
+                            <span><?= htmlspecialchars($photo_notice['text']) ?></span>
+                            <button type="button" class="photo-notice-close" aria-label="Fechar aviso"
+                                data-photo-toast-close>&times;</button>
                         </div>
-                        <?php if (isset($_SESSION['msg'])): ?>
-                            <div id="msg">
-                                <?php echo ($_SESSION['msg']);
-                                unset($_SESSION['msg']);
-                                ?>
+                    <?php endif; ?>
+
+                    <?php if (!empty($user['profile_photo'])): ?>
+                        <div class="avatar-edit">
+                            <a href="perfil_photo.php" title="Clique para alterar a foto">
+                                <div class="avatar" id="pf-avatar">
+                                    <img src="../../<?= htmlspecialchars($user['profile_photo']); ?>" alt="Perfil">
+                                </div>
+                            </a>
+                            <a href="perfil_photo.php" class="avatar-edit-badge" title="Alterar foto" aria-label="Alterar foto de perfil">
+                                <i class="fa-solid fa-camera"></i>
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <div class="avatar-edit">
+                            <div class="avatar" id="pf-avatar"><a href="perfil_photo.php" title="Clique para adicionar uma foto">
+                                    <?= pegarIniciais($user['name']) ?></a>
                             </div>
-                            <script>
-                                setTimeout(() => {
-                                    document.getElementById("msg").style.display = "none";
-                                }, 3000);
-                            </script>
-                        <?php endif; ?>
+                            <a href="perfil_photo.php" class="avatar-edit-badge" title="Adicionar foto" aria-label="Adicionar foto de perfil">
+                                <i class="fa-solid fa-camera"></i>
+                            </a>
+                        </div>
                     <?php endif; ?>
 
 
@@ -378,7 +382,7 @@ if (empty($_GET)) {
                                                     <?= 'R$ ' . htmlspecialchars(number_format(($product['price'] ?? 0), 2, ',', '.')); ?>
                                                 </p>
                                                 <div>
-                                                    <a href="update_product.php?id=<?= $product['id']; ?>">
+                                                    <a href="update_product.php?id=<?= $product['id']; ?>" title="Editar produto (aqui você também troca a foto)" aria-label="Editar produto">
                                                         <i class="fa-solid fa-pen-to-square update-product"></i>
                                                     </a>
                                                     <form class="inline-form" action="../controller/delete_product.php" method="post">
@@ -884,6 +888,7 @@ if (empty($_GET)) {
             }
         }
     </script>
+    <script src="../../assets/js/photo.js"></script>
     <script src="../../assets/js/ScrollToMsg.js"></script>
     <?php require __DIR__ . '/partials/order_notifier.php'; ?>
     <?php require __DIR__ . '/partials/bottom_nav.php'; ?>

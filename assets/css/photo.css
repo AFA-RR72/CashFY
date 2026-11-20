@@ -1,0 +1,347 @@
+/* ============================================
+   Fotos: avisos, indicação de "clique para alterar"
+   (arquivo separado para não se perder ao trocar o style.css)
+============================================ */
+
+/* ---------- Aviso de foto atualizada ---------- */
+.photo-notice {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    font-family: var(--font-body);
+    font-size: .9rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow: hidden;
+}
+
+.photo-notice > i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.photo-notice > span {
+    flex: 1;
+}
+
+.photo-notice.is-success {
+    background: #E6F3E2;
+    border-color: #CDE9C6;
+    color: var(--leaf-700);
+}
+
+.photo-notice.is-error {
+    background: #FBEAE6;
+    border-color: #F2C7BE;
+    color: #C0503D;
+}
+
+body.dark-mode .photo-notice.is-success {
+    background: #1E3929;
+    border-color: #315D40;
+    color: #8CCB9D;
+}
+
+body.dark-mode .photo-notice.is-error {
+    background: #3A2420;
+    border-color: #694039;
+    color: #F09A86;
+}
+
+.photo-notice-close {
+    flex-shrink: 0;
+    margin: -4px -6px -4px 0;
+    padding: 4px 8px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: .55;
+    transition: opacity .15s ease;
+}
+
+.photo-notice-close:hover,
+.photo-notice-close:focus-visible {
+    opacity: 1;
+}
+
+/* Versão "toast": flutua no topo da tela, sem empurrar o layout */
+.photo-notice--toast {
+    position: fixed;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    left: 50%;
+    z-index: 1200;
+    width: max-content;
+    max-width: min(92vw, 420px);
+    transform: translateX(-50%);
+    animation: photoNoticeIn .4s cubic-bezier(.2, .9, .3, 1.15) both;
+    transition: opacity .3s ease, transform .3s ease;
+}
+
+.photo-notice--toast.is-leaving {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+}
+
+/* Barrinha que mostra quanto tempo falta para o aviso sumir */
+.photo-notice--toast::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: .35;
+    transform-origin: left center;
+    animation: photoNoticeBar 4.5s linear forwards;
+}
+
+/* Versão "inline": fica dentro do cartão da página de foto */
+.photo-notice--inline {
+    margin: 0 0 20px;
+    transition: opacity .3s ease, transform .3s ease;
+    animation: photoNoticeInline .3s ease both;
+}
+
+.photo-notice--inline.is-leaving {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+@keyframes photoNoticeIn {
+    from { opacity: 0; transform: translate(-50%, -18px) scale(.96); }
+    to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes photoNoticeInline {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes photoNoticeBar {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+/* ---------- Avatar do perfil: "clique para alterar a foto" ---------- */
+.avatar-edit {
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+    width: max-content;
+}
+
+.avatar-edit > a:first-child {
+    display: block;
+    border-radius: 50%;
+}
+
+.avatar-edit .avatar {
+    transition: filter .2s ease;
+}
+
+.avatar-edit:hover .avatar {
+    filter: brightness(.92);
+}
+
+.avatar-edit-badge {
+    position: absolute;
+    right: -2px;
+    bottom: 2px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: var(--orange-600);
+    color: #fff;
+    font-size: .8rem;
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .22);
+    transition: transform .15s ease, background .15s ease;
+}
+
+.avatar-edit:hover .avatar-edit-badge,
+.avatar-edit-badge:focus-visible {
+    background: var(--orange-500);
+    transform: scale(1.12);
+}
+
+body.dark-mode .avatar-edit-badge {
+    border-color: var(--card);
+}
+
+/* ---------- Página "Foto de perfil" ---------- */
+.photo-frame {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.photo-frame .photo-preview {
+    width: 100%;
+    height: 100%;
+}
+
+/* Aparece ao passar o mouse sobre a foto */
+.photo-edit-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 50%;
+    background: rgba(20, 60, 55, .58);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: .8rem;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+}
+
+.photo-edit-hint i {
+    font-size: 1.4rem;
+}
+
+.photo-upload:hover .photo-edit-hint,
+.photo-upload:focus-within .photo-edit-hint {
+    opacity: 1;
+}
+
+/* Sempre visível (inclusive no celular, onde não existe "hover") */
+.photo-edit-badge {
+    position: absolute;
+    right: 2px;
+    bottom: 6px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--card);
+    border-radius: 50%;
+    background: var(--orange-600);
+    color: #fff;
+    font-size: .95rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .22);
+    pointer-events: none;
+    transition: transform .15s ease, background .15s ease;
+}
+
+.photo-upload:hover .photo-edit-badge {
+    background: var(--orange-500);
+    transform: scale(1.1);
+}
+
+@media (hover: none) {
+    .photo-edit-hint {
+        display: none;
+    }
+}
+
+/* ---------- Texto de ajuda sob a foto ---------- */
+.photo-hint {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    color: var(--ink-soft);
+    font-size: .82rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.photo-hint i {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.photo-hint.is-ready {
+    color: var(--leaf-700);
+}
+
+.photo-hint.is-error {
+    color: #C0503D;
+}
+
+body.dark-mode .photo-hint.is-ready {
+    color: #8CCB9D;
+}
+
+body.dark-mode .photo-hint.is-error {
+    color: #F09A86;
+}
+
+/* Nos formulários de produto o texto fica colado ao círculo da imagem */
+.img-drop + .photo-hint {
+    margin-top: -8px;
+}
+
+/* ---------- Formulário de produto: "clique na foto para alterar" ---------- */
+.img-drop .img-edit-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: 16px 6px 10px;
+    background: linear-gradient(0deg, rgba(20, 60, 55, .75), rgba(20, 60, 55, 0));
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: .72rem;
+    font-weight: 700;
+    pointer-events: none;
+    transition: background .2s ease, top .2s ease;
+}
+
+.img-drop .img-edit-hint i {
+    font-size: 1rem;
+}
+
+.img-drop:hover .img-edit-hint,
+.img-drop:focus-within .img-edit-hint {
+    top: 0;
+    justify-content: center;
+    background: rgba(20, 60, 55, .55);
+    font-size: .8rem;
+}
+
+.img-drop:hover .img-edit-hint i,
+.img-drop:focus-within .img-edit-hint i {
+    font-size: 1.4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .photo-notice,
+    .photo-notice--toast,
+    .photo-notice--toast::after,
+    .photo-notice--inline,
+    .avatar-edit-badge,
+    .photo-edit-badge,
+    .photo-edit-hint,
+    .img-drop .img-edit-hint {
+        animation: none;
+        transition: none;
+    }
+}

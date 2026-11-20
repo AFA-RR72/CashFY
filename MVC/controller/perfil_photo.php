@@ -1,55 +1,71 @@
-<?php session_start();
-    require_once("../config/init.php");
-    require_once('../model/user.php');
+<?php
+require_once('../config/auth.php');   // session_start + login pelo cookie "lembrar de mim"
+require_once('../config/upload.php');
 
-    $user = get_user_by_id($_SESSION['id']);
+check_login();
 
-    if (isset($_POST['delete_profile_photo'])) {
-        if (empty($user['profile_photo'])) {
-            $_SESSION['msg'] = "Você não tem uma foto de perfil.";
-            header("Location: ../view/perfil_photo.php#msg");
-            exit;
-        } else {
-            $caminho = BASE_PATH . $user['profile_photo'];
-            unlink($caminho);
-            update_photo($user['id'], null);
-            header("Location: ../view/perfil.php#msg");
-            exit;
-        }
-    } elseif (!empty($user['profile_photo'])) {
-        if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK){
-            $foto = $_FILES['profile_photo'];
-            $caminho = (BASE_PATH . $user['profile_photo']);
-            move_uploaded_file($foto['tmp_name'], $caminho);
-            $_SESSION['msg'] = "Foto alterada com sucesso.";
-            header("Location: ../view/perfil.php#msg");
-            exit;
-        } else {
-            $_SESSION['msg'] = "Você precisa inserir uma foto.";
-            header("Location: ../view/perfil_photo.php#msg");
-            exit;
-        }
+/* Guarda o aviso na sessão e volta para a página indicada */
+function photo_back(string $page, string $text, string $type): void
+{
+    $_SESSION['photo_notice'] = ['type' => $type, 'text' => $text];
+    header('Location: ../view/' . $page);
+    exit;
+}
 
-    } else {
-        if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
-            $foto = $_FILES['profile_photo'];
-            $nome = uniqid() . '.jpg';
-            $caminho = (BASE_PATH . "uploads/perfil/" . $nome);
-            move_uploaded_file($foto['tmp_name'], $caminho);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../view/perfil_photo.php');
+    exit;
+}
 
-            $caminho_banco = "uploads/perfil/$nome";
-            update_photo($user['id'], $caminho_banco);
+$user = get_user_by_id((int) $_SESSION['id']);
 
-            $user = get_user_by_id($user['id']);
+if (!$user) {
+    header('Location: ../view/login.php');
+    exit;
+}
 
-            $_SESSION['msg'] = "Foto adicionada com sucesso.";
-            header("Location: ../view/perfil.php#msg");
-            exit;
-        } else {
-            $_SESSION['msg'] = "Você precisa inserir uma foto.";
-            header("Location: ../view/perfil_photo.php#msg");
-            exit;
-        }
+$had_photo = !empty($user['profile_photo']);
 
+/* ---------- Excluir foto ---------- */
+if (isset($_POST['delete_profile_photo'])) {
+    if (!$had_photo) {
+        photo_back('perfil_photo.php', 'Você não tem uma foto de perfil.', 'error');
     }
-    ?>
+
+    update_photo((int) $user['id'], null);
+    cashfy_delete_upload($user['profile_photo'], 'perfil');
+
+    photo_back('perfil.php', 'Foto removida com sucesso.', 'success');
+}
+
+/* ---------- Adicionar / alterar foto ---------- */
+if (cashfy_post_too_large()) {
+    photo_back('perfil_photo.php', CASHFY_MAX_IMAGE_TEXT, 'error');
+}
+
+$file = $_FILES['profile_photo'] ?? null;
+
+if ($file === null || (int) $file['error'] === UPLOAD_ERR_NO_FILE) {
+    photo_back('perfil_photo.php', 'Você precisa inserir uma foto.', 'error');
+}
+
+$new_photo = cashfy_save_image($file, 'perfil', $upload_error);
+
+if ($new_photo === null) {
+    photo_back('perfil_photo.php', $upload_error, 'error');
+}
+
+try {
+    update_photo((int) $user['id'], $new_photo);
+} catch (Throwable $e) {
+    cashfy_delete_upload($new_photo, 'perfil');
+    error_log('perfil_photo: ' . $e->getMessage());
+    photo_back('perfil_photo.php', 'Não foi possível salvar a foto. Tente novamente.', 'error');
+}
+
+// A foto antiga só sai do disco depois que a nova já está salva no banco
+if ($had_photo) {
+    cashfy_delete_upload($user['profile_photo'], 'perfil');
+}
+
+photo_back('perfil.php', $had_photo ? 'Foto alterada com sucesso.' : 'Foto adicionada com sucesso.', 'success');
