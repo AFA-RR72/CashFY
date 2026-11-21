@@ -11,7 +11,7 @@ $cashfy_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
 $cashfy_host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $cashfy_root = realpath(__DIR__ . '/../../');
 $cashfy_docroot = realpath($_SERVER['DOCUMENT_ROOT'] ?? '');
-$cashfy_path = '/activities/CashFY';
+$cashfy_path = '/public_html/';
 
 if ($cashfy_root && $cashfy_docroot && strpos($cashfy_root, $cashfy_docroot) === 0) {
     $cashfy_path = str_replace('\\', '/', substr($cashfy_root, strlen($cashfy_docroot)));
