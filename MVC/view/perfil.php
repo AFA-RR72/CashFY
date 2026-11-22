@@ -22,8 +22,7 @@ if (empty($_GET)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Meu perfil — Cashfy</title>
-    <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-    <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+    <?= cashfy_render_head_icons('../../'); ?>
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/orders.css">
@@ -131,7 +130,7 @@ if (empty($_GET)) {
                         <div class="avatar-edit">
                             <a href="perfil_photo.php" title="Clique para alterar a foto">
                                 <div class="avatar" id="pf-avatar">
-                                    <img src="../../<?= htmlspecialchars($user['profile_photo']); ?>" alt="Perfil">
+                                    <img src="<?= htmlspecialchars(cashfy_image_url($user['profile_photo'], 'thumb', '../../')); ?>" alt="Perfil" decoding="async">
                                 </div>
                             </a>
                             <a href="perfil_photo.php" class="avatar-edit-badge" title="Alterar foto" aria-label="Alterar foto de perfil">
@@ -369,7 +368,7 @@ if (empty($_GET)) {
                                     <?php if ($product['user_id'] == $user['id']): ?>
                                         <div class="product-card perfil-card">
                                             <div class="product-img">
-                                                <img src="<?= "../../" . $product['product_photo'] ?>" alt="Image">
+                                                <img src="<?= htmlspecialchars(cashfy_image_url($product['product_photo'], 'thumb', '../../')); ?>" alt="<?= htmlspecialchars($product['name'] ?? 'Produto'); ?>" loading="lazy" decoding="async">
                                             </div>
                                             <p class="product-name">
                                                 <?= htmlspecialchars($product['name']) ?? ''; ?>

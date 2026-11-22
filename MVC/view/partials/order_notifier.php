@@ -19,7 +19,9 @@ if ($notifier_user):
     $buyer_state = get_buyer_orders_state($notifier_uid);
     $vapid_cfg = get_vapid_config();
 ?>
-    <link rel="stylesheet" href="<?= BASE_URL; ?>assets/css/orders.css">
+    <?php if (basename($_SERVER['SCRIPT_NAME'] ?? '') !== 'perfil.php'): ?>
+        <link rel="stylesheet" href="<?= BASE_URL; ?>assets/css/orders.css">
+    <?php endif; ?>
     <span id="orders-notify" data-sw-url="<?= BASE_URL; ?>service-worker.js" hidden
         data-user-id="<?= $notifier_uid; ?>"
         data-role-id="<?= $notifier_role; ?>"

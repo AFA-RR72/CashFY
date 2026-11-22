@@ -49,8 +49,7 @@ if (isset($_SESSION['id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Categoria — Cashfy</title>
-  <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-  <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+  <?= cashfy_render_head_icons('../../'); ?>
   <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="manifest" href="../../manifest.json">
@@ -119,7 +118,7 @@ if (isset($_SESSION['id'])) {
               <?php if (!empty($user['profile_photo'])): ?>
 
                 <span class="account-mark">
-                  <img src="../../<?= $user['profile_photo'] ?>" alt="Perfil">
+                  <img src="<?= htmlspecialchars(cashfy_image_url($user['profile_photo'], 'thumb', '../../')); ?>" alt="Perfil" decoding="async">
                 </span>
 
               <?php elseif (isset($user)) : ?>
@@ -199,8 +198,8 @@ if (isset($_SESSION['id'])) {
                 <?php endif; ?>
 
                 <div class="product-img">
-                  <img src="<?= htmlspecialchars('../../' . $product['product_photo']); ?>"
-                    alt="<?= htmlspecialchars($product['name']); ?>">
+                  <img src="<?= htmlspecialchars(cashfy_image_url($product['product_photo'], 'thumb', '../../')); ?>"
+                    alt="<?= htmlspecialchars($product['name']); ?>" loading="lazy" decoding="async">
                 </div>
 
                 <p class="product-name">
@@ -255,8 +254,8 @@ if (isset($_SESSION['id'])) {
         <div class="cart-form">
           <div>
             <img
-              src="<?= htmlspecialchars('../../' . $product_modal['product_photo']); ?>"
-              alt="<?= htmlspecialchars($product_modal['name']); ?>">
+              src="<?= htmlspecialchars(cashfy_image_url($product_modal['product_photo'], 'original', '../../')); ?>"
+              alt="<?= htmlspecialchars($product_modal['name']); ?>" decoding="async">
           </div>
 
           <div>

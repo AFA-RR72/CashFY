@@ -248,8 +248,11 @@
                 return;
             }
 
+            const baseOrigin = swUrl ? new URL('./', swUrl).href : location.href;
             await registration.showNotification(title, {
                 body: body,
+                icon: new URL('assets/img/icon-192.png', baseOrigin).href,
+                badge: new URL('assets/img/badge-72.png', baseOrigin).href,
                 tag: tag,
                 renotify: true,
                 vibrate: [200, 100, 200],

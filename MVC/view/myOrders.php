@@ -69,7 +69,7 @@ function render_order_card(array $order): void
             <div class="mo-seller-info">
                 <span class="mo-avatar">
                     <?php if (!empty($order['seller_photo'])): ?>
-                        <img src="../../<?= htmlspecialchars($order['seller_photo']); ?>" alt="">
+                        <img src="<?= htmlspecialchars(cashfy_image_url($order['seller_photo'], 'thumb', '../../')); ?>" alt="" loading="lazy" decoding="async">
                     <?php else: ?>
                         <?= htmlspecialchars(pegarIniciais($order['seller_name'])); ?>
                     <?php endif; ?>
@@ -98,7 +98,7 @@ function render_order_card(array $order): void
                 <li class="mo-item">
                     <span class="mo-item-img">
                         <?php if (!empty($item['product_photo'])): ?>
-                            <img src="../../<?= htmlspecialchars($item['product_photo']); ?>" alt="" loading="lazy">
+                            <img src="<?= htmlspecialchars(cashfy_image_url($item['product_photo'], 'thumb', '../../')); ?>" alt="" loading="lazy" decoding="async">
                         <?php else: ?>
                             <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
                         <?php endif; ?>
@@ -173,8 +173,7 @@ $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CashFY - Pedidos</title>
-    <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-    <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+    <?= cashfy_render_head_icons('../../'); ?>
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/orders.css">
@@ -235,7 +234,7 @@ $order_ok_msgs = ['Pedido aceito', 'Pedido recusado', 'Pedido concluído'];
                     <div class="profile-photo-icon-mother">
                         <?php if (!empty($user['profile_photo'])): ?>
                             <span class="account-mark">
-                                <img src="../../<?= htmlspecialchars($user['profile_photo']); ?>" alt="Perfil">
+                                <img src="<?= htmlspecialchars(cashfy_image_url($user['profile_photo'], 'thumb', '../../')); ?>" alt="Perfil" decoding="async">
                             </span>
                         <?php else: ?>
                             <span class="index-account-mark-child">

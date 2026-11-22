@@ -1,4 +1,5 @@
 <?php session_start();
+require_once('../config/upload.php');
 require_once('../model/products.php');
 
 /*
@@ -27,6 +28,11 @@ if (!$product || $product['user_id'] != $_SESSION['id']) {
 
 // 'deleted' (apagado de vez), 'archived' (exclusão lógica) ou false (não foi possível)
 $result = delete_product((int) $product['id'], (int) $_SESSION['id']);
+
+// Só remove a foto e miniatura do disco quando o produto foi apagado definitivamente
+if ($result === 'deleted' && !empty($product['product_photo'])) {
+    cashfy_delete_upload($product['product_photo'], 'products');
+}
 
 // Para o vendedor o resultado é o mesmo: o produto sai da lista dele
 $_SESSION['msg-form'] = $result !== false

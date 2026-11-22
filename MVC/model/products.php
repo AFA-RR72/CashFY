@@ -74,7 +74,7 @@ function update_product(int $id, string $name, float $price, int $category_id, s
     return;
 }
 
-// Troca só a foto do produto. $product_photo = caminho relativo (ex.: uploads/products/ab12cd34.jpg)
+// Troca só a foto do produto. $product_photo = caminho relativo (ex.: cashfy-uploads/products/ab12cd34.webp)
 function update_product_photo(int $id, string $product_photo){
     $conn = conn();
 

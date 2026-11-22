@@ -1,5 +1,6 @@
 <?php session_start();
 require_once('init.php');
+require_once(__DIR__ . '/image_optimizer.php');
 require_once(__DIR__ . '/remember.php');
 login_from_remember_cookie();
 require_once(__DIR__ . '/../model/user.php');

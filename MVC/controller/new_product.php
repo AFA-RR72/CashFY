@@ -59,7 +59,7 @@ if (cashfy_post_too_large()) {
     header("Location: ../view/new_product.php#msg");
     exit;
 } else {
-    // Valida o conteúdo da imagem e grava com nome único em uploads/products/
+    // Valida o conteúdo da imagem e grava com nome único em ../cashfy-uploads/products/
     $db_path = cashfy_save_image($photo, 'products', $upload_error);
 
     if ($db_path === null) {

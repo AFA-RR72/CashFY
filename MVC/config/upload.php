@@ -5,12 +5,14 @@
  * Feito para hospedagem Linux (Hostinger):
  *  - cria a pasta de destino se ela não existir e confere se dá para gravar nela;
  *  - valida o CONTEÚDO do arquivo (getimagesize), não só o nome/extensão;
- *  - grava com nome único e extensão real (jpg/png/gif/webp). Nunca sobrescreve o arquivo
- *    antigo, então navegador, CDN e cache da Hostinger nunca servem a foto velha;
+ *  - otimiza via PHP GD (priorizando WebP, compressão, redimensionamento e miniatura);
+ *  - grava com nome único (nunca sobrescreve o arquivo antigo, então navegador, CDN e
+ *    cache da Hostinger nunca servem a foto velha);
  *  - aplica permissão 0644 (o arquivo temporário do PHP nasce 0600 no Linux, e isso pode
  *    deixar a imagem inacessível pelo servidor web; no Windows/XAMPP isso não acontece).
  */
 require_once __DIR__ . '/init.php';
+require_once __DIR__ . '/image_optimizer.php';
 
 const CASHFY_MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
 const CASHFY_MAX_IMAGE_TEXT = 'A imagem é grande demais. Escolha uma foto de até 10 MB.';
@@ -46,36 +48,9 @@ function cashfy_post_too_large(): bool
         && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0;
 }
 
-function cashfy_upload_root(): string
-{
-    $root = realpath(BASE_PATH);
-
-    return ($root !== false ? $root : rtrim(BASE_PATH, '/\\')) . '/';
-}
-
-/* Garante uploads/<sub>/ existente e gravável. Devolve o caminho da pasta ou null. */
-function cashfy_prepare_upload_dir(string $sub): ?string
-{
-    $dir = cashfy_upload_root() . 'uploads/' . $sub;
-
-    if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
-        return null;
-    }
-
-    if (!is_writable($dir)) {
-        @chmod($dir, 0755);
-
-        if (!is_writable($dir)) {
-            return null;
-        }
-    }
-
-    return $dir;
-}
-
 /*
- * Valida e grava a imagem enviada em uploads/<sub>/.
- * Sucesso: devolve o caminho relativo para o banco (ex.: "uploads/perfil/ab12cd34ef567890.jpg").
+ * Valida, otimiza (WebP + redimensionamento + miniatura) e grava em ../cashfy-uploads/<sub>/.
+ * Sucesso: devolve o caminho relativo para o banco (ex.: "cashfy-uploads/perfil/ab12cd34ef567890.webp").
  * Falha: devolve null e preenche $error com a mensagem para o usuário.
  */
 function cashfy_save_image(array $file, string $sub, ?string &$error = null): ?string
@@ -100,61 +75,28 @@ function cashfy_save_image(array $file, string $sub, ?string &$error = null): ?s
         return null;
     }
 
-    $extensions = [
-        IMAGETYPE_JPEG => 'jpg',
-        IMAGETYPE_PNG => 'png',
-        IMAGETYPE_GIF => 'gif',
-        IMAGETYPE_WEBP => 'webp',
+    $supported_types = [
+        IMAGETYPE_JPEG => true,
+        IMAGETYPE_PNG => true,
+        IMAGETYPE_GIF => true,
+        IMAGETYPE_WEBP => true,
     ];
 
     $info = @getimagesize($tmp);
 
-    if ($info === false || !isset($extensions[$info[2]])) {
+    if ($info === false || !isset($supported_types[$info[2]])) {
         $error = 'Formato de imagem não suportado. Use JPG, PNG, WEBP ou GIF.';
         return null;
     }
 
-    $dir = cashfy_prepare_upload_dir($sub);
-
-    if ($dir === null) {
-        error_log('cashfy upload: pasta uploads/' . $sub . ' ausente ou sem permissão de escrita');
-        $error = 'O servidor não conseguiu salvar a imagem. Tente novamente em instantes.';
-        return null;
-    }
-
-    $name = bin2hex(random_bytes(8)) . '.' . $extensions[$info[2]];
-    $destination = $dir . '/' . $name;
-
-    if (!@move_uploaded_file($tmp, $destination)) {
-        error_log('cashfy upload: move_uploaded_file falhou para ' . $destination);
-        $error = 'O servidor não conseguiu salvar a imagem. Tente novamente em instantes.';
-        return null;
-    }
-
-    @chmod($destination, 0644);
-
-    return 'uploads/' . $sub . '/' . $name;
+    return cashfy_optimize_uploaded_image($tmp, $info, $sub, $error);
 }
 
 /*
- * Apaga do disco uma imagem antiga. Só mexe dentro de uploads/<sub>/ (nunca em outras
- * pastas) e ignora arquivo que não existe, sem gerar warning.
+ * Apaga do disco a imagem antiga e sua miniatura. Só mexe dentro de ../cashfy-uploads/<sub>/
+ * (nunca em outras pastas) e ignora arquivo que não existe, sem gerar warning.
  */
 function cashfy_delete_upload(?string $db_path, string $sub): void
 {
-    if (empty($db_path)) {
-        return;
-    }
-
-    $db_path = str_replace('\\', '/', $db_path);
-
-    if (strpos($db_path, '..') !== false || strpos($db_path, 'uploads/' . $sub . '/') !== 0) {
-        return;
-    }
-
-    $file = cashfy_upload_root() . $db_path;
-
-    if (is_file($file)) {
-        @unlink($file);
-    }
+    cashfy_delete_image_variants($db_path, $sub);
 }

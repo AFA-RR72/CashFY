@@ -16,8 +16,7 @@ if (isset($_SESSION['id'])) {
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <title>Política de Privacidade - CashFy</title>
-    <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-    <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+    <?= cashfy_render_head_icons('../../'); ?>
     <link rel="manifest" href="../../manifest.json">
     <meta name="theme-color" content="#1F7A70">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -115,8 +114,8 @@ if (isset($_SESSION['id'])) {
                                 <span class="account-mark">
 
                                     <img
-                                        src="../../<?= $user['profile_photo'] ?>"
-                                        alt="Perfil">
+                                        src="<?= htmlspecialchars(cashfy_image_url($user['profile_photo'], 'thumb', '../../')); ?>"
+                                        alt="Perfil" decoding="async">
 
                                 </span>
 

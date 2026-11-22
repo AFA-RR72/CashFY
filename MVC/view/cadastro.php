@@ -21,8 +21,7 @@ $oldPp = isset($_SESSION['form']['pp']);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Criar conta — Cashfy</title>
-  <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-  <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+  <?= cashfy_render_head_icons('../../'); ?>
   <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="manifest" href="../../manifest.json">

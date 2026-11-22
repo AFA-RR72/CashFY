@@ -28,8 +28,7 @@ $categories = get_categories();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Novo Produto - Cashfy</title>
-  <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-  <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+  <?= cashfy_render_head_icons('../../'); ?>
     <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
       <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/photo.css">
@@ -325,10 +324,13 @@ $categories = get_categories();
         document.getElementById('stock').value = productHasStock ? product.stock : '';
         document.getElementById('stock-qty').hidden = !productHasStock;
 
-        if (product.product_photo) {
+        const initialProductPhoto = <?= json_encode(cashfy_image_url($product['product_photo'] ?? null, 'original', '../../')); ?>;
+
+        if (initialProductPhoto) {
             const img = document.createElement('img');
 
-            img.src = '../../' + product.product_photo;
+            img.src = initialProductPhoto;
+            img.decoding = 'async';
 
             document.getElementById('photoPreview').appendChild(img);
             document.querySelector('.drop-label').style.display = 'none';

@@ -14,8 +14,7 @@ if (isset($_SESSION['id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Sobre nós — Cashfy</title>
-  <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-  <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+  <?= cashfy_render_head_icons('../../'); ?>
   <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="manifest" href="../../manifest.json">
@@ -114,8 +113,8 @@ if (isset($_SESSION['id'])) {
                 <span class="account-mark">
 
                   <img
-                    src="../../<?= $user['profile_photo'] ?>"
-                    alt="Perfil">
+                    src="<?= htmlspecialchars(cashfy_image_url($user['profile_photo'], 'thumb', '../../')); ?>"
+                    alt="Perfil" decoding="async">
 
                 </span>
 
@@ -149,14 +148,14 @@ if (isset($_SESSION['id'])) {
       <div class="team-grid">
 
         <div class="team-card">
-          <div class="team-photo"><img src="../../uploads/icones/andrei.jpg" alt=""></div>
+          <div class="team-photo"><img src="<?= htmlspecialchars(cashfy_image_url('cashfy-uploads/icones/andrei.jpg', 'thumb', '../../')); ?>" alt="" loading="lazy" decoding="async"></div>
           <p class="team-name">Andrei Freire</p>
           <p class="team-role">back-end e desenvolvedor</p>
           <p class="team-bio placeholder">Andrei é responsável pela inteligência e lógica do site.</p>
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="../../uploads/icones/eu.jpeg" alt=""></div>
+          <div class="team-photo"><img src="<?= htmlspecialchars(cashfy_image_url('cashfy-uploads/icones/eu.jpeg', 'thumb', '../../')); ?>" alt="" loading="lazy" decoding="async"></div>
           <p class="team-name">Carlos Henrique</p>
           <p class="team-role">front-end e desenvolvedor</p>
           <p class="team-bio placeholder">Carlos é focado na interface e interação do usuario, proporcionando
@@ -164,21 +163,21 @@ if (isset($_SESSION['id'])) {
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="../../uploads/icones/maria.jpg" alt=""></div>
+          <div class="team-photo"><img src="<?= htmlspecialchars(cashfy_image_url('cashfy-uploads/icones/maria.jpg', 'thumb', '../../')); ?>" alt="" loading="lazy" decoding="async"></div>
           <p class="team-name">Maria Lara</p>
           <p class="team-role">web designer</p>
           <p class="team-bio placeholder">Maria cuida da identidade visual e do layout inicial</p>
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="../../uploads/icones/larissa.jpg" alt=""></div>
+          <div class="team-photo"><img src="<?= htmlspecialchars(cashfy_image_url('cashfy-uploads/icones/larissa.jpg', 'thumb', '../../')); ?>" alt="" loading="lazy" decoding="async"></div>
           <p class="team-name">Larissa dos Santos</p>
           <p class="team-role">testadora e banco de dados</p>
           <p class="team-bio placeholder">Larissa é responsável pelos testes e pela segurança das informações</p>
         </div>
 
         <div class="team-card">
-          <div class="team-photo"><img src="../../uploads/icones/sofia.jpeg" alt=""></div>
+          <div class="team-photo"><img src="<?= htmlspecialchars(cashfy_image_url('cashfy-uploads/icones/sofia.jpeg', 'thumb', '../../')); ?>" alt="" loading="lazy" decoding="async"></div>
           <p class="team-name">Sofia Hage</p>
           <p class="team-role">líder</p>
           <p class="team-bio placeholder">Sofia é resposável pela gestao e organização</p>

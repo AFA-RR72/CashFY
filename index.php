@@ -23,8 +23,7 @@ if (isset($_SESSION['id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Cashfy — Compra e venda entre estudantes</title>
-  <link rel="icon" href="assets/img/favicon-v2.png" type="image/png" id="icon">
-  <link rel="apple-touch-icon" href="assets/img/favicon-v2.png" id="apple-icon">
+  <?= cashfy_render_head_icons(); ?>
   <link rel="stylesheet" href="assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="manifest" href="manifest.json">
@@ -106,7 +105,7 @@ if (isset($_SESSION['id'])) {
               <?php if (!empty($user['profile_photo'])): ?>
 
                 <span class="account-mark">
-                  <img src="<?= $user['profile_photo'] ?>" alt="Perfil">
+                  <img src="<?= htmlspecialchars(cashfy_image_url($user['profile_photo'], 'thumb')); ?>" alt="Perfil" decoding="async">
                 </span>
 
               <?php elseif (isset($user)): ?>
@@ -180,7 +179,7 @@ if (isset($_SESSION['id'])) {
                       <?= pegarIniciais($seller['name']); ?>
                     </span>
                   <?php else: ?>
-                    <img src="<?= $seller['profile_photo']; ?>" alt="Foto de perfil">
+                    <img src="<?= htmlspecialchars(cashfy_image_url($seller['profile_photo'], 'thumb')); ?>" alt="Foto de perfil" loading="lazy" decoding="async">
                   <?php endif; ?>
                 </div>
 
@@ -210,7 +209,13 @@ if (isset($_SESSION['id'])) {
             <?php if ($seller['role_id'] == 2): ?>
               <div class="seller-card" id="seller-<?= $seller['id'] ?>">
                 <div class="thumb">
-                  <img src="<?= $seller['profile_photo']; ?>" alt="foto de perfil">
+                  <?php if (empty($seller['profile_photo'])): ?>
+                    <span class="seller-slang-name">
+                      <?= pegarIniciais($seller['name']); ?>
+                    </span>
+                  <?php else: ?>
+                    <img src="<?= htmlspecialchars(cashfy_image_url($seller['profile_photo'], 'thumb')); ?>" alt="Foto de perfil" loading="lazy" decoding="async">
+                  <?php endif; ?>
                 </div>
                 <div class="seller-info">
 

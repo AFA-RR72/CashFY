@@ -2,6 +2,16 @@
 define('BASE_PATH', __DIR__ . '/../../');
 
 /*
+ * Pasta externa de uploads no mesmo nível do public_html (ao lado de cashfy-private):
+ * a partir do index.php corresponde a ../cashfy-uploads/ (dirname(__DIR__, 3) . '/cashfy-uploads').
+ */
+$cashfy_parent = realpath(__DIR__ . '/../../../');
+if ($cashfy_parent === false) {
+    $cashfy_parent = dirname(__DIR__, 3);
+}
+define('CASHFY_UPLOADS_DIR', rtrim(str_replace('\\', '/', $cashfy_parent), '/') . '/cashfy-uploads');
+
+/*
  * BASE_URL acompanha o endereço pelo qual o site foi aberto (localhost, IP da rede, domínio
  * ou túnel HTTPS). Antes era fixo em http://localhost/..., o que quebrava redirecionamentos,
  * o SSE e o Service Worker quando o site era aberto pelo celular.

@@ -36,8 +36,7 @@ if (isset($_SESSION['id'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <title>Vendedor — Cashfy</title>
-  <link rel="icon" href="../../assets/img/favicon-v2.png" type="image/png" id="icon">
-  <link rel="apple-touch-icon" href="../../assets/img/favicon-v2.png" id="apple-icon">
+  <?= cashfy_render_head_icons('../../'); ?>
   <link rel="stylesheet" href="../../assets/fontawesome-free-7.3.1-web/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="manifest" href="../../manifest.json">
@@ -139,8 +138,8 @@ if (isset($_SESSION['id'])) {
                 <span class="account-mark">
 
                   <img
-                    src="../../<?= $user['profile_photo'] ?>"
-                    alt="Perfil">
+                    src="<?= htmlspecialchars(cashfy_image_url($user['profile_photo'], 'thumb', '../../')); ?>"
+                    alt="Perfil" decoding="async">
 
                 </span>
 
@@ -199,7 +198,7 @@ if (isset($_SESSION['id'])) {
 
           <div class="avatar" id="pf-avatar">
             <?php if (!empty($seller['profile_photo'])): ?>
-              <img src="../../<?= htmlspecialchars($seller['profile_photo']); ?>" alt="Perfil">
+              <img src="<?= htmlspecialchars(cashfy_image_url($seller['profile_photo'], 'thumb', '../../')); ?>" alt="Perfil" decoding="async">
             <?php else: ?>
               <?= pegarIniciais($seller['name']); ?>
             <?php endif; ?>
@@ -267,8 +266,8 @@ if (isset($_SESSION['id'])) {
 
             <div>
               <img
-                src="../../<?= $product['product_photo'] ?>"
-                alt="<?= htmlspecialchars($product['name']); ?>">
+                src="<?= htmlspecialchars(cashfy_image_url($product['product_photo'], 'original', '../../')); ?>"
+                alt="<?= htmlspecialchars($product['name']); ?>" decoding="async">
             </div>
 
             <div>
@@ -417,8 +416,8 @@ if (isset($_SESSION['id'])) {
 
                 <div class="product-img">
                   <img
-                    src="../../<?= $product['product_photo']; ?>"
-                    alt="Preview">
+                    src="<?= htmlspecialchars(cashfy_image_url($product['product_photo'], 'thumb', '../../')); ?>"
+                    alt="<?= htmlspecialchars($product['name']); ?>" loading="lazy" decoding="async">
                 </div>
 
                 <p class="product-name">
