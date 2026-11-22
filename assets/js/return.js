@@ -1,5 +1,4 @@
-
-const BASE_URL = `${window.location.origin}/activities/CashFY/`;
+const BASE_URL = `${window.location.origin}/`;
 
 function voltarPagina(event) {
     event.preventDefault();
@@ -7,16 +6,21 @@ function voltarPagina(event) {
     const referrer = document.referrer;
 
     if (referrer) {
-        const previousPage = new URL(referrer);
+        try {
+            const previousPage = new URL(referrer);
 
-        const isCashFY =
-            previousPage.origin === window.location.origin &&
-            previousPage.pathname.startsWith('/activities/CashFY/') &&
-            previousPage.pathname !== window.location.pathname;
+            const currentURL = new URL(window.location.href);
 
-        if (isCashFY) {
-            history.back();
-            return;
+            const isCashFY =
+                previousPage.origin === currentURL.origin &&
+                previousPage.pathname !== currentURL.pathname;
+
+            if (isCashFY) {
+                history.back();
+                return;
+            }
+        } catch (error) {
+            // URL inválida: utiliza o redirecionamento padrão.
         }
     }
 
