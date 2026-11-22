@@ -57,7 +57,7 @@ if (empty($_GET)) {
                 </button>
                 <ul class="nav-links">
 
-                    <li class="home <?php if (isset($user) && $user['role_id'] == 3) {
+                    <li class="home <?php if (isset($user)) {
                                         echo 'client';
                                     } ?>">
                         <a href="../../index.php">Home</a>

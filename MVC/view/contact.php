@@ -56,7 +56,7 @@ if (isset($_SESSION['id'])) {
 
                 <ul class="nav-links">
 
-                    <li class="home <?php if (isset($user) && $user['role_id'] == 3) {
+                    <li class="home <?php if (isset($user)) {
                                         echo 'client';
                                     } ?>">
                         <a href="../../index.php">Home</a>
@@ -70,7 +70,7 @@ if (isset($_SESSION['id'])) {
                         <a href="sobre.php">Sobre nós</a>
                     </li>
 
-                    <?php if (isset($user) && $user['role_id'] == 3): ?>
+                    <?php if (isset($user)): ?>
                         <li>
                             <a href="myOrders.php">Meus pedidos</a>
                         </li>
